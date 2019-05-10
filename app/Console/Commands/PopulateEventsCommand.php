@@ -5,6 +5,8 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Goutte\Client as WebScraper;
 
+use App\Provider;
+
 class PopulateEventsCommand extends Command
 {
     /**
@@ -29,6 +31,10 @@ class PopulateEventsCommand extends Command
     public function handle()
     {
         $scraper = new WebScraper;
+
+        $provider = Provider::first();
+
+        dd($provider->toArray());
 
         $crawler = $scraper->request('GET', 'https://www.symfony.com/blog/');
     }
