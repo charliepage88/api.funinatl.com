@@ -2,7 +2,13 @@
 
 namespace App\Providers;
 
+use Geocoder\Provider\AlgoliaPlaces\AlgoliaPlaces;
+use Http\Adapter\Guzzle6\Client;
 use Illuminate\Support\ServiceProvider;
+
+use App\Location;
+use App\Helpers\SiteHelper;
+use App\Observers\LocationObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -13,7 +19,24 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->singleton('geocoder', function () {
+            $adapter  = new Client();
+            $provider = new AlgoliaPlaces(
+                $adapter,
+                env('ALGOLIA_PLACES_KEY'),
+                env('ALGOLIA_PLACES_APP_ID')
+            );
+            $geocoder = new \Geocoder\StatefulGeocoder(
+                $provider,
+                'en'
+            );
+
+            return $geocoder;
+        });
+
+        $this->app->singleton('siteHelper', function () {
+            return new SiteHelper();
+        });
     }
 
     /**
@@ -23,6 +46,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        Location::observe(LocationObserver::class);
     }
 }

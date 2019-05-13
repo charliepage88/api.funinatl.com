@@ -38,6 +38,38 @@ class Category extends Model
     ];
 
     /**
+    * Events
+    *
+    * @return Collection
+    */
+    public function events()
+    {
+        return $this->hasMany(Event::class, 'category_id');
+    }
+
+    /**
+    * Locations
+    *
+    * @return Collection
+    */
+    public function locations()
+    {
+        return $this->hasMany(Location::class, 'category_id');
+    }
+
+    /**
+    * Is Active
+    *
+    * @param object $query
+    *
+    * @return object
+    */
+    public function scopeIsActive($query)
+    {
+        return $query->where('active', '=', true);
+    }
+
+    /**
      * Get Slug options
      *
      * @return SlugOptions

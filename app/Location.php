@@ -2,12 +2,15 @@
 
 namespace App;
 
+use Geocoder\Query\GeocodeQuery;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia\HasMedia;
 use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Spatie\Tags\HasTags;
+
+use App\Facades\Geocoder;
 
 class Location extends Model implements HasMedia
 {
@@ -39,13 +42,64 @@ class Location extends Model implements HasMedia
         'deleted_at'
     ];
 
-    /*
-    * @var array
+    /**
+    * Events
+    *
+    * @return Collection
     */
-    protected $casts = [
-        'latitude'  => 'decimal:10,7',
-        'longitude' => 'decimal:10,7'
-    ];
+    public function events()
+    {
+        return $this->hasMany(Event::class, 'location_id');
+    }
+
+    /**
+    * Provider
+    *
+    * @return Provider
+    */
+    public function provider()
+    {
+        return $this->hasOne(Provider::class, 'location_id');
+    }
+
+    /**
+    * Category
+    *
+    * @return Category
+    */
+    public function category()
+    {
+        return $this->belongsTo(Category::class, 'category_id');
+    }
+
+    /**
+     * Geocode Address
+     *
+     * @return Location
+     */
+    public function geocodeAddress()
+    {
+        $parts = [
+            $this->address,
+            $this->city,
+            $this->state,
+            $this->zip
+        ];
+
+        $addressString = implode(', ', $parts);
+
+        $gQuery = GeocodeQuery::create($addressString);
+        $geoResults = Geocoder::geocodeQuery($gQuery);
+
+        $address = $geoResults->first();
+
+        $coords = $address->getCoordinates();
+
+        $this->latitude = $coords->getLatitude();
+        $this->longitude = $coords->getLongitude();
+
+        $this->save();
+    }
 
     /**
      * Get Slug options

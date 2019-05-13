@@ -40,6 +40,28 @@ class Provider extends Model
     ];
 
     /**
+    * Location
+    *
+    * @return Location
+    */
+    public function location()
+    {
+        return $this->belongsTo(Location::class, 'location_id');
+    }
+
+    /**
+    * Is Active
+    *
+    * @param object $query
+    *
+    * @return object
+    */
+    public function scopeIsActive($query)
+    {
+        return $query->where('active', '=', true);
+    }
+
+    /**
      * Get Slug options
      *
      * @return SlugOptions
