@@ -7,8 +7,11 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Str;
 
 use App\Event;
+
+use Storage;
 
 class ParseEvent implements ShouldQueue
 {
@@ -63,15 +66,25 @@ class ParseEvent implements ShouldQueue
                 \Log::error($this->event);
 
                 throw new \Exception('Could not create event');
+            } else {
+                \Log::info('Created event #' . $event->id);
             }
 
             // attach image to event
-            $results = $this->spotify->search($event->name, 'artist');
+            $results = $this->findArtist($event);
 
             if ($results->artists->total) {
                 $event = $this->populateImage($event, $results);
             } else {
                 \Log::error('Could not find any spotify results for `' . $event->name . '`');
+            }
+        } elseif (!$find->photo_url) {
+            $results = $this->findArtist($find);
+
+            if ($results->artists->total) {
+                $find = $this->populateImage($find, $results);
+            } else {
+                \Log::error('Could not find any spotify results for `' . $find->name . '`');
             }
         }
     }
@@ -88,6 +101,7 @@ class ParseEvent implements ShouldQueue
     {
         // get largest image
         $imageUrl = null;
+        $artistId = null;
         $largestImage = 0;
         foreach($results->artists->items as $result) {
             if (!empty($result->images)) {
@@ -96,15 +110,100 @@ class ParseEvent implements ShouldQueue
 
                     if ($size > $largestImage) {
                         $imageUrl = $image->url;
+                        $artistId = $result->id;
                     }
                 }
             }
         }
 
+        // save spotify artist ID so we don't
+        // have to search next time
+        if (!empty($artistId)) {
+            $event->spotify_artist_id = $artistId;
+
+            $event->save();
+        }
+
         if (!empty($imageUrl)) {
-            $event->addMedia($imageUrl)->toMediaCollection('images', 'spaces');
+            try {
+                // get image contents
+                $contents = file_get_contents($imageUrl);
+
+                // get image info
+                $info = pathinfo($imageUrl);
+
+                // set filename & path
+                if (!empty($info['extension'])) {
+                    $extension = $info['extension'];
+                } else {
+                    $extension = '.jpeg';
+                }
+
+                $filename = $event->id . '-' . $event->slug;
+                $filename = $filename . $extension;
+                $tmpPath = storage_path('app') . '/' . $filename;
+
+                // store locally for a moment
+                Storage::disk('local')->put($filename, $contents);
+
+                // then add the url
+                $event->addMedia($tmpPath)->toMediaCollection('images', 'spaces');
+
+                \Log::info('Uploaded image for event #' . $event->id);
+
+                sleep(2);
+            } catch (\Exception $e) {
+                \Log::error('Could not attach image to event.');
+                \Log::error($e->getMessage());
+            }
+        }
+
+        if (empty($event->photo_url)) {
+            // copy over default for this category
+            $filename = $event->id . '-' . $event->slug . '.jpg';
+
+            Storage::disk('public')->copy('category-music.jpg', $filename);
+
+            $path = storage_path('app/public') . '/' . $filename;
+
+            // then add the url
+            $event->addMedia($path)->toMediaCollection('images', 'spaces');
+
+            \Log::info('Uploaded image for event #' . $event->id);
+
+            sleep(2);
         }
 
         return $event;
+    }
+
+    /**
+    * Find Artist
+    *
+    * @param Event $event
+    *
+    * @return object
+    */
+    private function findArtist(Event $event)
+    {
+        $name = $event->name;
+
+        if (strstr($name, ', ')) {
+            $ex = explode(', ', $name);
+
+            $name = $ex[0];
+        }
+
+        // attach image to event if empty
+        $results = $this->spotify->search($name, 'artist');
+
+        if (!empty($ex) && !$results->artists->total) {
+            $results = $this->spotify->search($event->name, 'artist');
+        }
+
+        \Log::info('Spotify search for `' . $name . '`');
+        \Log::info((array) $results->artists->items);
+
+        return $results;
     }
 }

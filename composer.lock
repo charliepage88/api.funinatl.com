@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "algolia/algoliasearch-client-php",
-            "version": "2.2.4",
+            "version": "2.2.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/algolia/algoliasearch-client-php.git",
-                "reference": "f921b366357a24f7e5596c0250c19191542acb01"
+                "reference": "eac3508fc52c696be8055ee9baae100a65e6f6d6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/algolia/algoliasearch-client-php/zipball/f921b366357a24f7e5596c0250c19191542acb01",
-                "reference": "f921b366357a24f7e5596c0250c19191542acb01",
+                "url": "https://api.github.com/repos/algolia/algoliasearch-client-php/zipball/eac3508fc52c696be8055ee9baae100a65e6f6d6",
+                "reference": "eac3508fc52c696be8055ee9baae100a65e6f6d6",
                 "shasum": ""
             },
             "require": {
@@ -74,7 +74,7 @@
                 "php",
                 "search"
             ],
-            "time": "2019-05-07T13:34:37+00:00"
+            "time": "2019-05-14T09:49:55+00:00"
         },
         {
             "name": "asm89/stack-cors",
@@ -130,16 +130,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.93.7",
+            "version": "3.93.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "41fe205dae433d5cd7a48a4117d37a43a44ed0d2"
+                "reference": "8b51e85e954ef232ea9c905f26454195ac72ba9b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/41fe205dae433d5cd7a48a4117d37a43a44ed0d2",
-                "reference": "41fe205dae433d5cd7a48a4117d37a43a44ed0d2",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/8b51e85e954ef232ea9c905f26454195ac72ba9b",
+                "reference": "8b51e85e954ef232ea9c905f26454195ac72ba9b",
                 "shasum": ""
             },
             "require": {
@@ -209,7 +209,7 @@
                 "s3",
                 "sdk"
             ],
-            "time": "2019-05-10T18:13:26+00:00"
+            "time": "2019-05-13T18:08:02+00:00"
         },
         {
             "name": "babenkoivan/scout-elasticsearch-driver",
@@ -3637,16 +3637,16 @@
         },
         {
             "name": "spatie/image",
-            "version": "1.7.1",
+            "version": "1.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/image.git",
-                "reference": "04fc75fc203d5aa944f3c667d5b55f2203c9d64f"
+                "reference": "61fa48fa4cb85eda4ef4f8f20b1c27edd9d38e85"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/image/zipball/04fc75fc203d5aa944f3c667d5b55f2203c9d64f",
-                "reference": "04fc75fc203d5aa944f3c667d5b55f2203c9d64f",
+                "url": "https://api.github.com/repos/spatie/image/zipball/61fa48fa4cb85eda4ef4f8f20b1c27edd9d38e85",
+                "reference": "61fa48fa4cb85eda4ef4f8f20b1c27edd9d38e85",
                 "shasum": ""
             },
             "require": {
@@ -3686,7 +3686,7 @@
                 "image",
                 "spatie"
             ],
-            "time": "2019-04-17T06:45:22+00:00"
+            "time": "2019-05-13T11:38:22+00:00"
         },
         {
             "name": "spatie/image-optimizer",
@@ -6525,16 +6525,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "8.1.4",
+            "version": "8.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "b534b017daaef2d7f60c6ee61e6aa2e13fdc6910"
+                "reference": "01392d4b5878aa617e8d9bc7a529e5febc8fe956"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/b534b017daaef2d7f60c6ee61e6aa2e13fdc6910",
-                "reference": "b534b017daaef2d7f60c6ee61e6aa2e13fdc6910",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/01392d4b5878aa617e8d9bc7a529e5febc8fe956",
+                "reference": "01392d4b5878aa617e8d9bc7a529e5febc8fe956",
                 "shasum": ""
             },
             "require": {
@@ -6603,7 +6603,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2019-05-09T05:13:39+00:00"
+            "time": "2019-05-14T04:57:31+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",

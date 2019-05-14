@@ -35,7 +35,9 @@ class Event extends Model implements HasMedia
         'description',
         'featured',
         'active',
-        'website'
+        'website',
+        'is_sold_out',
+        'spotify_artist_id'
     ];
 
     /*
@@ -51,10 +53,11 @@ class Event extends Model implements HasMedia
     * @var array
     */
     protected $casts = [
-        'start_date' => 'date',
-        'end_date'   => 'date',
-        'featured'   => 'boolean',
-        'active'     => 'boolean'
+        'start_date'  => 'date',
+        'end_date'    => 'date',
+        'featured'    => 'boolean',
+        'active'      => 'boolean',
+        'is_sold_out' => 'boolean'
     ];
 
     /**
