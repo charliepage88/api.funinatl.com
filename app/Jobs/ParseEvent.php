@@ -78,13 +78,32 @@ class ParseEvent implements ShouldQueue
             } else {
                 \Log::error('Could not find any spotify results for `' . $event->name . '`');
             }
-        } elseif (!$find->photo_url) {
-            $results = $this->findArtist($find);
+        } else {
+            // if field values have changed
+            // trigger update
+            $triggerUpdate = false;
+            $fields = [
+                'website',
+                'price',
+                'is_sold_out',
+                'start_time'
+            ];
 
-            if ($results->artists->total) {
-                $find = $this->populateImage($find, $results);
-            } else {
-                \Log::error('Could not find any spotify results for `' . $find->name . '`');
+            foreach($fields as $field) {
+                if ($this->event[$field] !== $find->$field) {
+                    $triggerUpdate = true;
+                }
+            }
+
+            // if no photo URL, try and find one
+            if (!$find->photo_url) {
+                $results = $this->findArtist($find);
+
+                if ($results->artists->total) {
+                    $find = $this->populateImage($find, $results);
+                } else {
+                    \Log::error('Could not find any spotify results for `' . $find->name . '`');
+                }
             }
         }
     }
