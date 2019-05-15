@@ -102,6 +102,24 @@ class Location extends Model implements HasMedia
     }
 
     /**
+    * Get Photo Url Attribute
+    *
+    * @return stirng|null
+    */
+    public function getPhotoUrlAttribute()
+    {
+        $photos = $this->getMedia('images');
+
+        if ($photos->count()) {
+            $photo = env('DO_SPACES_URL') . '/' . $photos->first()->getPath();
+        } else {
+            $photo = null;
+        }
+
+        return $photo;
+    }
+
+    /**
      * Get Slug options
      *
      * @return SlugOptions
