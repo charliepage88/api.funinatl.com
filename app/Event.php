@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Jenssegers\Mongodb\Eloquent\HybridRelations;
 use Laravel\Scout\Searchable;
 use Spatie\MediaLibrary\HasMedia\HasMedia;
 use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
@@ -15,7 +16,10 @@ class Event extends Model implements HasMedia
     use HasMediaTrait,
         HasSlug,
         HasTags,
+        HybridRelations,
         Searchable;
+
+    protected $connection = 'mysql';
 
     /*
     * @var array
@@ -197,9 +201,41 @@ class Event extends Model implements HasMedia
         $event['tags'] = $this->list_tags;
         $event['created_at'] = $this->created_at->toAtomString();
         $event['updated_at'] = $this->updated_at->toAtomString();
-        $event['location'] = $this->location->toArray();
         $event['category'] = $this->category->name;
         $event['event_type'] = $this->eventType->name;
+
+        $location = $this->location->toArray();
+
+        $location['created_at'] = $this->location->created_at->toAtomString();
+        $location['updated_at'] = $this->location->updated_at->toAtomString();
+
+        $event['location'] = $location;
+
+        return $event;
+    }
+
+    /**
+     * Get Mongo Array
+     *
+     * @return array
+     */
+    public function getMongoArray()
+    {
+        $event = $this->toArray();
+
+        $event['photo'] = $this->photo_url;
+        $event['tags'] = $this->list_tags;
+        $event['created_at'] = $this->created_at->toAtomString();
+        $event['updated_at'] = $this->updated_at->toAtomString();
+        $event['category'] = $this->category->name;
+        $event['event_type'] = $this->eventType->name;
+
+        $location = $this->location->toArray();
+
+        $location['created_at'] = $this->location->created_at->toAtomString();
+        $location['updated_at'] = $this->location->updated_at->toAtomString();
+
+        $event['location'] = $location;
 
         return $event;
     }

@@ -16,6 +16,7 @@
         "fabpot/goutte": "^3.2",
         "fideloper/proxy": "^4.0",
         "geocoder-php/algolia-places-provider": "^0.1.0",
+        "jenssegers/mongodb": "^3.5",
         "jwilsson/spotify-web-api-php": "^2.6",
         "laravel/framework": "5.8.*",
         "laravel/scout": "^7.1",
