@@ -46,6 +46,7 @@ class PopulateEventsCommand extends Command
 
         $providers = Provider::isActive()
             ->where('last_scraped', '<=', $today)
+            // ->where('id', '=', 3)
             ->orWhereNull('last_scraped')
             ->get();
 
@@ -331,7 +332,7 @@ class PopulateEventsCommand extends Command
 
                     $ex = explode(' :: ', $value);
 
-                    if (strstr($ex[1], 'Early Show')) {
+                    if (!empty($ex[1]) && strstr($ex[1], 'Early Show')) {
                         $lastValue = explode(' :: ', $values[$index - 1]);
 
                         $data['start_date'] = Carbon::parse($lastValue[1])->format('Y-m-d');
@@ -382,6 +383,115 @@ class PopulateEventsCommand extends Command
                 $results[] = $row;
             }
         }
+
+        $this->info(count($results) . ' events found for provider `' . $provider->name . '`');
+
+        // fire off data into queue
+        foreach($results as $event) {
+            ParseEvent::dispatch($event, $spotify);
+
+            $this->info('Dispatching job for event `' . $event['name'] . '`');
+        }
+
+        // save last scraped time
+        $provider->last_scraped = Carbon::now();
+
+        $provider->save();
+    }
+
+    /**
+    * Provider Terminal West
+    *
+    * @param Provider      $provider
+    * @param WebScraper    $scraper
+    * @param SpotifyWebAPI $spotify
+    *
+    * @return array
+    */
+    public function providerTerminalWest(Provider $provider, $scraper, SpotifyWebAPI $spotify)
+    {
+        $crawler = $scraper->request('GET', $provider->scrape_url);
+
+        // Get the latest post in this category and display the titles
+        $results = $crawler->filter('article.event')->each(function ($node) use ($provider) {
+            $data = [
+                'name' => '',
+                'location_id' => $provider->location_id,
+                'user_id' => 1,
+                'category_id' => $provider->location->category_id,  
+                'event_type_id' => 2,
+                'start_date' => '',
+                'price' => '',
+                'start_time' => '',
+                'end_time' => '',
+                'website' => '',
+                'is_sold_out' => false
+            ];
+
+            // get band name & other bands
+            $data['name'] = trim($node->filter('.middle-info > .headliner a')->text());
+            
+            try {
+                $data['short_description'] = trim($node->filter('.middle-info > .headliner_support')->text());
+            } catch (\Exception $e) {
+                // do nothing
+            }
+
+            try {
+                $data['description'] = $node->filter('.middle-info > p')->text();
+            } catch (\Exception $e) {
+                // do nothing
+            }
+
+            // get price & start time
+            $details = $node->filter('.middle-info > .bottom-list > ul > li')
+                ->reduce(function ($childNode, $index) {
+                    return $index <= 1;
+                })
+                ->each(function ($childNode, $index) {
+                    if ($index === 0) {
+                        return [ 'price' => $childNode->text() ];
+                    }
+
+                    if ($index === 1) {
+                        $text = $childNode->text();
+
+                        $find = [
+                            'show',
+                            'doors'
+                        ];
+
+                        $text = str_replace($find, '', $text);
+
+                        return [ 'time' => trim($text) ];
+                    }
+
+                    return null;
+                });
+
+            foreach($details as $row) {
+                if (!empty($row['price'])) {
+                    $data['price'] = $row['price'];
+                }
+
+                if (!empty($row['time'])) {
+                    $ex = explode('  ', $row['time']);
+
+                    $dateObj = Carbon::parse($data['start_date'] . ' ' . $ex[1]);
+
+                    $data['start_time'] = $dateObj->format('g:i A');
+                    $data['end_time'] = $dateObj->copy()->addHours(3)->format('g:i A');
+                }
+            }
+
+            // get date & website
+            $data['start_date'] = trim($node->filter('.right-buttons > .date')->text());
+            $data['start_date'] = Carbon::parse($data['start_date'])->format('Y-m-d');
+
+            $data['website'] = $node->filter('.right-buttons > a.more')->attr('href');
+
+            return $data;
+        });
 
         $this->info(count($results) . ' events found for provider `' . $provider->name . '`');
 

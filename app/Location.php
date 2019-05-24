@@ -30,7 +30,9 @@ class Location extends Model implements HasMedia
         'zip',
         'latitude',
         'longitude',
-        'description'
+        'description',
+        'category_id',
+        'website'
     ];
 
     /*

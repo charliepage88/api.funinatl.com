@@ -16,7 +16,7 @@ class Provider extends Model
     protected $fillable = [
         'name',
         'slug',
-        'website',
+        'location_id',
         'last_scraped',
         'scrape_url',
         'active'

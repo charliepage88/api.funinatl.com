@@ -80,6 +80,7 @@
                             name="active"
                             id="active"
                             class="form-switch-checkbox"
+                            value="1"
                             checked
                         >
                         <label class="form-switch-label" for="active"></label>

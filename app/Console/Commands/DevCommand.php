@@ -82,5 +82,29 @@ class DevCommand extends Command
 
         $this->info('Done!');
         */
+
+        // Update all events data
+        $mysqlEvents = Event::all();
+
+        foreach($mysqlEvents as $event) {
+            $find = DB::connection('mongodb')->collection('events')->where('id', $event->id)->first();
+
+            if (empty($find)) {
+                $value = $event->getMongoArray();
+
+                DB::connection('mongodb')->collection('events')->insert($value);
+
+                $this->info('Inserted event #' . $event->id . ' into MongoDB.');
+            } else {
+                $value = $event->getMongoArray();
+
+                DB::connection('mongodb')->collection('events')->where('id', $event->id)
+                    ->update($value);
+
+                $this->info('Updated event #' . $event->id . ' with MongoDB.');
+            }
+        }
+
+        $this->info('Done!');
     }
 }

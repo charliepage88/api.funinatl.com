@@ -85,6 +85,7 @@
                             name="active"
                             id="active"
                             class="form-switch-checkbox"
+                            value="1"
                             <?php echo $provider->active ? 'checked' : '' ?>
                         >
                         <label class="form-switch-label" for="active"></label>

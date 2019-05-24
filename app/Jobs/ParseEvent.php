@@ -52,9 +52,9 @@ class ParseEvent implements ShouldQueue
         $find = Event::where('start_date', '=', $this->event['start_date'])
             ->where('location_id', '=', $this->event['location_id'])
             ->where('name', '=', $this->event['name'])
-            ->count();
+            ->first();
 
-        if (!$find) {
+        if (empty($find)) {
             // create event
             $event = new Event;
 

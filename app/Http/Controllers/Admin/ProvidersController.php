@@ -66,7 +66,7 @@ class ProvidersController extends Controller
     {
         if ($request->getMethod() === 'POST') {
             $request->validate([
-                'name' => 'required|max:255|unique:providers,name',
+                'name' => 'required|max:255|unique:providers,name,' . $provider->id . ',id',
                 'location_id' => 'required',
                 'scrape_url' => 'required'
             ]);
