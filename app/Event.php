@@ -208,6 +208,7 @@ class Event extends Model implements HasMedia
 
         $location['created_at'] = $this->location->created_at->toAtomString();
         $location['updated_at'] = $this->location->updated_at->toAtomString();
+        $location['photo'] = $this->location->photo_url;
 
         $event['location'] = $location;
 

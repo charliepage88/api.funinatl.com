@@ -3,12 +3,14 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
 class Category extends Model
 {
-    use HasSlug;
+    use HasSlug,
+        Searchable;
 
     /*
     * @var array
@@ -79,5 +81,64 @@ class Category extends Model
         return SlugOptions::create()
             ->generateSlugsFrom('name')
             ->saveSlugsTo('slug');
+    }
+
+    /**
+     * To Searchable Array
+     *
+     * @return array
+     */
+    public function toSearchableArray()
+    {
+        $category['created_at'] = $this->created_at->toAtomString();
+        $category['updated_at'] = $this->updated_at->toAtomString();
+        $category['events'] = [];
+
+        // events
+        $events = [];
+        foreach($this->events as $event) {
+            $events[] = $event->getMongoArray();
+        }
+
+        $category['events'] = $events;
+
+        // locations
+        $locations = [];
+        foreach($this->locations as $location) {
+            $locations[] = $location->getMongoArray();
+        }
+
+        $category['locations'] = $locations;
+
+        return $category;
+    }
+
+    /**
+     * Get Mongo Array
+     *
+     * @return array
+     */
+    public function getMongoArray()
+    {
+        $category['created_at'] = $this->created_at->toAtomString();
+        $category['updated_at'] = $this->updated_at->toAtomString();
+
+        // events
+        $events = [];
+        foreach($this->events as $event) {
+            $events[] = $event->getMongoArray();
+        }
+
+        $category['events'] = $events;
+
+        // locations
+        $locations = [];
+        foreach($this->locations as $location) {
+            $locations[] = $location->getMongoArray();
+        }
+
+        $category['locations'] = $locations;
+
+        return $category;
     }
 }

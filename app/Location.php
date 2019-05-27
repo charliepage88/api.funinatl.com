@@ -4,6 +4,7 @@ namespace App;
 
 use Geocoder\Query\GeocodeQuery;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
 use Spatie\MediaLibrary\HasMedia\HasMedia;
 use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
 use Spatie\Sluggable\HasSlug;
@@ -16,7 +17,8 @@ class Location extends Model implements HasMedia
 {
     use HasMediaTrait,
         HasSlug,
-        HasTags;
+        HasTags,
+        Searchable;
 
     /*
     * @var array
@@ -131,5 +133,71 @@ class Location extends Model implements HasMedia
         return SlugOptions::create()
             ->generateSlugsFrom('name')
             ->saveSlugsTo('slug');
+    }
+
+    /**
+     * To Searchable Array
+     *
+     * @return array
+     */
+    public function toSearchableArray()
+    {
+        $location = $this->toArray();
+
+        $location['photo'] = $this->photo_url;
+        $location['created_at'] = $this->created_at->toAtomString();
+        $location['updated_at'] = $this->updated_at->toAtomString();
+        $location['category'] = $this->category->name;
+
+        // category
+        $category = $this->category->toArray();
+
+        $category['created_at'] = $this->category->created_at->toAtomString();
+        $category['updated_at'] = $this->category->updated_at->toAtomString();
+
+        $location['category'] = $category;
+
+        // events
+        $events = [];
+        foreach($this->events as $event) {
+            $events[] = $event->getMongoArray();
+        }
+
+        $location['events'] = $events;
+
+        return $location;
+    }
+
+    /**
+     * Get Mongo Array
+     *
+     * @return array
+     */
+    public function getMongoArray()
+    {
+        $location = $this->toArray();
+
+        $location['photo'] = $this->photo_url;
+        $location['created_at'] = $this->created_at->toAtomString();
+        $location['updated_at'] = $this->updated_at->toAtomString();
+        $location['category'] = $this->category->name;
+
+        // category
+        $category = $this->category->toArray();
+
+        $category['created_at'] = $this->category->created_at->toAtomString();
+        $category['updated_at'] = $this->category->updated_at->toAtomString();
+
+        $location['category'] = $category;
+
+        // events
+        $events = [];
+        foreach($this->events as $event) {
+            $events[] = $event->getMongoArray();
+        }
+
+        $location['events'] = $events;
+
+        return $location;
     }
 }
