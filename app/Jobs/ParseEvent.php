@@ -74,9 +74,11 @@ class ParseEvent implements ShouldQueue
             $results = $this->findArtist($event);
 
             if ($results->artists->total) {
-                $event = $this->populateImage($event, $results);
+                $this->populateImage($event, $results);
             } else {
-                \Log::error('Could not find any spotify results for `' . $event->name . '`');
+                $this->populateImage($event, null);
+
+                \Log::info('Could not find any spotify results for `' . $event->name . '`');
             }
         } else {
             // if field values have changed
@@ -100,9 +102,11 @@ class ParseEvent implements ShouldQueue
                 $results = $this->findArtist($find);
 
                 if ($results->artists->total) {
-                    $find = $this->populateImage($find, $results);
+                    $this->populateImage($find, $results);
                 } else {
-                    \Log::error('Could not find any spotify results for `' . $find->name . '`');
+                    $this->populateImage($find, null);
+
+                    \Log::info('Could not find any spotify results for `' . $find->name . '`');
                 }
             }
         }
@@ -118,29 +122,31 @@ class ParseEvent implements ShouldQueue
     */
     private function populateImage(Event $event, $results)
     {
-        // get largest image
         $imageUrl = null;
-        $artistId = null;
-        $largestImage = 0;
-        foreach($results->artists->items as $result) {
-            if (!empty($result->images)) {
-                foreach($result->images as $image) {
-                    $size = ($image->width + $image->height);
+        if (!empty($results) && !empty($results->artists)) {
+            // get largest image
+            $artistId = null;
+            $largestImage = 0;
+            foreach($results->artists->items as $result) {
+                if (!empty($result->images)) {
+                    foreach($result->images as $image) {
+                        $size = ($image->width + $image->height);
 
-                    if ($size > $largestImage) {
-                        $imageUrl = $image->url;
-                        $artistId = $result->id;
+                        if ($size > $largestImage) {
+                            $imageUrl = $image->url;
+                            $artistId = $result->id;
+                        }
                     }
                 }
             }
-        }
 
-        // save spotify artist ID so we don't
-        // have to search next time
-        if (!empty($artistId)) {
-            $event->spotify_artist_id = $artistId;
+            // save spotify artist ID so we don't
+            // have to search next time
+            if (!empty($artistId)) {
+                $event->spotify_artist_id = $artistId;
 
-            $event->save();
+                $event->save();
+            }
         }
 
         if (!empty($imageUrl)) {

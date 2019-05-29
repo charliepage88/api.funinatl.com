@@ -20,6 +20,8 @@ class Location extends Model implements HasMedia
         HasTags,
         Searchable;
 
+    protected $connection = 'mysql';
+
     /*
     * @var array
     */
@@ -124,6 +126,26 @@ class Location extends Model implements HasMedia
     }
 
     /**
+    * Get List Tags Attribute
+    *
+    * @return array
+    */
+    public function getListTagsAttribute()
+    {
+        $data = $this->tags;
+
+        $tags = [];
+        foreach($data as $tag) {
+            $tags[] = [
+                'name' => $tag->name,
+                'slug' => $tag->slug
+            ];
+        }
+
+        return $tags;
+    }
+
+    /**
      * Get Slug options
      *
      * @return SlugOptions
@@ -142,28 +164,45 @@ class Location extends Model implements HasMedia
      */
     public function toSearchableArray()
     {
-        $location = $this->toArray();
+        // location data
+        $fields = [
+            'id',
+            'name',
+            'slug',
+            'category_id',
+            'website',
+            'address',
+            'city',
+            'state',
+            'zip',
+            'latitude',
+            'longitude',
+            'description'
+        ];
 
-        $location['photo'] = $this->photo_url;
-        $location['created_at'] = $this->created_at->toAtomString();
-        $location['updated_at'] = $this->updated_at->toAtomString();
-        $location['category'] = $this->category->name;
-
-        // category
-        $category = $this->category->toArray();
-
-        $category['created_at'] = $this->category->created_at->toAtomString();
-        $category['updated_at'] = $this->category->updated_at->toAtomString();
-
-        $location['category'] = $category;
-
-        // events
-        $events = [];
-        foreach($this->events as $event) {
-            $events[] = $event->getMongoArray();
+        $location = [];
+        foreach($fields as $field) {
+            $location[$field] = $this->$field;
         }
 
-        $location['events'] = $events;
+        $location['photo'] = $this->photo_url;
+        $location['tags'] = $this->list_tags;
+        $location['created_at'] = $this->created_at->toAtomString();
+        $location['updated_at'] = $this->updated_at->toAtomString();
+
+        // category
+        if (!empty($this->category)) {
+            $category = [];
+
+            $category['id'] = $this->category->id;
+            $category['name'] = $this->category->name;
+            $category['active'] = $this->category->active;
+            $category['is_default'] = $this->category->is_default;
+            $category['created_at'] = $this->category->created_at->toAtomString();
+            $category['updated_at'] = $this->category->updated_at->toAtomString();
+
+            $location['category'] = $category;
+        }
 
         return $location;
     }
@@ -171,32 +210,61 @@ class Location extends Model implements HasMedia
     /**
      * Get Mongo Array
      *
+     * @param boolean $includeRelationships
+     *
      * @return array
      */
-    public function getMongoArray()
+    public function getMongoArray($includeRelationships = true)
     {
-        $location = $this->toArray();
+        // location data
+        $fields = [
+            'id',
+            'name',
+            'slug',
+            'category_id',
+            'website',
+            'address',
+            'city',
+            'state',
+            'zip',
+            'latitude',
+            'longitude',
+            'description'
+        ];
 
-        $location['photo'] = $this->photo_url;
-        $location['created_at'] = $this->created_at->toAtomString();
-        $location['updated_at'] = $this->updated_at->toAtomString();
-        $location['category'] = $this->category->name;
-
-        // category
-        $category = $this->category->toArray();
-
-        $category['created_at'] = $this->category->created_at->toAtomString();
-        $category['updated_at'] = $this->category->updated_at->toAtomString();
-
-        $location['category'] = $category;
-
-        // events
-        $events = [];
-        foreach($this->events as $event) {
-            $events[] = $event->getMongoArray();
+        $location = [];
+        foreach($fields as $field) {
+            $location[$field] = $this->$field;
         }
 
-        $location['events'] = $events;
+        $location['photo'] = $this->photo_url;
+        $location['tags'] = $this->list_tags;
+        $location['created_at'] = $this->created_at->toAtomString();
+        $location['updated_at'] = $this->updated_at->toAtomString();
+
+        // category
+        if ($includeRelationships && !empty($this->category)) {
+            $category = [];
+
+            $category['id'] = $this->category->id;
+            $category['name'] = $this->category->name;
+            $category['active'] = $this->category->active;
+            $category['is_default'] = $this->category->is_default;
+            $category['created_at'] = $this->category->created_at->toAtomString();
+            $category['updated_at'] = $this->category->updated_at->toAtomString();
+
+            $location['category'] = $category;
+        }
+
+        // events
+        if ($includeRelationships) {
+            $events = [];
+            foreach($this->events as $event) {
+                $events[] = $event->getMongoArray(false);
+            }
+
+            $location['events'] = $events;
+        }
 
         return $location;
     }

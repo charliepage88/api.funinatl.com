@@ -195,22 +195,47 @@ class Event extends Model implements HasMedia
      */
     public function toSearchableArray()
     {
-        $event = $this->toArray();
+        // event data
+        $fields = [
+            'id',
+            'name',
+            'slug',
+            'location_id',
+            'user_id',
+            'category_id',
+            'event_type_id',
+            'start_date',
+            'end_date',
+            'price',
+            'start_time',
+            'end_time',
+            'short_description',
+            'description',
+            'featured',
+            'active',
+            'is_sold_out',
+            'website',
+            'spotify_artist_id'
+        ];
+
+        $event = [];
+        foreach($fields as $field) {
+            $event[$field] = $this->$field;
+        }
 
         $event['photo'] = $this->photo_url;
         $event['tags'] = $this->list_tags;
         $event['created_at'] = $this->created_at->toAtomString();
         $event['updated_at'] = $this->updated_at->toAtomString();
+        $event['start_date'] = $this->start_date->format('Y-m-d');
+
+        if (!empty($event['end_date'])) {
+            $event['end_date'] = $this->end_date->format('Y-m-d');
+        }
+
         $event['category'] = $this->category->name;
         $event['event_type'] = $this->eventType->name;
-
-        $location = $this->location->toArray();
-
-        $location['created_at'] = $this->location->created_at->toAtomString();
-        $location['updated_at'] = $this->location->updated_at->toAtomString();
-        $location['photo'] = $this->location->photo_url;
-
-        $event['location'] = $location;
+        $event['location'] = $this->location->toSearchableArray();
 
         return $event;
     }
@@ -218,26 +243,53 @@ class Event extends Model implements HasMedia
     /**
      * Get Mongo Array
      *
+     * @param boolean $includeRelationships
+     *
      * @return array
      */
-    public function getMongoArray()
+    public function getMongoArray($includeRelationships = true)
     {
-        $event = $this->toArray();
+        // event data
+        $fields = [
+            'id',
+            'name',
+            'slug',
+            'location_id',
+            'user_id',
+            'category_id',
+            'event_type_id',
+            'start_date',
+            'end_date',
+            'price',
+            'start_time',
+            'end_time',
+            'short_description',
+            'description',
+            'featured',
+            'active',
+            'is_sold_out',
+            'website',
+            'spotify_artist_id'
+        ];
+
+        $event = [];
+        foreach($fields as $field) {
+            $event[$field] = $this->$field;
+        }
 
         $event['photo'] = $this->photo_url;
         $event['tags'] = $this->list_tags;
         $event['created_at'] = $this->created_at->toAtomString();
         $event['updated_at'] = $this->updated_at->toAtomString();
+        $event['start_date'] = $this->start_date->format('Y-m-d');
+
+        if (!empty($event['end_date'])) {
+            $event['end_date'] = $this->end_date->format('Y-m-d');
+        }
+
         $event['category'] = $this->category->name;
         $event['event_type'] = $this->eventType->name;
-
-        $location = $this->location->toArray();
-
-        $location['created_at'] = $this->location->created_at->toAtomString();
-        $location['updated_at'] = $this->location->updated_at->toAtomString();
-        $location['photo'] = $this->location->photo_url;
-
-        $event['location'] = $location;
+        $event['location'] = $this->location->getMongoArray(false);
 
         return $event;
     }

@@ -34,145 +34,131 @@ class DevCommand extends Command
      */
     public function handle()
     {
-        /*
-        // Sync all events to MongoDB
+        // $this->syncEventsToMongo();
+        // $this->syncLocationsToMongo();
+        // $this->syncCategoriesToMongo();
+    }
+
+    /**
+    * Sync Events To Mongo
+    *
+    * @return void
+    */
+    private function syncEventsToMongo()
+    {
         $mysqlEvents = Event::all();
 
         foreach($mysqlEvents as $event) {
-            $find = DB::connection('mongodb')->collection('events')->where('id', $event->id)->first();
+            $find = DB::connection('mongodb')
+                ->collection('events')
+                ->where('id', $event->id)
+                ->first();
 
             if (empty($find)) {
                 $value = $event->getMongoArray();
 
-                DB::connection('mongodb')->collection('events')->insert($value);
-
-                $this->info('Inserted event #' . $event->id . ' into MongoDB.');
-            }
-        }
-
-        $mongoEvents = DB::connection('mongodb')->collection('events')->get();
-
-        $this->info('MySQL: ' . $mysqlEvents->count() . ' :: MongoDB: ' . $mongoEvents->count());
-        */
-
-        /*
-        // Add tags to events & sync to mongo
-        $mysqlEvents = Event::where('location_id', '=', 2)->get();
-
-        foreach($mysqlEvents as $event) {
-            // Add `blues` tag to mysql events
-            $event->syncTags([ 'blues music' ]);
-
-            $find = DB::connection('mongodb')->collection('events')->where('id', $event->id)->first();
-
-            if (empty($find)) {
-                $value = $event->getMongoArray();
-
-                DB::connection('mongodb')->collection('events')->insert($value);
+                DB::connection('mongodb')
+                    ->collection('events')
+                    ->insert($value);
 
                 $this->info('Inserted event #' . $event->id . ' into MongoDB.');
             } else {
                 $value = $event->getMongoArray();
 
-                DB::connection('mongodb')->collection('events')->where('id', $event->id)
+                DB::connection('mongodb')
+                    ->collection('events')
+                    ->where('id', $event->id)
                     ->update($value);
 
                 $this->info('Updated event #' . $event->id . ' with MongoDB.');
             }
         }
 
-        $mongoEvents = DB::connection('mongodb')->collection('events')->get();
+        // sync to search
+        Event::all()->searchable();
 
-        $this->info('Done!');
-        */
+        $this->info('Events synced to Mongo and Scout.');
+    }
 
-        // Update all events data
-        /*
-        $mysqlEvents = Event::all();
+    /**
+    * Sync Locations To Mongo
+    *
+    * @return void
+    */
+    private function syncLocationsToMongo()
+    {
+        $locations = Location::all();
 
-        foreach($mysqlEvents as $event) {
-            $find = DB::connection('mongodb')->collection('events')->where('id', $event->id)->first();
+        foreach($locations as $location) {
+            $find = DB::connection('mongodb')
+                ->collection('locations')
+                ->where('id', $location->id)
+                ->first();
 
             if (empty($find)) {
-                $value = $event->getMongoArray();
+                $payload = $location->getMongoArray();
 
-                DB::connection('mongodb')->collection('events')->insert($value);
+                DB::connection('mongodb')
+                    ->collection('locations')
+                    ->insert($payload);
 
-                $this->info('Inserted event #' . $event->id . ' into MongoDB.');
+                $this->info('Inserted location #' . $location->id . ' into MongoDB.');
             } else {
-                $value = $event->getMongoArray();
+                $payload = $location->getMongoArray();
 
-                DB::connection('mongodb')->collection('events')->where('id', $event->id)
-                    ->update($value);
+                DB::connection('mongodb')
+                    ->collection('locations')
+                    ->where('id', $location->id)
+                    ->update($payload);
 
-                $this->info('Updated event #' . $event->id . ' with MongoDB.');
+                $this->info('Updated location #' . $location->id . ' with MongoDB.');
             }
         }
 
-        $this->info('Done!');
-        */
+        // sync to search
+        Location::all()->searchable();
 
-        // Update Locations in MongoDB
-        /*
-        $items = Location::all();
+        $this->info('Locations synced to Mongo and Scout.');
+    }
 
-        foreach($items as $item) {
-            $find = DB::connection('mongodb')->collection('locations')->where('id', $item->id)->first();
-
-            if (empty($find)) {
-                $value = $item->getMongoArray();
-
-                DB::connection('mongodb')->collection('locations')->insert($value);
-
-                $this->info('Inserted location #' . $item->id . ' into MongoDB.');
-            }
-        }
-
-        $locations = DB::connection('mongodb')->collection('locations')->get();
-
-        $this->info('MySQL: ' . $items->count() . ' :: MongoDB: ' . $locations->count());
-        */
-
-        // Script to ensure all events have photo
-        /*
-        $events = Event::all();
-
-        foreach($events as $event) {
-            if (empty($event->photo_url)) {
-                // copy over default for this category
-                $filename = $event->id . '-' . $event->slug . '.jpg';
-
-                Storage::disk('public')->copy('category-music.jpg', $filename);
-
-                $path = storage_path('app/public') . '/' . $filename;
-
-                // then add the url
-                $event->addMedia($path)->toMediaCollection('images', 'spaces');
-
-                $this->info('Uploaded image for event #' . $event->id);
-            }
-        }
-        */
-
-        // Update Locations in MongoDB
-        /*
+    /**
+    * Sync Categories To Mongo
+    *
+    * @return void
+    */
+    private function syncCategoriesToMongo()
+    {
         $items = Category::all();
 
         foreach($items as $item) {
-            $find = DB::connection('mongodb')->collection('categories')->where('id', $item->id)->first();
+            $find = DB::connection('mongodb')
+                ->collection('categories')
+                ->where('id', $item->id)
+                ->first();
 
             if (empty($find)) {
                 $value = $item->getMongoArray();
 
-                DB::connection('mongodb')->collection('categories')->insert($value);
+                DB::connection('mongodb')
+                    ->collection('categories')
+                    ->insert($value);
 
-                $this->info('Inserted location #' . $item->id . ' into MongoDB.');
+                $this->info('Inserted category #' . $item->id . ' into MongoDB.');
+            } else {
+                $value = $item->getMongoArray();
+
+                DB::connection('mongodb')
+                    ->collection('categories')
+                    ->where('id', $item->id)
+                    ->update($value);
+
+                $this->info('Updated category #' . $item->id . ' with MongoDB.');
             }
         }
 
-        $categories = DB::connection('mongodb')->collection('categories')->get();
+        // sync to search
+        Category::all()->searchable();
 
-        $this->info('MySQL: ' . $items->count() . ' :: MongoDB: ' . $categories->count());
-        */
+        $this->info('Categories synced to Mongo and Scout.');
     }
 }

@@ -12,6 +12,8 @@ class Category extends Model
     use HasSlug,
         Searchable;
 
+    protected $connection = 'mysql';
+
     /*
     * @var array
     */
@@ -90,25 +92,22 @@ class Category extends Model
      */
     public function toSearchableArray()
     {
+        // category data
+        $fields = [
+            'id',
+            'name',
+            'slug',
+            'active',
+            'is_default'
+        ];
+
+        $category = [];
+        foreach($fields as $field) {
+            $category[$field] = $this->$field;
+        }
+
         $category['created_at'] = $this->created_at->toAtomString();
         $category['updated_at'] = $this->updated_at->toAtomString();
-        $category['events'] = [];
-
-        // events
-        $events = [];
-        foreach($this->events as $event) {
-            $events[] = $event->getMongoArray();
-        }
-
-        $category['events'] = $events;
-
-        // locations
-        $locations = [];
-        foreach($this->locations as $location) {
-            $locations[] = $location->getMongoArray();
-        }
-
-        $category['locations'] = $locations;
 
         return $category;
     }
@@ -116,17 +115,33 @@ class Category extends Model
     /**
      * Get Mongo Array
      *
+     * @param boolean $includeRelationships
+     *
      * @return array
      */
-    public function getMongoArray()
+    public function getMongoArray($includeRelationships = true)
     {
+        // category data
+        $fields = [
+            'id',
+            'name',
+            'slug',
+            'active',
+            'is_default'
+        ];
+
+        $category = [];
+        foreach($fields as $field) {
+            $category[$field] = $this->$field;
+        }
+
         $category['created_at'] = $this->created_at->toAtomString();
         $category['updated_at'] = $this->updated_at->toAtomString();
 
         // events
         $events = [];
         foreach($this->events as $event) {
-            $events[] = $event->getMongoArray();
+            $events[] = $event->getMongoArray(false);
         }
 
         $category['events'] = $events;
@@ -134,7 +149,7 @@ class Category extends Model
         // locations
         $locations = [];
         foreach($this->locations as $location) {
-            $locations[] = $location->getMongoArray();
+            $locations[] = $location->getMongoArray(false);
         }
 
         $category['locations'] = $locations;
