@@ -58,9 +58,23 @@ class ParseEvent implements ShouldQueue
             // create event
             $event = new Event;
 
-            $event->fill($this->event);
+            // setup data
+            $data = $this->event;
+            $tags = [];
+
+            if (isset($data['tags'])) {
+                $tags = $data['tags'];
+
+                unset($data['tags']);
+            }
+
+            $event->fill($data);
 
             $event->save();
+
+            if (!empty($tags)) {
+                $event->syncTags($tags);
+            }
 
             if (empty($event->id)) {
                 \Log::error($this->event);

@@ -19,7 +19,7 @@ class LocationsController extends Controller
     */
     public function index(Request $request)
     {
-        $locations = Location::paginate(15);
+        $locations = Location::orderBy('name', 'asc')->paginate(15);
 
         return view('admin.locations.index', compact('locations'));
     }
@@ -61,7 +61,7 @@ class LocationsController extends Controller
             return redirect(route('admin.locations.index'))->with('is-success', 'Location has been created!');
         }
 
-        $categories = Category::all()->pluck('name', 'id');
+        $categories = Category::orderBy('name', 'asc')->pluck('name', 'id');
 
         return view('admin.locations.create', compact('location', 'categories'));
     }
@@ -106,7 +106,7 @@ class LocationsController extends Controller
             return redirect(route('admin.locations.index'))->with('is-success', 'Location has been saved!');
         }
 
-        $categories = Category::all()->pluck('name', 'id');
+        $categories = Category::orderBy('name', 'asc')->pluck('name', 'id');
 
         return view('admin.locations.edit', compact('location', 'categories'));
     }

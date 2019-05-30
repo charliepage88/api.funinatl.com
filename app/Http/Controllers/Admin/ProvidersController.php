@@ -19,7 +19,7 @@ class ProvidersController extends Controller
     */
     public function index(Request $request)
     {
-        $providers = Provider::paginate(15);
+        $providers = Provider::orderBy('name', 'asc')->paginate(15);
 
         return view('admin.providers.index', compact('providers'));
     }
@@ -49,7 +49,7 @@ class ProvidersController extends Controller
             return redirect(route('admin.providers.index'))->with('is-success', 'Provider has been created!');
         }
 
-        $locations = Location::all()->pluck('name', 'id');
+        $locations = Location::orderBy('name', 'asc')->pluck('name', 'id');
 
         return view('admin.providers.create', compact('provider', 'locations'));
     }
@@ -78,7 +78,7 @@ class ProvidersController extends Controller
             return redirect(route('admin.providers.index'))->with('is-success', 'Provider has been saved!');
         }
 
-        $locations = Location::all()->pluck('name', 'id');
+        $locations = Location::orderBy('name', 'asc')->pluck('name', 'id');
 
         return view('admin.providers.edit', compact('provider', 'locations'));
     }
