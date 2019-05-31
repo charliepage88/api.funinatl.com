@@ -233,7 +233,11 @@ class Event extends Model implements HasMedia
             $event['end_date'] = $this->end_date->format('Y-m-d');
         }
 
-        $event['category'] = $this->category->name;
+        $event['category'] = [
+            'name' => $this->category->name,
+            'slug' => $this->category->slug
+        ];
+
         $event['event_type'] = $this->eventType->name;
         $event['location'] = $this->location->toSearchableArray();
 
@@ -287,7 +291,11 @@ class Event extends Model implements HasMedia
             $event['end_date'] = $this->end_date->format('Y-m-d');
         }
 
-        $event['category'] = $this->category->name;
+        $event['category'] = [
+            'name' => $this->category->name,
+            'slug' => $this->category->slug
+        ];
+
         $event['event_type'] = $this->eventType->name;
         $event['location'] = $this->location->getMongoArray(false);
 

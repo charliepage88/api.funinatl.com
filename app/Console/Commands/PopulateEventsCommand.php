@@ -46,13 +46,19 @@ class PopulateEventsCommand extends Command
 
         $providers = Provider::isActive()
             ->where('last_scraped', '<=', $today)
-            ->where('id', '=', 4)
+            ->where('id', '=', 5)
             ->orWhereNull('last_scraped')
             ->get();
 
         $scraper = new WebScraper;
         foreach($providers as $provider) {
-            $methodName = Str::camel('provider' . $provider->name);
+            $find = [
+                '"',
+                "'"
+            ];
+
+            $providerName = str_replace($find, '', $provider->name);
+            $methodName = Str::camel('provider' . $providerName);
 
             if (method_exists($this, $methodName)) {
                 $this->$methodName($provider, $scraper, $spotify);
@@ -518,6 +524,174 @@ class PopulateEventsCommand extends Command
     * @return array
     */
     public function provider529(Provider $provider, $scraper, SpotifyWebAPI $spotify)
+    {
+        $crawler = $scraper->request('GET', $provider->scrape_url);
+
+        // Get the latest post in this category and display the titles
+        $results = $crawler->filter('.event-container-single')->each(function ($node) use ($provider) {
+            $data = [
+                'name' => '',
+                'location_id' => $provider->location_id,
+                'user_id' => 1,
+                'category_id' => $provider->location->category_id,  
+                'event_type_id' => 2,
+                'start_date' => '',
+                'price' => '',
+                'start_time' => '',
+                'end_time' => '',
+                'website' => '',
+                'is_sold_out' => false,
+                'tags' => []
+            ];
+
+            // get date for event
+            $date = trim($node->filter('.event-date-single > .right')->text());
+
+            $data['start_date'] = Carbon::parse($date)->format('Y-m-d');
+
+            // get website
+            $data['website'] = $node->filter('.event-info > .left-column > .event-buttons > a')
+                ->reduce(function ($childNode) {
+                    return strtolower(trim($childNode->text())) === 'info';
+                })->attr('href');
+
+            // get meta info
+            // for price, time & tags
+            $meta = trim($node->filter('.event-info > .left-column > .event-meta')->text());
+            $meta = explode('|', $meta);
+            
+            foreach($meta as $index => $value) {
+                $value = trim($value);
+
+                if ($value === '21+' || $value === '18+') {
+                    $data['tags'][] = $value;
+                } elseif (strstr(strtolower($value), ' pm')) {
+                    $dateObj = Carbon::parse($data['start_date'] . ' ' . $value);
+
+                    $data['start_time'] = $dateObj->format('g:i A');
+                    $data['end_time'] = $dateObj->copy()->addHours(3)->format('g:i A');
+                } else {
+                    $ex = explode('/', $value);
+
+                    if (count($ex) === 2) {
+                        $find = [
+                            'ADV',
+                            'DOS'
+                        ];
+
+                        $price_from = str_replace($find, '', trim($ex[0]));
+                        $price_to = str_replace($find, '', trim($ex[1]));
+
+                        $data['price'] = $price_from . ' - ' . $price_to;
+                    } else {
+                        $data['price'] = trim($ex[0]);
+                    }
+                }
+            }
+
+            // check for no-smoking
+            try {
+                $value = trim($node->filter('.event-info > .left-column > .event-meta > .no-smoking')->attr('src'));
+
+                $data['tags'][] = 'No Smoking';
+            } catch (\Exception $e) {
+                // do nothing
+            }
+
+            // get band name(s)
+            $bands = $node->filter('.event-info > .left-column > .event-headliners')
+                ->each(function ($childNode) {
+                    return trim($childNode->text());
+                });
+
+            if (!empty($bands)) {
+                $data['name'] = $bands[0];
+
+                if (count($bands) > 1) {
+                    $bandsAfterFirst = $bands;
+
+                    unset($bandsAfterFirst[0]);
+
+                    $data['description'] = implode(' | ', $bandsAfterFirst);
+                }
+            }
+
+            // include lesser known bands in description
+            try {
+                $backupBands = trim($node->filter('.event-info > .left-column > .event-bands')->text());
+
+                $value = str_replace(' | ', ', ', $backupBands);
+
+                $data['short_description'] = 'Also with music from: ' . $value;
+
+                if (empty($data['name'])) {
+                    $ex = explode(' | ', $backupBands);
+
+                    $data['name'] = $ex[0];
+                }
+            } catch (\Exception $e) {
+                // do nothing
+            }
+
+            return $data;
+        });
+
+        $this->info(count($results) . ' events found for provider `' . $provider->name . '`');
+
+        // validation
+        $required_fields = [
+            'name',
+            'start_date',
+            'start_time',
+            'end_time',
+            'website',
+            'price'
+        ];
+
+        $errors = [];
+        foreach($results as $key => $event) {
+            $isValid = true;
+
+            foreach($required_fields as $field) {
+                if (empty($event[$field])) {
+                    if (!isset($errors[$key])) {
+                        $errors[$key] = [];
+                    }
+
+                    $errors[$key][$field] = $event;
+                }
+            }
+        }
+
+        if (!empty($errors)) {
+            \Log::error($errors);
+
+            return false;
+        }
+
+        // fire off data into queue
+        foreach($results as $event) {
+            ParseEvent::dispatch($event, $spotify);
+
+            $this->info('Dispatching job for event `' . $event['name'] . '`');
+        }
+
+        // save last scraped time
+        $provider->last_scraped = Carbon::now();
+
+        $provider->save();
+    }
+
+    /**
+    * Provider Venkmans
+    *
+    * @param Provider      $provider
+    * @param WebScraper    $scraper
+    * @param SpotifyWebAPI $spotify
+    *
+    * @return array
+    */
+    public function providerVenkmans(Provider $provider, $scraper, SpotifyWebAPI $spotify)
     {
         $crawler = $scraper->request('GET', $provider->scrape_url);
 
