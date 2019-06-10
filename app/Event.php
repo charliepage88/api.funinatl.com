@@ -21,7 +21,7 @@ class Event extends Model implements HasMedia
 
     protected $connection = 'mysql';
 
-    /*
+    /**
     * @var array
     */
     protected $fillable = [
@@ -41,10 +41,11 @@ class Event extends Model implements HasMedia
         'active',
         'website',
         'is_sold_out',
-        'spotify_artist_id'
+        'spotify_artist_id',
+        'is_family_friendly'
     ];
 
-    /*
+    /**
     * @var array
     */
     protected $dates = [
@@ -53,15 +54,16 @@ class Event extends Model implements HasMedia
         'deleted_at'
     ];
 
-    /*
+    /**
     * @var array
     */
     protected $casts = [
-        'start_date'  => 'date',
-        'end_date'    => 'date',
-        'featured'    => 'boolean',
-        'active'      => 'boolean',
-        'is_sold_out' => 'boolean'
+        'start_date'         => 'date',
+        'end_date'           => 'date',
+        'featured'           => 'boolean',
+        'active'             => 'boolean',
+        'is_sold_out'        => 'boolean',
+        'is_family_friendly' => 'boolean'
     ];
 
     /**

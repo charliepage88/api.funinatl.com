@@ -22,7 +22,7 @@ class Location extends Model implements HasMedia
 
     protected $connection = 'mysql';
 
-    /*
+    /**
     * @var array
     */
     protected $fillable = [
@@ -36,16 +36,24 @@ class Location extends Model implements HasMedia
         'longitude',
         'description',
         'category_id',
-        'website'
+        'website',
+        'is_family_friendly'
     ];
 
-    /*
+    /**
     * @var array
     */
     protected $dates = [
         'created_at',
         'updated_at',
         'deleted_at'
+    ];
+
+    /**
+    * @var array
+    */
+    protected $casts = [
+        'is_family_friendly' => 'boolean'
     ];
 
     /**

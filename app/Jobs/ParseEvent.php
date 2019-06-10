@@ -72,6 +72,11 @@ class ParseEvent implements ShouldQueue
 
             $event->save();
 
+            // if family friendly value not set, use location default
+            if (!isset($data['is_family_friendly'])) {
+                $event->is_family_friendly = $location->is_family_friendly;
+            }
+
             if (!empty($tags)) {
                 $event->syncTags($tags);
             }
@@ -102,11 +107,12 @@ class ParseEvent implements ShouldQueue
                 'website',
                 'price',
                 'is_sold_out',
-                'start_time'
+                'start_time',
+                'is_family_friendly'
             ];
 
             foreach($fields as $field) {
-                if ($this->event[$field] !== $find->$field) {
+                if (isset($this->event[$field]) && ($this->event[$field] !== $find->$field)) {
                     $triggerUpdate = true;
                 }
             }

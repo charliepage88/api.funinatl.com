@@ -10,7 +10,7 @@ class Provider extends Model
 {
     use HasSlug;
 
-    /*
+    /**
     * @var array
     */
     protected $fillable = [
@@ -22,7 +22,7 @@ class Provider extends Model
         'active'
     ];
 
-    /*
+    /**
     * @var array
     */
     protected $dates = [
@@ -31,7 +31,7 @@ class Provider extends Model
         'deleted_at'
     ];
 
-    /*
+    /**
     * @var array
     */
     protected $casts = [

@@ -14,7 +14,7 @@ class Category extends Model
 
     protected $connection = 'mysql';
 
-    /*
+    /**
     * @var array
     */
     protected $fillable = [
@@ -24,7 +24,7 @@ class Category extends Model
         'is_default'
     ];
 
-    /*
+    /**
     * @var array
     */
     protected $dates = [
@@ -33,7 +33,7 @@ class Category extends Model
         'deleted_at'
     ];
 
-    /*
+    /**
     * @var array
     */
     protected $casts = [

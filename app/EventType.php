@@ -10,7 +10,7 @@ class EventType extends Model
 {
     use HasSlug;
 
-    /*
+    /**
     * @var array
     */
     protected $fillable = [
