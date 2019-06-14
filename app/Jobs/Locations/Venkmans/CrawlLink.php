@@ -2,6 +2,8 @@
 
 namespace App\Jobs\Locations\Venkmans;
 
+use Carbon\Carbon;
+use Goutte\Client as WebScraper;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -23,22 +25,17 @@ class CrawlLink implements ShouldQueue
     public $data;
 
     /**
-    * @var WebScraper
-    */
-    public $scraper;
-
-    /**
     * @var SpotifyWebAPI
     */
     public $spotify;
 
     /**
-    * @var Collection
+    * @var array
     */
     public $categories;
 
     /**
-    * @var Collection
+    * @var array
     */
     public $eventTypes;
 
@@ -47,10 +44,9 @@ class CrawlLink implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(array $data, $scraper, $spotify, $categories, $eventTypes)
+    public function __construct(array $data, $spotify, array $categories, array $eventTypes)
     {
         $this->data = $data;
-        $this->scraper = $scraper;
         $this->spotify = $spotify;
         $this->categories = $categories;
         $this->eventTypes = $eventTypes;
@@ -67,12 +63,15 @@ class CrawlLink implements ShouldQueue
         $data = $this->data;
         $eventTypes = $this->eventTypes;
         $categories = $this->categories;
+        $spotify = $this->spotify;
 
         // parse date
         $startDate = Carbon::parse($data['start_date']);
 
         // get crawler
-        $crawler = $this->scraper->request('GET', $data['website']);
+        $scraper = new WebScraper;
+
+        $crawler = $scraper->request('GET', $data['website']);
 
         // event array
         $event = [
@@ -85,13 +84,13 @@ class CrawlLink implements ShouldQueue
             'price' => '',
             'start_time' => '',
             'end_time' => '',
-            'website' => $data['website'],
+            'website' => trim($data['website']),
             'is_sold_out' => false,
             'tags' => []
         ];
 
         // get the name of the event
-        $event['name'] = $node->filter('.tribe-events-single-event-title')->text();
+        $event['name'] = trim($crawler->filter('.tribe-events-single-event-title')->text());
 
         // parse event name to figure out category
         $lowerName = strtolower($event['name']);
@@ -104,50 +103,50 @@ class CrawlLink implements ShouldQueue
         if (strstr($lowerName, 'kids eat free')) {
             $event['price'] = 'Free';
             $event['is_family_friendly'] = true;
-            $event['category_id'] = $categories['fooddrinks']->first()->id;
+            $event['category_id'] = $categories['food-drinks']->id;
             $is_special = true;
         }
 
         if (strstr($lowerName, 'bottomless mimosa')) {
-            $event['category_id'] = $categories['fooddrinks']->first()->id;
+            $event['category_id'] = $categories['food-drinks']->id;
             $is_special = true;
         }
 
         if (strstr($lowerName, 'taco wednesday')) {
             $event['price'] = 'Special';
             $event['is_family_friendly'] = true;
-            $event['category_id'] = $categories['fooddrinks']->first()->id;
+            $event['category_id'] = $categories['food-drinks']->id;
             $is_special = true;
         }
 
         if (strstr($lowerName, 'princess brunch')) {
             $event['price'] = 'Free';
             $event['is_family_friendly'] = true;
-            $event['category_id'] = $categories['fooddrinks']->first()->id;
+            $event['category_id'] = $categories['food-drinks']->id;
             $is_special = true;
         }
 
         if (strstr($lowerName, 'brunch dine out')) {
             $event['is_family_friendly'] = true;
-            $event['category_id'] = $categories['fooddrinks']->first()->id;
+            $event['category_id'] = $categories['food-drinks']->id;
             $is_special = true;
         }
 
         if (strstr($lowerName, 'trivia')) {
             $event['price'] = 'Free';
-            $event['category_id'] = $categories['fooddrinks']->first()->id;
+            $event['category_id'] = $categories['food-drinks']->id;
             $is_special = true;
         }
 
         if ($is_special) {
-            $event['event_type_id'] = $eventTypes['special']->first()->id;
+            $event['event_type_id'] = $eventTypes['special']->id;
         }
 
         // get start and if listed, end time
 
         // start time
         try {
-            $start_time = $node->filter('.tribe-event-date-start')->text();
+            $start_time = trim($crawler->filter('.tribe-event-date-start')->text());
             $start_time = str_replace($startDate->format('F d') . ' @ ', '', $start_time);
 
             $event['start_time'] = Carbon::parse($event['start_date'] . ' ' . $start_time);
@@ -158,17 +157,17 @@ class CrawlLink implements ShouldQueue
 
         // end time
         try {
-            $end_time = $node->filter('.tribe-event-time')->text();
+            $end_time = trim($crawler->filter('.tribe-event-time')->text());
 
             $event['end_time'] = Carbon::parse($event['start_date'] . ' ' . $end_time);
             $event['end_time'] = $event['end_time']->format('g:i A');
         } catch (\Exception $e) {
-            $event['end_time'] = '?';
+            
         }
 
         // figure out price
         try {
-            $event['price'] = $node->filter('.tribe-events-cost')->text();
+            $event['price'] = trim($crawler->filter('.tribe-events-cost')->text());
         } catch (\Exception $e) {
 
         }
@@ -177,6 +176,6 @@ class CrawlLink implements ShouldQueue
             $event['price'] = 'Special';
         }
 
-        dispatch(new ParseEvent($event, $this->spotify));
+        dispatch(new ParseEvent($event, $spotify));
     }
 }

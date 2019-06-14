@@ -12,7 +12,7 @@ use App\Category;
 use App\EventType;
 use App\Provider;
 use App\Jobs\ParseEvent;
-use App\Locations\Venkmans\CrawlLink as CrawlVenkmansLink;
+use App\Jobs\Locations\Venkmans\CrawlLink as CrawlVenkmansLink;
 
 use Cache;
 use DB;
@@ -49,7 +49,6 @@ class PopulateEventsCommand extends Command
 
         $providers = Provider::isActive()
             ->where('last_scraped', '<=', $today)
-            // ->where('id', '=', 5)
             ->orWhereNull('last_scraped')
             ->get();
 
@@ -694,11 +693,11 @@ class PopulateEventsCommand extends Command
                 $today = Carbon::now();
                 $links = [];
 
-                $crawler->filter('.tribe-events-thismonth')->each(function ($parentNode) use ($today, &$links) {
+                $crawler->filter('.tribe-events-thismonth')->each(function ($parentNode) use ($today, &$links, $provider) {
                     $startDate = Carbon::parse($parentNode->attr('data-day'));
 
                     if ($startDate->greaterThanOrEqualTo($today)) {
-                        $parentNode->filter('.tribe_events')->each(function ($linkNode) use ($startDate, &$links) {
+                        $parentNode->filter('.tribe_events')->each(function ($linkNode) use ($startDate, &$links, $provider) {
                             $url = $linkNode->filter('.tribe-events-month-event-title > a')->attr('href');
 
                             $links[] = [
@@ -724,15 +723,23 @@ class PopulateEventsCommand extends Command
         $this->info(count($urls) . ' links found that need to be crawled for provider `' . $provider->name . '`');
 
         // fire off data into queue
-        $categories = Category::all()
-            ->groupBy('slug');
+        $items = Category::all();
 
-        $eventTypes = EventType::all()
-            ->groupBy('slug');
+        $categories = [];
+        foreach($items as $item) {
+            $categories[$item->slug] = $item;
+        }
+
+        $items = EventType::all();
+
+        $eventTypes = [];
+        foreach($items as $item) {
+            $eventTypes[$item->slug] = $item;
+        }
 
         $delays = [];
         $max = 300;
-        foreach($urls as $url) {
+        foreach($urls as $data) {
             do {
                 $rand = rand(15, $max);
 
@@ -743,12 +750,10 @@ class PopulateEventsCommand extends Command
                 }
             } while (0);
 
-            $this->info($rand);
-
-            CrawlVenkmansLink::dispatch($url, $scraper, $spotify, $categories, $eventTypes)
+            CrawlVenkmansLink::dispatch($data, $spotify, $categories, $eventTypes)
                 ->delay(now()->addSeconds($rand));
 
-            $this->info('Dispatching crawler for url: ' . $url);
+            $this->info('Dispatching crawler for url: ' . $data['website'] . '. Delay: ' . $rand);
         }
 
         // save last scraped time

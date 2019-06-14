@@ -12,6 +12,9 @@ class Category extends Model
     use HasSlug,
         Searchable;
 
+    /**
+    * @var string
+    */
     protected $connection = 'mysql';
 
     /**

@@ -19,6 +19,9 @@ class Event extends Model implements HasMedia
         HybridRelations,
         Searchable;
 
+    /**
+    * @var string
+    */
     protected $connection = 'mysql';
 
     /**

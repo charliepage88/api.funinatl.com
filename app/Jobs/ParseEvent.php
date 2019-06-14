@@ -74,7 +74,9 @@ class ParseEvent implements ShouldQueue
 
             // if family friendly value not set, use location default
             if (!isset($data['is_family_friendly'])) {
-                $event->is_family_friendly = $location->is_family_friendly;
+                $event->is_family_friendly = $event->location->is_family_friendly;
+
+                $event->save();
             }
 
             if (!empty($tags)) {
@@ -92,17 +94,20 @@ class ParseEvent implements ShouldQueue
             // attach image to event
             $results = $this->findArtist($event);
 
-            if ($results->artists->total) {
-                $this->populateImage($event, $results);
+            if (is_string($results)) {
+                $this->populateImage($event, null, $results);
             } else {
-                $this->populateImage($event, null);
+                if ($results->artists->total) {
+                    $this->populateImage($event, $results);
+                } else {
+                    $this->populateImage($event, null);
 
-                \Log::info('Could not find any spotify results for `' . $event->name . '`');
+                    \Log::info('Could not find any spotify results for `' . $event->name . '`');
+                }
             }
         } else {
             // if field values have changed
             // trigger update
-            $triggerUpdate = false;
             $fields = [
                 'website',
                 'price',
@@ -110,23 +115,34 @@ class ParseEvent implements ShouldQueue
                 'start_time',
                 'is_family_friendly'
             ];
+            $dataToSave = [];
 
             foreach($fields as $field) {
                 if (isset($this->event[$field]) && ($this->event[$field] !== $find->$field)) {
-                    $triggerUpdate = true;
+                    $dataToSave[$field] = $this->event[$field];
                 }
+            }
+
+            if (!empty($dataToSave)) {
+                $find->fill($dataToSave);
+
+                $find->save();
             }
 
             // if no photo URL, try and find one
             if (!$find->photo_url) {
                 $results = $this->findArtist($find);
 
-                if ($results->artists->total) {
-                    $this->populateImage($find, $results);
+                if (is_string($results)) {
+                    $this->populateImage($event, null, $results);
                 } else {
-                    $this->populateImage($find, null);
+                    if ($results->artists->total) {
+                        $this->populateImage($find, $results);
+                    } else {
+                        $this->populateImage($find, null);
 
-                    \Log::info('Could not find any spotify results for `' . $find->name . '`');
+                        \Log::info('Could not find any spotify results for `' . $find->name . '`');
+                    }
                 }
             }
         }
@@ -137,13 +153,13 @@ class ParseEvent implements ShouldQueue
     *
     * @param Event  $event
     * @param object $results
+    * @param string $imageUrl
     *
     * @return Event
     */
-    private function populateImage(Event $event, $results)
+    private function populateImage(Event $event, $results, $imageUrl = null)
     {
-        $imageUrl = null;
-        if (!empty($results) && !empty($results->artists)) {
+        if (!empty($results) && !empty($results->artists) && empty($imageUrl)) {
             // get largest image
             $artistId = null;
             $largestImage = 0;
@@ -231,12 +247,22 @@ class ParseEvent implements ShouldQueue
     */
     private function findArtist(Event $event)
     {
+        // get name of band/event
         $name = $event->name;
 
         if (strstr($name, ', ')) {
             $ex = explode(', ', $name);
 
             $name = $ex[0];
+        }
+
+        // lookup in database first, see if we already found it
+        $find = Event::where('name', '=', $name)
+            ->whereNotNull('spotify_artist_id')
+            ->first();
+
+        if (!empty($find)) {
+            return $find->photo_url;
         }
 
         // attach image to event if empty

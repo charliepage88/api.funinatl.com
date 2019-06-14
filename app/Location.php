@@ -20,6 +20,9 @@ class Location extends Model implements HasMedia
         HasTags,
         Searchable;
 
+    /**
+    * @var string
+    */
     protected $connection = 'mysql';
 
     /**

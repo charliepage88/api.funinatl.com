@@ -34,7 +34,7 @@ class DevCommand extends Command
      */
     public function handle()
     {
-        // $this->syncEventsToMongo();
+        $this->syncEventsToMongo();
         // $this->syncLocationsToMongo();
         // $this->syncCategoriesToMongo();
     }
