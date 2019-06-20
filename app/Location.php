@@ -206,6 +206,7 @@ class Location extends Model implements HasMedia
             $category = [];
 
             $category['id'] = $this->category->id;
+            $category['slug'] = $this->category->slug;
             $category['name'] = $this->category->name;
             $category['active'] = $this->category->active;
             $category['is_default'] = $this->category->is_default;
@@ -258,6 +259,7 @@ class Location extends Model implements HasMedia
             $category = [];
 
             $category['id'] = $this->category->id;
+            $category['slug'] = $this->category->slug;
             $category['name'] = $this->category->name;
             $category['active'] = $this->category->active;
             $category['is_default'] = $this->category->is_default;
