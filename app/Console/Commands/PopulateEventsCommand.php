@@ -6,13 +6,16 @@ use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 use Goutte\Client as WebScraper;
+use GuzzleHttp\Client as Guzzle;
 use SpotifyWebAPI\SpotifyWebAPI;
+use Symfony\Component\DomCrawler\Crawler;
 
 use App\Category;
 use App\EventType;
 use App\Provider;
 use App\Jobs\ParseEvent;
-use App\Jobs\Locations\Venkmans\CrawlLink as CrawlVenkmansLink;
+use App\Jobs\Locations\CrawlVenkmansLink;
+use App\Jobs\Locations\CrawlAisleFiveLink;
 
 use Cache;
 use DB;
@@ -49,6 +52,7 @@ class PopulateEventsCommand extends Command
 
         $providers = Provider::isActive()
             ->where('last_scraped', '<=', $today)
+            ->where('id', '=', 7)
             ->orWhereNull('last_scraped')
             ->get();
 
@@ -63,6 +67,8 @@ class PopulateEventsCommand extends Command
             $methodName = Str::camel('provider' . $providerName);
 
             if (method_exists($this, $methodName)) {
+                $this->info('Starting scraper for `' . $provider->name . '`');
+
                 $this->$methodName($provider, $scraper, $spotify);
             }
         }
@@ -102,6 +108,49 @@ class PopulateEventsCommand extends Command
         $spotify->setAccessToken($accessToken);
 
         return $spotify;
+    }
+
+    /**
+    * Validate
+    *
+    * @param array $results
+    *
+    * @return boolean
+    */
+    public function validate(array $results)
+    {
+        // validation
+        $required_fields = [
+            'name',
+            'start_date',
+            'start_time',
+            'end_time',
+            'website',
+            'price'
+        ];
+
+        $errors = [];
+        foreach($results as $key => $event) {
+            $isValid = true;
+
+            foreach($required_fields as $field) {
+                if (empty($event[$field])) {
+                    if (!isset($errors[$key])) {
+                        $errors[$key] = [];
+                    }
+
+                    $errors[$key][$field] = $event;
+                }
+            }
+        }
+
+        if (!empty($errors)) {
+            \Log::error($errors);
+
+            return false;
+        } else {
+            return true;
+        }
     }
 
     /**
@@ -610,34 +659,10 @@ class PopulateEventsCommand extends Command
 
         $this->info(count($results) . ' events found for provider `' . $provider->name . '`');
 
-        // validation
-        $required_fields = [
-            'name',
-            'start_date',
-            'start_time',
-            'end_time',
-            'website',
-            'price'
-        ];
+        // validate
+        $validator = $this->validate($results);
 
-        $errors = [];
-        foreach($results as $key => $event) {
-            $isValid = true;
-
-            foreach($required_fields as $field) {
-                if (empty($event[$field])) {
-                    if (!isset($errors[$key])) {
-                        $errors[$key] = [];
-                    }
-
-                    $errors[$key][$field] = $event;
-                }
-            }
-        }
-
-        if (!empty($errors)) {
-            \Log::error($errors);
-
+        if (!$validator) {
             return false;
         }
 
@@ -754,6 +779,190 @@ class PopulateEventsCommand extends Command
                 ->delay(now()->addSeconds($rand));
 
             $this->info('Dispatching crawler for url: ' . $data['website'] . '. Delay: ' . $rand);
+        }
+
+        // save last scraped time
+        $provider->last_scraped = Carbon::now();
+
+        $provider->save();
+    }
+
+    /**
+    * Provider Aisle 5
+    *
+    * @param Provider      $provider
+    * @param WebScraper    $scraper
+    * @param SpotifyWebAPI $spotify
+    *
+    * @return array
+    */
+    public function providerAisle5(Provider $provider, $scraper, SpotifyWebAPI $spotify)
+    {
+        // won't work with our scraper
+        // use symfony dom crawler manually
+        $html = file_get_contents($provider->scrape_url);
+        $crawler = new Crawler($html);
+
+        // let's just collect links, that's it
+        $today = Carbon::now();
+
+        $urls = $crawler->filter('.has-event')
+            ->reduce(function ($node) use ($today) {
+                $status = true;
+
+                try {
+                    $event = $node->filter('.one-event')->text();
+
+                    $startDate = Carbon::parse($node->filter('.dtstart > span')->attr('title'));
+
+                    if (!$startDate->greaterThanOrEqualTo($today)) {
+                        $status = false;
+                    }
+                } catch (\Exception $e) {
+                    $status = false;
+                }
+
+                return $status;
+            })
+            ->each(function ($node) use ($today, $provider) {
+                $startDate = Carbon::parse(trim($node->filter('.dtstart > span')->attr('title')));
+
+                $url = 'https://www.aisle5atl.com';
+                $url .= trim($node->filter('.one-event > a')->eq(0)->attr('href'));
+
+                $event = [
+                    'website' => $url,
+                    'start_date' => $startDate->format('Y-m-d'),
+                    'location_id' => $provider->location_id,
+                    'category_id' => $provider->location->category_id
+                ];
+
+                return $event;
+            });
+
+        $this->info(count($urls) . ' links found that need to be crawled for provider `' . $provider->name . '`');
+
+        // fire off data into queue
+        $delays = [];
+        $max = 300;
+        foreach($urls as $data) {
+            do {
+                $rand = rand(15, $max);
+
+                if (!in_array($rand, $delays)) {
+                    $delays[] = $rand;
+
+                    break;
+                }
+            } while (0);
+
+            CrawlAisleFiveLink::dispatch($data, $spotify)
+                ->delay(now()->addSeconds($rand));
+
+            $this->info('Dispatching crawler for url: ' . $data['website'] . '. Delay: ' . $rand);
+        }
+
+        // save last scraped time
+        $provider->last_scraped = Carbon::now();
+
+        $provider->save();
+    }
+
+    /**
+    * Provider Eddies Attic
+    *
+    * @param Provider      $provider
+    * @param WebScraper    $scraper
+    * @param SpotifyWebAPI $spotify
+    *
+    * @return array
+    */
+    public function providerEddiesAttic(Provider $provider, $scraper, SpotifyWebAPI $spotify)
+    {
+        // JSON feed, yay!
+        // set start & end date
+        $startDate = Carbon::now();
+        $endDate = $startDate->copy()->addMonth(6)->format('Y-m-d');
+        $startDate = $startDate->format('Y-m-d');
+
+        // get json contents of events
+        $json = file_get_contents($provider->scrape_url . '?fromDate=' . $startDate . '&thruDate=' . $endDate);
+        $json = json_decode($json, true);
+
+        // parse through data
+        $events = [];
+        foreach($json as $event) {
+            $data = [
+                'name' => '',
+                'location_id' => $provider->location_id,
+                'user_id' => 1,
+                'category_id' => $provider->location->category_id,  
+                'event_type_id' => 2,
+                'start_date' => '',
+                'price' => '',
+                'start_time' => '',
+                'end_time' => '',
+                'website' => '',
+                'is_sold_out' => false,
+                'tags' => []
+            ];
+
+            // set basic info
+            $data['name'] = $event['title'];
+            $data['website'] = str_replace('?utm_medium=api', '', $event['url']);
+
+            if (!empty($event['supportsName'])) {
+                $data['short_description'] = 'With: ' . $event['supportsName'];
+            }
+
+            // set date/time
+            $date = Carbon::parse($event['start']);
+
+            $data['start_date'] = $date->copy()->format('Y-m-d');
+            $data['start_time'] = $date->copy()->format('g:i A');
+            $data['end_time'] = $date->copy()->addHours(3)->format('g:i A');
+
+            // get price
+            $crawler = new Crawler($event['popoverContent']);
+
+            $priceLookup = $crawler->filter('p')
+                ->each(function ($node) {
+                    $html = trim($node->html());
+
+                    $ex = explode('<br>', $html);
+
+                    if (!empty($ex[1]) && strstr($ex[1], '$')) {
+                        return str_replace('</i>', '', $ex[1]);
+                    } else {
+                        return false;
+                    }
+                });
+
+            foreach($priceLookup as $row) {
+                if (!empty($row)) {
+                    $data['price'] = trim($row);
+
+                    break;
+                }
+            }
+
+            $events[] = $data;
+        }
+
+        // validate
+        $validator = $this->validate($events);
+
+        if (!$validator) {
+            return false;
+        }
+
+        $this->info(count($events) . ' links found that need to be crawled for provider `' . $provider->name . '`');
+
+        // fire off data into queue
+        foreach($events as $event) {
+            ParseEvent::dispatch($event, $spotify);
+
+            $this->info('Dispatching job for event `' . $event['name'] . '`');
         }
 
         // save last scraped time

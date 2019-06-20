@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs\Locations\Venkmans;
+namespace App\Jobs\Locations;
 
 use Carbon\Carbon;
 use Goutte\Client as WebScraper;
@@ -12,7 +12,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 
 use App\Jobs\ParseEvent;
 
-class CrawlLink implements ShouldQueue
+class CrawlVenkmansLink implements ShouldQueue
 {
     use Dispatchable,
         InteractsWithQueue,
