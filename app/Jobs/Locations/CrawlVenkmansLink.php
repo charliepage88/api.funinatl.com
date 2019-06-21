@@ -10,7 +10,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 
-use App\Jobs\ParseEvent;
+use App\Jobs\ParseMusicEvent;
 
 class CrawlVenkmansLink implements ShouldQueue
 {
@@ -176,6 +176,6 @@ class CrawlVenkmansLink implements ShouldQueue
             $event['price'] = 'Special';
         }
 
-        dispatch(new ParseEvent($event, $spotify));
+        dispatch(new ParseMusicEvent($event, $spotify));
     }
 }

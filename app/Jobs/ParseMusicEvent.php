@@ -13,7 +13,7 @@ use App\Event;
 
 use Storage;
 
-class ParseEvent implements ShouldQueue
+class ParseMusicEvent implements ShouldQueue
 {
     use Dispatchable,
         InteractsWithQueue,
@@ -26,13 +26,19 @@ class ParseEvent implements ShouldQueue
     public $event;
 
     /**
+    * @var SpotifyWebAPI
+    */
+    public $spotify;
+
+    /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(array $event)
+    public function __construct(array $event, $spotify)
     {
         $this->event = $event;
+        $this->spotify = $spotify;
     }
 
     /**
@@ -86,7 +92,19 @@ class ParseEvent implements ShouldQueue
             }
 
             // attach image to event
-            $this->populateImage($event);
+            $results = $this->findArtist($event);
+
+            if (is_string($results)) {
+                $this->populateImage($event, null, $results);
+            } else {
+                if ($results->artists->total) {
+                    $this->populateImage($event, $results);
+                } else {
+                    $this->populateImage($event, null);
+
+                    \Log::info('Could not find any spotify results for `' . $event->name . '`');
+                }
+            }
         } else {
             // if field values have changed
             // trigger update
@@ -113,8 +131,19 @@ class ParseEvent implements ShouldQueue
 
             // if no photo URL, try and find one
             if (!$find->photo_url) {
-                // attach image to event
-                $this->populateImage($find);
+                $results = $this->findArtist($find);
+
+                if (is_string($results)) {
+                    $this->populateImage($find, null, $results);
+                } else {
+                    if ($results->artists->total) {
+                        $this->populateImage($find, $results);
+                    } else {
+                        $this->populateImage($find, null);
+
+                        \Log::info('Could not find any spotify results for `' . $find->name . '`');
+                    }
+                }
             }
         }
     }
@@ -123,15 +152,41 @@ class ParseEvent implements ShouldQueue
     * Populate Image
     *
     * @param Event  $event
+    * @param object $results
+    * @param string $imageUrl
     *
     * @return Event
     */
-    private function populateImage(Event $event)
+    private function populateImage(Event $event, $results, $imageUrl = null)
     {
-        if (!empty($this->event['image_url'])) {
-            try {
-                $imageUrl = $this->event['image_url'];
+        if (!empty($results) && !empty($results->artists) && empty($imageUrl)) {
+            // get largest image
+            $artistId = null;
+            $largestImage = 0;
+            foreach($results->artists->items as $result) {
+                if (!empty($result->images)) {
+                    foreach($result->images as $image) {
+                        $size = ($image->width + $image->height);
 
+                        if ($size > $largestImage) {
+                            $imageUrl = $image->url;
+                            $artistId = $result->id;
+                        }
+                    }
+                }
+            }
+
+            // save spotify artist ID so we don't
+            // have to search next time
+            if (!empty($artistId)) {
+                $event->spotify_artist_id = $artistId;
+
+                $event->save();
+            }
+        }
+
+        if (!empty($imageUrl)) {
+            try {
                 // get image contents
                 $contents = file_get_contents($imageUrl);
 
@@ -164,7 +219,6 @@ class ParseEvent implements ShouldQueue
             }
         }
 
-        /*
         if (empty($event->photo_url)) {
             // copy over default for this category
             $filename = $event->id . '-' . $event->slug . '.jpg';
@@ -180,8 +234,47 @@ class ParseEvent implements ShouldQueue
 
             sleep(2);
         }
-        */
 
         return $event;
+    }
+
+    /**
+    * Find Artist
+    *
+    * @param Event $event
+    *
+    * @return object
+    */
+    private function findArtist(Event $event)
+    {
+        // get name of band/event
+        $name = $event->name;
+
+        if (strstr($name, ', ')) {
+            $ex = explode(', ', $name);
+
+            $name = $ex[0];
+        }
+
+        // lookup in database first, see if we already found it
+        $find = Event::where('name', '=', $name)
+            ->whereNotNull('spotify_artist_id')
+            ->first();
+
+        if (!empty($find)) {
+            return $find->photo_url;
+        }
+
+        // attach image to event if empty
+        $results = $this->spotify->search($name, 'artist');
+
+        if (!empty($ex) && !$results->artists->total) {
+            $results = $this->spotify->search($event->name, 'artist');
+        }
+
+        \Log::info('Spotify search for `' . $name . '`');
+        \Log::info((array) $results->artists->items);
+
+        return $results;
     }
 }

@@ -188,7 +188,8 @@ class Location extends Model implements HasMedia
             'zip',
             'latitude',
             'longitude',
-            'description'
+            'description',
+            'is_family_friendly'
         ];
 
         $location = [];
@@ -241,7 +242,8 @@ class Location extends Model implements HasMedia
             'zip',
             'latitude',
             'longitude',
-            'description'
+            'description',
+            'is_family_friendly'
         ];
 
         $location = [];

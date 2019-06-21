@@ -7,13 +7,14 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 use Goutte\Client as WebScraper;
 use GuzzleHttp\Client as Guzzle;
+use ICal\ICal;
 use SpotifyWebAPI\SpotifyWebAPI;
 use Symfony\Component\DomCrawler\Crawler;
 
 use App\Category;
 use App\EventType;
 use App\Provider;
-use App\Jobs\ParseEvent;
+use App\Jobs\ParseMusicEvent;
 use App\Jobs\Locations\CrawlVenkmansLink;
 use App\Jobs\Locations\CrawlAisleFiveLink;
 
@@ -52,7 +53,7 @@ class PopulateEventsCommand extends Command
 
         $providers = Provider::isActive()
             ->where('last_scraped', '<=', $today)
-            ->where('id', '=', 7)
+            ->where('id', '=', 8)
             ->orWhereNull('last_scraped')
             ->get();
 
@@ -70,6 +71,8 @@ class PopulateEventsCommand extends Command
                 $this->info('Starting scraper for `' . $provider->name . '`');
 
                 $this->$methodName($provider, $scraper, $spotify);
+            } else {
+                $this->error('Cannot find method name `' . $methodName . '`');
             }
         }
     }
@@ -251,7 +254,7 @@ class PopulateEventsCommand extends Command
 
         // fire off data into queue
         foreach($results as $event) {
-            ParseEvent::dispatch($event, $spotify);
+            ParseMusicEvent::dispatch($event, $spotify);
 
             $this->info('Dispatching job for event `' . $event['name'] . '`');
         }
@@ -415,7 +418,7 @@ class PopulateEventsCommand extends Command
 
         // fire off data into queue
         foreach($results as $event) {
-            ParseEvent::dispatch($event, $spotify);
+            ParseMusicEvent::dispatch($event, $spotify);
 
             $this->info('Dispatching job for event `' . $event['name'] . '`');
         }
@@ -524,7 +527,7 @@ class PopulateEventsCommand extends Command
 
         // fire off data into queue
         foreach($results as $event) {
-            ParseEvent::dispatch($event, $spotify);
+            ParseMusicEvent::dispatch($event, $spotify);
 
             $this->info('Dispatching job for event `' . $event['name'] . '`');
         }
@@ -668,7 +671,7 @@ class PopulateEventsCommand extends Command
 
         // fire off data into queue
         foreach($results as $event) {
-            ParseEvent::dispatch($event, $spotify);
+            ParseMusicEvent::dispatch($event, $spotify);
 
             $this->info('Dispatching job for event `' . $event['name'] . '`');
         }
@@ -960,7 +963,7 @@ class PopulateEventsCommand extends Command
 
         // fire off data into queue
         foreach($events as $event) {
-            ParseEvent::dispatch($event, $spotify);
+            ParseMusicEvent::dispatch($event, $spotify);
 
             $this->info('Dispatching job for event `' . $event['name'] . '`');
         }
@@ -969,5 +972,50 @@ class PopulateEventsCommand extends Command
         $provider->last_scraped = Carbon::now();
 
         $provider->save();
+    }
+
+    /**
+    * Provider Piedmont Park
+    *
+    * @param Provider      $provider
+    * @param WebScraper    $scraper
+    * @param SpotifyWebAPI $spotify
+    *
+    * @return array
+    */
+    public function providerPiedmontPark(Provider $provider, $scraper, SpotifyWebAPI $spotify)
+    {
+        // reading from an ICS file
+        $feed = new ICal;
+
+        $feed->initUrl($provider->scrape_url);
+
+        $events = [];
+        foreach($feed->events() as $event) {
+
+        }
+
+        dd($events);
+
+        // validate
+        $validator = $this->validate($events);
+
+        if (!$validator) {
+            return false;
+        }
+
+        $this->info(count($events) . ' links found that need to be crawled for provider `' . $provider->name . '`');
+
+        // fire off data into queue
+        foreach($events as $event) {
+            ParseMusicEvent::dispatch($event, $spotify);
+
+            $this->info('Dispatching job for event `' . $event['name'] . '`');
+        }
+
+        // save last scraped time
+        $provider->last_scraped = Carbon::now();
+
+        // $provider->save();
     }
 }

@@ -220,7 +220,8 @@ class Event extends Model implements HasMedia
             'active',
             'is_sold_out',
             'website',
-            'spotify_artist_id'
+            'spotify_artist_id',
+            'is_family_friendly'
         ];
 
         $event = [];
@@ -278,7 +279,8 @@ class Event extends Model implements HasMedia
             'active',
             'is_sold_out',
             'website',
-            'spotify_artist_id'
+            'spotify_artist_id',
+            'is_family_friendly'
         ];
 
         $event = [];

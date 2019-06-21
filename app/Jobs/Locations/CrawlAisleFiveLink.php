@@ -11,7 +11,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Str;
 
-use App\Jobs\ParseEvent;
+use App\Jobs\ParseMusicEvent;
 
 class CrawlAisleFiveLink implements ShouldQueue
 {
@@ -109,6 +109,6 @@ class CrawlAisleFiveLink implements ShouldQueue
 
         }
 
-        dispatch(new ParseEvent($event, $spotify));
+        dispatch(new ParseMusicEvent($event, $spotify));
     }
 }

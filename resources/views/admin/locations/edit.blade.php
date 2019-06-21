@@ -151,6 +151,28 @@
             </div>
         </div>
 
+        <div class="flex flex-wrap -mx-3 mb-2">
+            <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-is-family-friendly">
+                    Family Friendly 
+                </label>
+
+                <div class="mb-2">                
+                    <div class="form-switch inline-block align-middle">
+                        <input
+                            type="checkbox"
+                            name="is_family_friendly"
+                            id="is_family_friendly"
+                            class="form-switch-checkbox"
+                            value="1"
+                            <?php echo $location->is_family_friendly ? 'checked' : '' ?>
+                        >
+                        <label class="form-switch-label" for="is_family_friendly"></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="flex flex-wrap -mx-3 mb-6">
             <div class="w-full px-3">
                 <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded">
