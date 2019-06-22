@@ -34,9 +34,27 @@ class DevCommand extends Command
      */
     public function handle()
     {
+        // $this->eventsWithoutPhoto();
+
         $this->syncEventsToMongo();
         $this->syncLocationsToMongo();
         $this->syncCategoriesToMongo();
+    }
+
+    /**
+    * Events Without Photo
+    *
+    * @return void
+    */
+    public function eventsWithoutPhoto()
+    {
+        $events = Event::all();
+
+        foreach($events as $event) {
+            if (empty($event->photo_url)) {
+                $this->info($event->name);
+            }
+        }
     }
 
     /**
