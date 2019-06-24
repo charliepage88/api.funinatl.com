@@ -4,12 +4,15 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
+use Spatie\MediaLibrary\HasMedia\HasMedia;
+use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
-class Category extends Model
+class Category extends Model implements HasMedia
 {
-    use HasSlug,
+    use HasMediaTrait,
+        HasSlug,
         Searchable;
 
     /**
@@ -89,6 +92,24 @@ class Category extends Model
     }
 
     /**
+    * Get Photo Url Attribute
+    *
+    * @return stirng|null
+    */
+    public function getPhotoUrlAttribute()
+    {
+        $photos = $this->getMedia('categories');
+
+        if ($photos->count()) {
+            $photo = env('DO_SPACES_URL') . '/' . $photos->first()->getPath();
+        } else {
+            $photo = null;
+        }
+
+        return $photo;
+    }
+
+    /**
      * To Searchable Array
      *
      * @return array
@@ -109,6 +130,7 @@ class Category extends Model
             $category[$field] = $this->$field;
         }
 
+        $category['photo'] = $this->photo_url;
         $category['created_at'] = $this->created_at->toAtomString();
         $category['updated_at'] = $this->updated_at->toAtomString();
 
@@ -138,6 +160,7 @@ class Category extends Model
             $category[$field] = $this->$field;
         }
 
+        $category['photo'] = $this->photo_url;
         $category['created_at'] = $this->created_at->toAtomString();
         $category['updated_at'] = $this->updated_at->toAtomString();
 

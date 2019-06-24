@@ -14,6 +14,7 @@ use Symfony\Component\DomCrawler\Crawler;
 use App\Category;
 use App\EventType;
 use App\Provider;
+use App\Jobs\ParseEvent;
 use App\Jobs\ParseMusicEvent;
 use App\Jobs\Locations\CrawlVenkmansLink;
 use App\Jobs\Locations\CrawlAisleFiveLink;
@@ -52,9 +53,9 @@ class PopulateEventsCommand extends Command
         $today = Carbon::today()->startOfDay()->format('Y-m-d H:i:s');
 
         $providers = Provider::isActive()
-            ->where('last_scraped', '<=', $today)
+            // ->where('last_scraped', '<=', $today)
             ->where('id', '=', 8)
-            ->orWhereNull('last_scraped')
+            // ->orWhereNull('last_scraped')
             ->get();
 
         $scraper = new WebScraper;
@@ -138,17 +139,20 @@ class PopulateEventsCommand extends Command
 
             foreach($required_fields as $field) {
                 if (empty($event[$field])) {
-                    if (!isset($errors[$key])) {
-                        $errors[$key] = [];
-                    }
-
-                    $errors[$key][$field] = $event;
+                    $errors[] = [
+                        'error' => 'Field is required: ' . $field,
+                        'event' => $event
+                    ];
                 }
             }
         }
 
         if (!empty($errors)) {
-            \Log::error($errors);
+            foreach($errors as $error) {
+                $this->error($error['error']);
+                $this->error(json_encode($error['event']));
+                $this->info('---');
+            }
 
             return false;
         } else {
@@ -992,10 +996,50 @@ class PopulateEventsCommand extends Command
 
         $events = [];
         foreach($feed->events() as $event) {
+            // init event data, including date
+            $startDate = Carbon::parse($event->dtstart);
 
+            $data = [
+                'start_date' => $startDate->copy()->format('Y-m-d'),
+                'start_time' => $startDate->copy()->format('g:i A'),
+                'description' => trim($event->description),
+                'website' => trim($event->url),
+                'image_url' => !empty($event->attach) ? $event->attach : '',
+                'location_id' => $provider->location_id,
+                'category_id' => $provider->location->category_id,
+                'user_id' => 1,
+                'event_type_id' => 2,
+                'price' => 'N/A'
+            ];
+
+            // set name
+            $data['name'] = str_replace('City permit: ', '', trim($event->summary));
+
+            // tags
+            if (!empty($event->categories)) {
+                $data['tags'] = explode(',', trim($event->categories));
+            }
+
+            // get end date/time
+            if (!empty($event->dtend)) {
+                $endDate = Carbon::parse($event->dtend);
+
+                $data['end_date'] = $endDate->copy()->format('Y-m-d');
+                $data['end_time'] = $endDate->copy()->format('g:i A');
+            }
+
+            // look for "Free", if it's present set the price
+            // to free. otherwise, leave empty
+            if (strstr(strtolower($data['name']), 'free')) {
+                $data['price'] = 'Free';
+            }
+
+            if (!empty($event->categories) && strstr(strtolower($event->categories), 'free')) {
+                $data['price'] = 'Free';
+            }
+
+            $events[] = $data;
         }
-
-        dd($events);
 
         // validate
         $validator = $this->validate($events);
@@ -1004,11 +1048,11 @@ class PopulateEventsCommand extends Command
             return false;
         }
 
-        $this->info(count($events) . ' links found that need to be crawled for provider `' . $provider->name . '`');
+        $this->info(count($events) . ' events found for provider `' . $provider->name . '`');
 
         // fire off data into queue
         foreach($events as $event) {
-            ParseMusicEvent::dispatch($event, $spotify);
+            ParseEvent::dispatch($event);
 
             $this->info('Dispatching job for event `' . $event['name'] . '`');
         }
@@ -1016,6 +1060,6 @@ class PopulateEventsCommand extends Command
         // save last scraped time
         $provider->last_scraped = Carbon::now();
 
-        // $provider->save();
+        $provider->save();
     }
 }

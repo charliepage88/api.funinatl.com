@@ -51,7 +51,7 @@ class LocationsController extends Controller
             $location->save();
 
             if ($request->has('photo')) {
-                $location->addMedia($request->file('photo'))->toMediaCollection('images', 'spaces');
+                $location->addMedia($request->file('photo'))->toMediaCollection('locations', 'spaces');
             }
 
             if ($request->has('tags') && $request->input('tags') !== null) {
@@ -92,7 +92,7 @@ class LocationsController extends Controller
             $location->save();
 
             if ($request->has('photo')) {
-                $location->addMedia($request->file('photo'))->toMediaCollection('images', 'spaces');
+                $location->addMedia($request->file('photo'))->toMediaCollection('locations', 'spaces');
             }
 
             if ($request->has('tags')) {

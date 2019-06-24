@@ -140,7 +140,7 @@ class Event extends Model implements HasMedia
     */
     public function getPhotoUrlAttribute()
     {
-        $photos = $this->getMedia('images');
+        $photos = $this->getMedia('events');
 
         if ($photos->count()) {
             $photo = env('DO_SPACES_URL') . '/' . $photos->first()->getPath();

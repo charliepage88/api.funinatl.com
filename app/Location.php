@@ -125,7 +125,7 @@ class Location extends Model implements HasMedia
     */
     public function getPhotoUrlAttribute()
     {
-        $photos = $this->getMedia('images');
+        $photos = $this->getMedia('locations');
 
         if ($photos->count()) {
             $photo = env('DO_SPACES_URL') . '/' . $photos->first()->getPath();
@@ -211,6 +211,7 @@ class Location extends Model implements HasMedia
             $category['name'] = $this->category->name;
             $category['active'] = $this->category->active;
             $category['is_default'] = $this->category->is_default;
+            $category['photo'] = $this->category->photo_url;
             $category['created_at'] = $this->category->created_at->toAtomString();
             $category['updated_at'] = $this->category->updated_at->toAtomString();
 
@@ -265,6 +266,7 @@ class Location extends Model implements HasMedia
             $category['name'] = $this->category->name;
             $category['active'] = $this->category->active;
             $category['is_default'] = $this->category->is_default;
+            $category['photo'] = $this->category->photo_url;
             $category['created_at'] = $this->category->created_at->toAtomString();
             $category['updated_at'] = $this->category->updated_at->toAtomString();
 

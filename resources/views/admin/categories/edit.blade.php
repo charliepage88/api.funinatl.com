@@ -67,6 +67,20 @@
         </div>
 
         <div class="flex flex-wrap -mx-3 mb-6">
+            <div class="w-full md:w-1/3 px-3">
+                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-photo">
+                    Photo
+                </label>
+
+                @if(!empty($category->photo_url))
+                    <img class="h-128 w-128 mx-auto mb-2" src="{{ $category->photo_url }}">
+                @endif
+                
+                <input class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:border-gray-500" name="photo" id="grid-photo" type="file">
+            </div>
+        </div>
+
+        <div class="flex flex-wrap -mx-3 mb-6">
             <div class="w-full px-3">
                 <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded">
                     Save

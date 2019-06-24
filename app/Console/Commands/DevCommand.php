@@ -52,7 +52,7 @@ class DevCommand extends Command
 
         foreach($events as $event) {
             if (empty($event->photo_url)) {
-                $this->info($event->name);
+                $this->info($event->id . ' :: ' . $event->name);
             }
         }
     }
@@ -178,5 +178,18 @@ class DevCommand extends Command
         Category::all()->searchable();
 
         $this->info('Categories synced to Mongo and Scout.');
+    }
+
+    /**
+    * Fix Media Collections
+    *
+    * @return void
+    */
+    public function fixMediaCollections()
+    {
+        DB::table('media')
+            ->where('collection_name', '=', 'images')
+            ->where('model_type', '=', 'App\Event')
+            ->update([ 'collection_name' => 'events' ]);
     }
 }

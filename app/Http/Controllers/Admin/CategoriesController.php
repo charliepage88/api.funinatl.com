@@ -41,9 +41,13 @@ class CategoriesController extends Controller
                 'name' => 'required|max:255|unique:categories,name'
             ]);
 
-            $category->fill($request->all());
+            $category->fill($request->except('photo'));
 
             $category->save();
+
+            if ($request->has('photo')) {
+                $category->addMedia($request->file('photo'))->toMediaCollection('categories', 'spaces');
+            }
 
             if ($category->is_default) {
                 DB::table('categories')->where('id', '!=', $category->id)
@@ -71,9 +75,13 @@ class CategoriesController extends Controller
                 'name' => 'required|max:255|unique:categories,name,' . $category->id . ',id'
             ]);
 
-            $category->fill($request->all());
+            $category->fill($request->except('photo'));
 
             $category->save();
+
+            if ($request->has('photo')) {
+                $category->addMedia($request->file('photo'))->toMediaCollection('categories', 'spaces');
+            }
 
             if ($category->is_default) {
                 DB::table('categories')->where('id', '!=', $category->id)

@@ -153,7 +153,7 @@ class ParseEvent implements ShouldQueue
                 Storage::disk('local')->put($filename, $contents);
 
                 // then add the url
-                $event->addMedia($tmpPath)->toMediaCollection('images', 'spaces');
+                $event->addMedia($tmpPath)->toMediaCollection('events', 'spaces');
 
                 \Log::info('Uploaded image for event #' . $event->id);
 
@@ -162,25 +162,23 @@ class ParseEvent implements ShouldQueue
                 \Log::error('Could not attach image to event.');
                 \Log::error($e->getMessage());
             }
-        }
+        } elseif (empty($event->photo_url)) {
+            // get category image
+            $contents = file_get_contents($event->category->photo_url);
 
-        /*
-        if (empty($event->photo_url)) {
-            // copy over default for this category
+            // store locally
             $filename = $event->id . '-' . $event->slug . '.jpg';
+            $tmpPath = storage_path('app') . '/' . $filename;
 
-            Storage::disk('public')->copy('category-music.jpg', $filename);
+            Storage::disk('local')->put($filename, $contents);
 
-            $path = storage_path('app/public') . '/' . $filename;
-
-            // then add the url
-            $event->addMedia($path)->toMediaCollection('images', 'spaces');
+            // then attach file
+            $event->addMedia($tmpPath)->toMediaCollection('events', 'spaces');
 
             \Log::info('Uploaded image for event #' . $event->id);
 
             sleep(2);
         }
-        */
 
         return $event;
     }
