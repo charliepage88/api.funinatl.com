@@ -4,6 +4,7 @@ namespace App;
 
 use Geocoder\Query\GeocodeQuery;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Laravel\Scout\Searchable;
 use Spatie\MediaLibrary\HasMedia\HasMedia;
 use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
@@ -11,6 +12,7 @@ use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Spatie\Tags\HasTags;
 
+use App\Tag;
 use App\Facades\Geocoder;
 
 class Location extends Model implements HasMedia
@@ -134,6 +136,28 @@ class Location extends Model implements HasMedia
         }
 
         return $photo;
+    }
+
+    /**
+    * Get Tag Class Name
+    *
+    * @return string
+    */
+    public static function getTagClassName(): string
+    {
+        return Tag::class;
+    }
+
+    /**
+    * Tags
+    *
+    * @return MorphToMany
+    */
+    public function tags(): MorphToMany
+    {
+        return $this
+            ->morphToMany(self::getTagClassName(), 'taggable', 'taggables', null, 'tag_id')
+            ->orderBy('order_column');
     }
 
     /**

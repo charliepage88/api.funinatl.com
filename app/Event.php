@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Jenssegers\Mongodb\Eloquent\HybridRelations;
 use Laravel\Scout\Searchable;
 use Spatie\MediaLibrary\HasMedia\HasMedia;
@@ -149,6 +150,28 @@ class Event extends Model implements HasMedia
         }
 
         return $photo;
+    }
+
+    /**
+    * Get Tag Class Name
+    *
+    * @return string
+    */
+    public static function getTagClassName(): string
+    {
+        return Tag::class;
+    }
+
+    /**
+    * Tags
+    *
+    * @return MorphToMany
+    */
+    public function tags(): MorphToMany
+    {
+        return $this
+            ->morphToMany(self::getTagClassName(), 'taggable', 'taggables', null, 'tag_id')
+            ->orderBy('order_column');
     }
 
     /**

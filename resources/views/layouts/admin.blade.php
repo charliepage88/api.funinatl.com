@@ -57,10 +57,12 @@
                         </div>
                     </div>
 
-
                     <div class="block lg:hidden pr-4">
                         <button id="nav-toggle" class="flex items-center px-3 py-2 border rounded text-grey border-grey-dark hover:text-black hover:border-teal appearance-none focus:outline-none">
-                            <svg class="fill-current h-3 w-3" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><title>Menu</title><path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z"/></svg>
+                            <svg class="fill-current h-3 w-3" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <title>Menu</title>
+                                <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z"/>
+                            </svg>
                         </button>
                     </div>
                 </div>
@@ -72,32 +74,50 @@
                 <ul class="list-reset lg:flex flex-1 items-center px-4 md:px-0">
                     <li class="mr-6 my-2 md:my-0">
                         <a href="{{ route('admin.dashboard') }}" class="block py-1 md:py-3 pl-1 align-middle no-underline hover:text-black border-b-2 <?php echo ($routeName === 'admin.dashboard' ? 'text-orange-dark border-orange-dark hover:border-orange-dark' : 'text-grey border-white hover:border-purple') ?>">
-                            <i class="fas fa-home fa-fw mr-3"></i>
+                            <i class="fas fa-home fa-fw mr-1"></i>
                             <span class="pb-1 md:pb-0 text-sm">Dashboard</span>
                         </a>
                     </li>
+
+                    <li class="mr-6 my-2 md:my-0">
+                        <a href="{{ route('admin.events.index') }}" class="block py-1 md:py-3 pl-1 align-middle no-underline hover:text-black border-b-2 <?php echo (strstr($routeName, 'admin.events') ? 'text-orange-dark border-orange-dark hover:border-orange-dark' : 'text-grey border-white hover:border-purple') ?>">
+                            <i class="fa fa-calendar-alt fa-fw mr-1"></i>
+                            <span class="pb-1 md:pb-0 text-sm">Events</span>
+                        </a>
+                    </li>
+
                     <li class="mr-6 my-2 md:my-0">
                         <a href="{{ route('admin.locations.index') }}" class="block py-1 md:py-3 pl-1 align-middle no-underline hover:text-black border-b-2 <?php echo (strstr($routeName, 'admin.locations') ? 'text-orange-dark border-orange-dark hover:border-orange-dark' : 'text-grey border-white hover:border-purple') ?>">
-                            <i class="fas fa-map fa-fw mr-3"></i>
+                            <i class="fas fa-map fa-fw mr-1"></i>
                             <span class="pb-1 md:pb-0 text-sm">Locations</span>
                         </a>
                     </li>
+
                     <li class="mr-6 my-2 md:my-0">
                         <a href="{{ route('admin.providers.index') }}" class="block py-1 md:py-3 pl-1 align-middle no-underline hover:text-black border-b-2 <?php echo (strstr($routeName, 'admin.providers') ? 'text-orange-dark border-orange-dark hover:border-orange-dark' : 'text-grey border-white hover:border-purple') ?>">
-                            <i class="fa fa-cogs fa-fw mr-3"></i>
+                            <i class="fa fa-cogs fa-fw mr-1"></i>
                             <span class="pb-1 md:pb-0 text-sm">Providers</span>
                         </a>
                     </li>
+
                     <li class="mr-6 my-2 md:my-0">
                         <a href="{{ route('admin.categories.index') }}" class="block py-1 md:py-3 pl-1 align-middle no-underline hover:text-black border-b-2 <?php echo (strstr($routeName, 'admin.categories') ? 'text-orange-dark border-orange-dark hover:border-orange-dark' : 'text-grey border-white hover:border-purple') ?>">
-                            <i class="fas fa-tasks fa-fw mr-3"></i>
+                            <i class="fas fa-tasks fa-fw mr-1"></i>
                             <span class="pb-1 md:pb-0 text-sm">Categories</span>
                         </a>
                     </li>
+
                     <li class="mr-6 my-2 md:my-0">
                         <a href="{{ route('admin.users.index') }}" class="block py-1 md:py-3 pl-1 align-middle no-underline hover:text-black border-b-2 <?php echo (strstr($routeName, 'admin.users') ? 'text-orange-dark border-orange-dark hover:border-orange-dark' : 'text-grey border-white hover:border-purple') ?>">
-                            <i class="fa fa-users fa-fw mr-3"></i>
+                            <i class="fa fa-users fa-fw mr-1"></i>
                             <span class="pb-1 md:pb-0 text-sm">Users</span>
+                        </a>
+                    </li>
+
+                    <li class="mr-6 my-2 md:my-0">
+                        <a href="{{ route('admin.tags.index') }}" class="block py-1 md:py-3 pl-1 align-middle no-underline hover:text-black border-b-2 <?php echo (strstr($routeName, 'admin.tags') ? 'text-orange-dark border-orange-dark hover:border-orange-dark' : 'text-grey border-white hover:border-purple') ?>">
+                            <i class="fa fa-tags fa-fw mr-1"></i>
+                            <span class="pb-1 md:pb-0 text-sm">Tags</span>
                         </a>
                     </li>
                 </ul>
@@ -116,7 +136,7 @@
 
     <!--Container-->
     <div class="container w-full mx-auto pt-20">
-        <div class="w-full px-4 md:px-0 md:mt-8 mb-16 text-grey-darkest leading-normal">
+        <div id="app" class="w-full px-4 md:px-0 md:mt-8 mb-16 text-grey-darkest leading-normal">
             @if(session()->has('is-error'))
                 <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-8" role="alert">
                   <strong class="font-bold">Error</strong>

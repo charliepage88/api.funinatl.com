@@ -55,4 +55,20 @@ Route::middleware('auth')->namespace('Admin')->prefix('admin')->group(function (
         ->name('admin.users.create');
     Route::any('/users/edit/{user}', 'UsersController@edit')
         ->name('admin.users.edit');
+
+    // Tags
+    Route::get('/tags', 'TagsController@index')
+        ->name('admin.tags.index');
+    Route::any('/tags/create', 'TagsController@create')
+        ->name('admin.tags.create');
+    Route::any('/tags/edit/{tag}', 'TagsController@edit')
+        ->name('admin.tags.edit');
+
+    // Events
+    Route::get('/events', 'EventsController@index')
+        ->name('admin.events.index');
+    Route::any('/events/create', 'EventsController@create')
+        ->name('admin.events.create');
+    Route::any('/events/edit/{event}', 'EventsController@edit')
+        ->name('admin.events.edit');
 });
