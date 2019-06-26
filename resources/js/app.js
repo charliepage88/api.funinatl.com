@@ -19,7 +19,12 @@ window.Vue = require('vue');
 // const files = require.context('./', true, /\.vue$/i);
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default));
 
+// admin components
 Vue.component('admin-filter-events', require('./components/AdminFilterEvents.vue').default);
+Vue.component('date-picker', require('./components/DatePicker.vue').default);
+
+// chart components
+Vue.component('chart-events-timeline', require('./components/Charts/ChartEventsTimeline.vue').default);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to

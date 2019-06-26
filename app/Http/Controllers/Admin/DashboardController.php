@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
 
+use App\Report;
 use App\Http\Controllers\Controller;
 
 class DashboardController extends Controller
@@ -17,6 +18,9 @@ class DashboardController extends Controller
     */
     public function adminDashboard(Request $request)
     {
-        return view('admin.dashboard');
+        $stats = Report::getAdminDashboardStats();
+        $charts = Report::getAdminDashboardCharts();
+
+        return view('admin.dashboard', compact('stats', 'charts'));
     }
 }

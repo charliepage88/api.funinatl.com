@@ -6,12 +6,27 @@
             <!--Metric Card-->
             <div class="bg-white border rounded shadow p-2">
                 <div class="flex flex-row items-center">
-                    <div class="flex-shrink pr-4">
-                        <div class="rounded p-3 bg-green-dark"><i class="fa fa-wallet fa-2x fa-fw fa-inverse"></i></div>
+                    <div class="w-1/5 pr-0">
+                        <div class="rounded p-3 pl-4 bg-purple-700">
+                            <i class="fa fa-calendar-alt fa-2x fa-fw fa-inverse"></i>
+                        </div>
                     </div>
-                    <div class="flex-1 text-right md:text-center">
-                        <h5 class="uppercase text-grey">Total Revenue</h5>
-                        <h3 class="text-3xl">$3249 <span class="text-green"><i class="fas fa-caret-up"></i></span></h3>
+                    <div class="w-3/4 text-right md:text-center">
+                        <h5 class="uppercase text-gray-500">Upcoming Events</h5>
+
+                        <h3 class="text-3xl">
+                            <span>{{ number_format($stats['events']['upcoming']) }}</span>
+
+                            @if($stats['events']['upcoming_increase'] > 0)
+                                <span class="text-blue-700">
+                                    @if ($stats['events']['upcoming_increase'] === 2)
+                                        <i class="fas fa-caret-up"></i>
+                                    @else
+                                        <i class="fas fa-caret-down"></i>
+                                    @endif
+                                </span>
+                            @endif
+                        </h3>
                     </div>
                 </div>
             </div>
@@ -21,12 +36,17 @@
             <!--Metric Card-->
             <div class="bg-white border rounded shadow p-2">
                 <div class="flex flex-row items-center">
-                    <div class="flex-shrink pr-4">
-                        <div class="rounded p-3 bg-orange-dark"><i class="fas fa-users fa-2x fa-fw fa-inverse"></i></div>
+                    <div class="w-1/5 pr-0">
+                        <div class="rounded p-3 pl-4 bg-purple-700">
+                            <i class="fa fa-users fa-2x fa-fw fa-inverse"></i>
+                        </div>
                     </div>
-                    <div class="flex-1 text-right md:text-center">
-                        <h5 class="uppercase text-grey">Total Users</h5>
-                        <h3 class="text-3xl">249 <span class="text-orange"><i class="fas fa-exchange-alt"></i></span></h3>
+                    <div class="w-3/4 text-right md:text-center">
+                        <h5 class="uppercase text-gray-500">Total Users</h5>
+
+                        <h3 class="text-3xl">
+                            <span>{{ number_format($stats['users']['total']) }}</span>
+                        </h3>
                     </div>
                 </div>
             </div>
@@ -36,12 +56,27 @@
             <!--Metric Card-->
             <div class="bg-white border rounded shadow p-2">
                 <div class="flex flex-row items-center">
-                    <div class="flex-shrink pr-4">
-                        <div class="rounded p-3 bg-yellow-dark"><i class="fas fa-user-plus fa-2x fa-fw fa-inverse"></i></div>
+                    <div class="w-1/5 pr-0">
+                        <div class="rounded p-3 pl-4 bg-purple-700">
+                            <i class="fa fa-user-plus fa-2x fa-fw fa-inverse"></i>
+                        </div>
                     </div>
-                    <div class="flex-1 text-right md:text-center">
-                        <h5 class="uppercase text-grey">New Users</h5>
-                        <h3 class="text-3xl">2 <span class="text-yellow-dark"><i class="fas fa-caret-up"></i></span></h3>
+                    <div class="w-3/4 text-right md:text-center">
+                        <h5 class="uppercase text-gray-500">New Users</h5>
+
+                        <h3 class="text-3xl">
+                            <span>{{ number_format($stats['users']['new']) }}</span>
+
+                            @if($stats['users']['new_increase'] > 0)
+                                <span class="text-blue-700">
+                                    @if ($stats['users']['new_increase'] === 2)
+                                        <i class="fas fa-caret-up"></i>
+                                    @else
+                                        <i class="fas fa-caret-down"></i>
+                                    @endif
+                                </span>
+                            @endif
+                        </h3>
                     </div>
                 </div>
             </div>
@@ -103,39 +138,13 @@
             <!--Graph Card-->
             <div class="bg-white border rounded shadow">
                 <div class="border-b p-3">
-                    <h5 class="uppercase text-grey-dark">Graph</h5>
+                    <h5 class="uppercase text-grey-800">Events Timeline</h5>
                 </div>
                 <div class="p-5">
-                    <canvas id="chartjs-7" class="chartjs" width="undefined" height="undefined"></canvas>
-                    <script>
-                        new Chart(document.getElementById("chartjs-7"), {
-                            "type": "bar",
-                            "data": {
-                                "labels": ["January", "February", "March", "April"],
-                                "datasets": [{
-                                    "label": "Page Impressions",
-                                    "data": [10, 20, 30, 40],
-                                    "borderColor": "rgb(255, 99, 132)",
-                                    "backgroundColor": "rgba(255, 99, 132, 0.2)"
-                                }, {
-                                    "label": "Adsense Clicks",
-                                    "data": [5, 15, 10, 30],
-                                    "type": "line",
-                                    "fill": false,
-                                    "borderColor": "rgb(54, 162, 235)"
-                                }]
-                            },
-                            "options": {
-                                "scales": {
-                                    "yAxes": [{
-                                        "ticks": {
-                                            "beginAtZero": true
-                                        }
-                                    }]
-                                }
-                            }
-                        });
-                    </script>
+                    <chart-events-timeline
+                        options-json="{{ json_encode($charts['events_timeline']['options']) }}"
+                        data-json="{{ json_encode($charts['events_timeline']['data']) }}"
+                    />
                 </div>
             </div>
             <!--/Graph Card-->
@@ -148,7 +157,7 @@
                     <h5 class="uppercase text-grey-dark">Graph</h5>
                 </div>
                 <div class="p-5">
-                    <canvas id="chartjs-0" class="chartjs" width="undefined" height="undefined"></canvas>
+                    {{-- <canvas id="chartjs-0" class="chartjs" width="undefined" height="undefined"></canvas>
                     <script>
                         new Chart(document.getElementById("chartjs-0"), {
                             "type": "line",
@@ -164,7 +173,7 @@
                             },
                             "options": {}
                         });
-                    </script>
+                    </script> --}}
                 </div>
             </div>
             <!--/Graph Card-->
@@ -177,7 +186,7 @@
                     <h5 class="uppercase text-grey-dark">Graph</h5>
                 </div>
                 <div class="p-5">
-                    <canvas id="chartjs-1" class="chartjs" width="undefined" height="undefined"></canvas>
+                    {{-- <canvas id="chartjs-1" class="chartjs" width="undefined" height="undefined"></canvas>
                     <script>
                         new Chart(document.getElementById("chartjs-1"), {
                             "type": "bar",
@@ -202,7 +211,7 @@
                                 }
                             }
                         });
-                    </script>
+                    </script> --}}
                 </div>
             </div>
             <!--/Graph Card-->
@@ -214,7 +223,8 @@
                 <div class="border-b p-3">
                     <h5 class="uppercase text-grey-dark">Graph</h5>
                 </div>
-                <div class="p-5"><canvas id="chartjs-4" class="chartjs" width="undefined" height="undefined"></canvas>
+                <div class="p-5">
+                    {{-- <canvas id="chartjs-4" class="chartjs" width="undefined" height="undefined"></canvas>
                     <script>
                         new Chart(document.getElementById("chartjs-4"), {
                             "type": "doughnut",
@@ -227,7 +237,7 @@
                                 }]
                             }
                         });
-                    </script>
+                    </script> --}}
                 </div>
             </div>
             <!--/Graph Card-->
