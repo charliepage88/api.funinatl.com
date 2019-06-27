@@ -12,15 +12,20 @@
     name: 'date-picker',
 
     props: [
-      'value'
+      'value',
+      'inputId'
     ],
 
     watch: {
       value (newVal, oldVal) {
+        this.updateInput(newVal)
+
         this.date = newVal
       },
 
       date (newVal, oldVal) {
+        this.updateInput(newVal)
+
         this.$emit('change', newVal)
       }
     },
@@ -37,6 +42,14 @@
 
     components: {
       flatPickr
+    },
+
+    methods: {
+      updateInput (value) {
+        if (this.inputId && document.getElementById(this.inputId)) {
+          document.getElementById(this.inputId).value = value
+        }
+      }
     },
 
     mounted () {

@@ -1,11 +1,11 @@
 @extends('layouts.admin')
 
 @section('content')
-    <form class="w-full" method="POST" action="{{ route('admin.events.create') }}" enctype="multipart/form-data">
+    <form class="w-full" method="POST" action="{{ route('admin.events.edit', [ 'event' => $event->id ]) }}" enctype="multipart/form-data">
         @csrf
 
         <h1 class="bg-brand font-bold text-center text-3xl md:text-5xl px-3">
-            Create Event
+            Edit Event
         </h1>
 
         <div class="flex flex-wrap -mx-3 mb-6">
@@ -15,7 +15,7 @@
                     <span class="text-red-500 text-xs italic">*</span>
                 </label>
                 
-                <input class="appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight" name="name" id="grid-name" type="text">
+                <input class="appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight" name="name" id="grid-name" type="text" value="{{ $event->name }}">
 
                 @if ($errors->has('name'))
                     <span class="text-red-500 text-sm" role="alert">
@@ -34,7 +34,9 @@
                     <select class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-category" name="category_id">
                         <option value="">Choose Category</option>
                         @foreach($categories as $id => $name)
-                            <option value="{{ $id }}">{{ $name }}</option>
+                            <option value="{{ $id }}"{{ $event->category_id === $id ? ' selected' : '' }}>
+                                {{ $name }}
+                            </option>
                         @endforeach
                     </select>
 
@@ -60,7 +62,7 @@
                     <select class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-location" name="location_id">
                         <option value="">Choose Location</option>
                         @foreach($locations as $id => $name)
-                            <option value="{{ $id }}">{{ $name }}</option>
+                            <option value="{{ $id }}"{{ $event->location_id === $id ? ' selected' : '' }}>{{ $name }}</option>
                         @endforeach
                     </select>
 
@@ -82,6 +84,10 @@
                 <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-photo">
                     Photo
                 </label>
+
+                @if(!empty($event->photo_url))
+                    <img class="h-128 w-128 mx-auto mb-2" src="{{ $event->photo_url }}">
+                @endif
                 
                 <input class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:border-gray-500" name="photo" id="grid-photo" type="file">
             </div>
@@ -93,10 +99,10 @@
                 </label>
                 
                 <div>
-                    <date-picker name="start_date" input-id="start_date" />
+                    <date-picker name="start_date" value="{{ $event->start_date }}" input-id="start_date" />
                 </div>
 
-                <input type="hidden" id="start_date">
+                <input type="hidden" id="start_date" value="{{ $event->start_date }}">
 
                 @if ($errors->has('start_date'))
                     <span class="text-red-500 text-sm" role="alert">
@@ -111,10 +117,10 @@
                 </label>
                 
                 <div>
-                    <date-picker name="end_date" input-id="end_date" />
+                    <date-picker name="end_date" value="{{ $event->end_date }}" input-id="end_date" />
                 </div>
 
-                <input type="hidden" id="end_date">
+                <input type="hidden" id="end_date" value="{{ $event->end_date }}">
 
                 @if ($errors->has('end_date'))
                     <span class="text-red-500 text-sm" role="alert">
@@ -131,7 +137,7 @@
                     <span class="text-red-500 text-xs italic">*</span>
                 </label>
                 
-                <input class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-price" type="text" name="price">
+                <input class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-price" type="text" name="price" value="{{ $event->price }}">
 
                 @if ($errors->has('price'))
                     <span class="text-red-500 text-sm" role="alert">
@@ -146,7 +152,7 @@
                     <span class="text-red-500 text-xs italic">*</span>
                 </label>
                 
-                <input class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-start-time" type="text" name="start_time">
+                <input class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-start-time" type="text" name="start_time" value="{{ $event->start_time }}">
 
                 @if ($errors->has('start_time'))
                     <span class="text-red-500 text-sm" role="alert">
@@ -160,7 +166,7 @@
                     End Time
                 </label>
                 
-                <input class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-end-time" type="text" name="end_time">
+                <input class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-end-time" type="text" name="end_time" value="{{ $event->end_time }}">
 
                 @if ($errors->has('end_time'))
                     <span class="text-red-500 text-sm" role="alert">
@@ -184,6 +190,7 @@
                             id="is_family_friendly"
                             class="form-switch-checkbox"
                             value="1"
+                            {{ $event->is_family_friendly ? 'checked' : '' }}
                         >
                         <label class="form-switch-label" for="is_family_friendly"></label>
                     </div>
@@ -204,7 +211,7 @@
                             id="active"
                             class="form-switch-checkbox"
                             value="1"
-                            checked
+                            {{ $event->active ? 'checked' : '' }}
                         >
                         <label class="form-switch-label" for="active"></label>
                     </div>
@@ -224,6 +231,7 @@
                             id="featured"
                             class="form-switch-checkbox"
                             value="1"
+                            {{ $event->featured ? 'checked' : '' }}
                         >
                         <label class="form-switch-label" for="featured"></label>
                     </div>
@@ -237,7 +245,7 @@
                     Short Description
                 </label>
 
-                <textarea class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-short-description" name="short_description"></textarea>
+                <textarea class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-short-description" name="short_description">{{ $event->short_description }}</textarea>
 
                 @if ($errors->has('short_description'))
                     <span class="text-red-500 text-sm" role="alert">
@@ -251,7 +259,7 @@
                     Description
                 </label>
 
-                <textarea class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-description" name="description"></textarea>
+                <textarea class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-description" name="description">{{ $event->description }}</textarea>
 
                 @if ($errors->has('description'))
                     <span class="text-red-500 text-sm" role="alert">

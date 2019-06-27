@@ -259,12 +259,14 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: 'date-picker',
-  props: ['value'],
+  props: ['value', 'inputId'],
   watch: {
     value: function value(newVal, oldVal) {
+      this.updateInput(newVal);
       this.date = newVal;
     },
     date: function date(newVal, oldVal) {
+      this.updateInput(newVal);
       this.$emit('change', newVal);
     }
   },
@@ -279,6 +281,13 @@ __webpack_require__.r(__webpack_exports__);
   },
   components: {
     flatPickr: vue_flatpickr_component__WEBPACK_IMPORTED_MODULE_0___default.a
+  },
+  methods: {
+    updateInput: function updateInput(value) {
+      if (this.inputId && document.getElementById(this.inputId)) {
+        document.getElementById(this.inputId).value = value;
+      }
+    }
   },
   mounted: function mounted() {
     this.date = this.value;
