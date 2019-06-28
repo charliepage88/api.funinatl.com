@@ -19,4 +19,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::namespace('Api')->group(function () {
     Route::post('/newsletter/subscribe', 'NewsletterController@subscribe');
+    Route::post('/events/submit', 'EventsController@submit');
+    Route::post('/locations/submit', 'LocationsController@submit');
 });

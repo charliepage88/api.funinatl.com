@@ -48,7 +48,7 @@ class DevCommand extends Command
     */
     public function eventsWithoutPhoto()
     {
-        $events = Event::all();
+        $events = Event::isActive()->get();
 
         foreach($events as $event) {
             if (empty($event->photo_url)) {
@@ -64,7 +64,7 @@ class DevCommand extends Command
     */
     private function syncEventsToMongo()
     {
-        $mysqlEvents = Event::all();
+        $mysqlEvents = Event::isActive()->get();
 
         foreach($mysqlEvents as $event) {
             $find = DB::connection('mongodb')
@@ -93,7 +93,7 @@ class DevCommand extends Command
         }
 
         // sync to search
-        Event::all()->searchable();
+        Event::isActive()->get()->searchable();
 
         $this->info('Events synced to Mongo and Scout.');
     }
@@ -105,7 +105,7 @@ class DevCommand extends Command
     */
     private function syncLocationsToMongo()
     {
-        $locations = Location::all();
+        $locations = Location::isActive()->get();
 
         foreach($locations as $location) {
             $find = DB::connection('mongodb')
@@ -134,7 +134,7 @@ class DevCommand extends Command
         }
 
         // sync to search
-        Location::all()->searchable();
+        Location::isActive()->get()->searchable();
 
         $this->info('Locations synced to Mongo and Scout.');
     }
@@ -146,7 +146,7 @@ class DevCommand extends Command
     */
     private function syncCategoriesToMongo()
     {
-        $items = Category::all();
+        $items = Category::isActive()->get();
 
         foreach($items as $item) {
             $find = DB::connection('mongodb')
@@ -175,7 +175,7 @@ class DevCommand extends Command
         }
 
         // sync to search
-        Category::all()->searchable();
+        Category::isActive()->get()->searchable();
 
         $this->info('Categories synced to Mongo and Scout.');
     }

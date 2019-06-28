@@ -145,8 +145,29 @@
             </div>
         </div>
 
-        <div class="flex flex-wrap -mx-3 mb-2">
-            <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+        <div class="flex flex-wrap -mx-3 mb-2 pt-4">
+            <div class="w-full md:w-2/12 px-3 mb-6 md:mb-0">
+                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-active">
+                    Active 
+                    <span class="text-red-500 text-xs italic">*</span>
+                </label>
+
+                <div class="mb-2">                
+                    <div class="form-switch inline-block align-middle">
+                        <input
+                            type="checkbox"
+                            name="active"
+                            id="active"
+                            class="form-switch-checkbox"
+                            value="1"
+                            checked
+                        >
+                        <label class="form-switch-label" for="active"></label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-full md:w-2/12 mb-6 md:mb-0">
                 <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-is-family-friendly">
                     Family Friendly 
                 </label>

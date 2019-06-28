@@ -177,7 +177,7 @@
         </div>
 
         <div class="flex flex-wrap -mx-3 mb-2 pt-4">
-            <div class="w-1/3 md:w-1/3 px-3 mb-6 md:mb-0">
+            <div class="w-full md:w-auto pl-3 pr-12 mb-6 md:mb-0">
                 <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-is-family-friendly">
                     Family Friendly 
                 </label>
@@ -197,7 +197,7 @@
                 </div>
             </div>
 
-            <div class="w-1/3 md:w-1/3 px-3 mb-6 md:mb-0">
+            <div class="w-full md:w-auto px-8 mb-6 md:mb-0">
                 <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-active">
                     Active
                     <span class="text-red-500 text-xs italic">*</span>
@@ -218,7 +218,7 @@
                 </div>
             </div>
 
-            <div class="w-1/3 md:w-1/3 px-3 mb-6 md:mb-0">
+            <div class="w-full md:w-auto pl-12 mb-6 md:mb-0">
                 <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-featured">
                     Featured
                 </label>

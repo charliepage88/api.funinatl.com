@@ -48,6 +48,8 @@ class LocationsController extends Controller
 
             $location->fill($request->except('photo', 'tags'));
 
+            $location->source = 'admin';
+
             $location->save();
 
             if ($request->has('photo')) {

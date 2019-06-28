@@ -42,7 +42,8 @@ class Location extends Model implements HasMedia
         'description',
         'category_id',
         'website',
-        'is_family_friendly'
+        'is_family_friendly',
+        'active'
     ];
 
     /**
@@ -58,7 +59,8 @@ class Location extends Model implements HasMedia
     * @var array
     */
     protected $casts = [
-        'is_family_friendly' => 'boolean'
+        'is_family_friendly' => 'boolean',
+        'active'             => 'boolean'
     ];
 
     /**
@@ -89,6 +91,16 @@ class Location extends Model implements HasMedia
     public function category()
     {
         return $this->belongsTo(Category::class, 'category_id');
+    }
+
+    /**
+    * Active Events
+    *
+    * @return Collection
+    */
+    public function activeEvents()
+    {
+        return $this->events()->isActive()->get();
     }
 
     /**
@@ -193,6 +205,16 @@ class Location extends Model implements HasMedia
     }
 
     /**
+    * Should Be Searchable
+    *
+    * @return boolean
+    */
+    public function shouldBeSearchable()
+    {
+        return $this->active;
+    }
+
+    /**
      * To Searchable Array
      *
      * @return array
@@ -233,7 +255,6 @@ class Location extends Model implements HasMedia
             $category['id'] = $this->category->id;
             $category['slug'] = $this->category->slug;
             $category['name'] = $this->category->name;
-            $category['active'] = $this->category->active;
             $category['is_default'] = $this->category->is_default;
             $category['photo'] = $this->category->photo_url;
             $category['created_at'] = $this->category->created_at->toAtomString();
@@ -288,7 +309,6 @@ class Location extends Model implements HasMedia
             $category['id'] = $this->category->id;
             $category['slug'] = $this->category->slug;
             $category['name'] = $this->category->name;
-            $category['active'] = $this->category->active;
             $category['is_default'] = $this->category->is_default;
             $category['photo'] = $this->category->photo_url;
             $category['created_at'] = $this->category->created_at->toAtomString();
@@ -300,7 +320,7 @@ class Location extends Model implements HasMedia
         // events
         if ($includeRelationships) {
             $events = [];
-            foreach($this->events as $event) {
+            foreach($this->activeEvents() as $event) {
                 $events[] = $event->getMongoArray(false);
             }
 
@@ -308,5 +328,17 @@ class Location extends Model implements HasMedia
         }
 
         return $location;
+    }
+
+    /**
+    * Is Active
+    *
+    * @param object $query
+    *
+    * @return object
+    */
+    public function scopeIsActive($query)
+    {
+        return $query->where('active', '=', true);
     }
 }

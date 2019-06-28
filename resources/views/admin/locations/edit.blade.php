@@ -48,7 +48,7 @@
                     <select class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-category" name="category_id">
                         <option value="">Choose category</option>
                         @foreach($categories as $id => $name)
-                            <option value="{{ $id }}" <?php echo $location->category_id === $id ? ' selected' : '' ?>>
+                            <option value="{{ $id }}" {{ $location->category_id === $id ? ' selected' : '' }}>
                                 {{ $name }}
                             </option>
                         @endforeach
@@ -151,8 +151,29 @@
             </div>
         </div>
 
-        <div class="flex flex-wrap -mx-3 mb-2">
-            <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+        <div class="flex flex-wrap -mx-3 mb-2 pt-4">
+            <div class="w-full md:w-2/12 px-3 mb-6 md:mb-0">
+                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-active">
+                    Active 
+                    <span class="text-red-500 text-xs italic">*</span>
+                </label>
+
+                <div class="mb-2">                
+                    <div class="form-switch inline-block align-middle">
+                        <input
+                            type="checkbox"
+                            name="active"
+                            id="active"
+                            class="form-switch-checkbox"
+                            value="1"
+                            {{ $location->active ? 'checked' : '' }}
+                        >
+                        <label class="form-switch-label" for="active"></label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-full md:w-2/12 mb-6 md:mb-0">
                 <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-is-family-friendly">
                     Family Friendly 
                 </label>
@@ -165,7 +186,7 @@
                             id="is_family_friendly"
                             class="form-switch-checkbox"
                             value="1"
-                            <?php echo $location->is_family_friendly ? 'checked' : '' ?>
+                            {{ $location->is_family_friendly ? 'checked' : '' }}
                         >
                         <label class="form-switch-label" for="is_family_friendly"></label>
                     </div>

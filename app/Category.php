@@ -68,6 +68,26 @@ class Category extends Model implements HasMedia
     }
 
     /**
+    * Active Events
+    *
+    * @return Collection
+    */
+    public function activeEvents()
+    {
+        return $this->events()->isActive()->get();
+    }
+
+    /**
+    * Active Locations
+    *
+    * @return Collection
+    */
+    public function activeLocations()
+    {
+        return $this->locations()->isActive()->get();
+    }
+
+    /**
     * Is Active
     *
     * @param object $query
@@ -110,6 +130,16 @@ class Category extends Model implements HasMedia
     }
 
     /**
+    * Should Be Searchable
+    *
+    * @return boolean
+    */
+    public function shouldBeSearchable()
+    {
+        return $this->active;
+    }
+
+    /**
      * To Searchable Array
      *
      * @return array
@@ -121,7 +151,6 @@ class Category extends Model implements HasMedia
             'id',
             'name',
             'slug',
-            'active',
             'is_default'
         ];
 
@@ -151,7 +180,6 @@ class Category extends Model implements HasMedia
             'id',
             'name',
             'slug',
-            'active',
             'is_default'
         ];
 
@@ -166,7 +194,7 @@ class Category extends Model implements HasMedia
 
         // events
         $events = [];
-        foreach($this->events as $event) {
+        foreach($this->activeEvents() as $event) {
             $events[] = $event->getMongoArray(false);
         }
 
@@ -174,7 +202,7 @@ class Category extends Model implements HasMedia
 
         // locations
         $locations = [];
-        foreach($this->locations as $location) {
+        foreach($this->activeLocations() as $location) {
             $locations[] = $location->getMongoArray(false);
         }
 
