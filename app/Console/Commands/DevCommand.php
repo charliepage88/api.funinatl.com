@@ -28,17 +28,41 @@ class DevCommand extends Command
     protected $description = 'Dev command for misc testing.';
 
     /**
+     * @var boolean
+     */
+    public $enableSyncToSearch = false;
+
+    /**
+     * @var boolean
+     */
+    public $enableSync = true;
+
+    /**
      * Execute the console command.
      *
      * @return mixed
      */
     public function handle()
     {
-        // $this->eventsWithoutPhoto();
+        // $this->truncateMongo();
 
-        $this->syncEventsToMongo();
-        $this->syncLocationsToMongo();
-        $this->syncCategoriesToMongo();
+        if ($this->enableSync) {
+            $this->syncCategoriesToMongo();
+            $this->syncLocationsToMongo();
+            $this->syncEventsToMongo();
+        }
+    }
+
+    /**
+     * Truncate Mongo
+     *
+     * @return void
+     */
+    public function truncateMongo()
+    {
+        DB::connection('mongodb')->collection('categories')->delete();
+        DB::connection('mongodb')->collection('locations')->delete();
+        DB::connection('mongodb')->collection('events')->delete();
     }
 
     /**
@@ -93,9 +117,13 @@ class DevCommand extends Command
         }
 
         // sync to search
-        Event::isActive()->get()->searchable();
+        if ($this->enableSyncToSearch) {
+            Event::isActive()->get()->searchable();
 
-        $this->info('Events synced to Mongo and Scout.');
+            $this->info('Events synced to Mongo and Scout.');
+        } else {
+            $this->info('Events synced to Mongo');
+        }
     }
 
     /**
@@ -134,9 +162,13 @@ class DevCommand extends Command
         }
 
         // sync to search
-        Location::isActive()->get()->searchable();
+        if ($this->enableSyncToSearch) {
+            Location::isActive()->get()->searchable();
 
-        $this->info('Locations synced to Mongo and Scout.');
+            $this->info('Locations synced to Mongo and Scout.');
+        } else {
+            $this->info('Locations synced to Mongo.');
+        }
     }
 
     /**
@@ -175,9 +207,13 @@ class DevCommand extends Command
         }
 
         // sync to search
-        Category::isActive()->get()->searchable();
+        if ($this->enableSyncToSearch) {
+            Category::isActive()->get()->searchable();
 
-        $this->info('Categories synced to Mongo and Scout.');
+            $this->info('Categories synced to Mongo and Scout.');
+        } else {
+            $this->info('Categories synced to Mongo.');
+        }
     }
 
     /**

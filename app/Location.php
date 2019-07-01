@@ -253,8 +253,8 @@ class Location extends Model implements HasMedia
             $category = [];
 
             $category['id'] = $this->category->id;
-            $category['slug'] = $this->category->slug;
             $category['name'] = $this->category->name;
+            $category['slug'] = $this->category->slug;
             $category['is_default'] = $this->category->is_default;
             $category['photo'] = $this->category->photo_url;
             $category['created_at'] = $this->category->created_at->toAtomString();
@@ -307,8 +307,8 @@ class Location extends Model implements HasMedia
             $category = [];
 
             $category['id'] = $this->category->id;
-            $category['slug'] = $this->category->slug;
             $category['name'] = $this->category->name;
+            $category['slug'] = $this->category->slug;
             $category['is_default'] = $this->category->is_default;
             $category['photo'] = $this->category->photo_url;
             $category['created_at'] = $this->category->created_at->toAtomString();
