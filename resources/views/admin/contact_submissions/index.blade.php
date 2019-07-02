@@ -2,69 +2,60 @@
 
 @section('content')
     <div class="box">
-        <admin-filter-events
-            locations-json="{{ json_encode($locations) }}"
-            categories-json="{{ json_encode($categories) }}"
-            create-event-url="{{ route('admin.events.create') }}"
-        ></admin-filter-events>
+        <div class="clearfix">
+            <div class="float-left">
+                <h1 class="bg-brand font-bold text-center text-3xl md:text-5xl px-3">
+                    Contact Submissions
+                </h1>
+            </div>
+        </div>
 
-        @if (!$events->count())
-            <span>No events found.</span>
+        @if (!$items->count())
+            <span>No contact submissions found.</span>
         @else
             <div class="w-full mx-auto">
                 <div class="bg-white shadow-md rounded my-6">
                     <table class="text-left w-full border-collapse">
                         <thead>
                             <th class="py-4 px-6 bg-gray-200 font-bold uppercase text-sm text-gray-700 border-b border-gray-100">
-                                Event
+                                Name
                             </th>
                             <th class="py-4 px-6 bg-gray-200 font-bold uppercase text-sm text-gray-700 border-b border-gray-100">
-                                Start Date
+                                Email
                             </th>
                             <th class="py-4 px-6 bg-gray-200 font-bold uppercase text-sm text-gray-700 border-b border-gray-100">
-                                Location
+                                Reviewed
                             </th>
                             <th class="py-4 px-6 bg-gray-200 font-bold uppercase text-sm text-gray-700 border-b border-gray-100">
-                                Category
+                                Created
                             </th>
                             <th class="py-4 px-6 bg-gray-200 font-bold uppercase text-sm text-gray-700 border-b border-gray-100">
                                 Actions
                             </th>
                         </thead>
                         <tbody>
-                            @foreach($events as $event)
+                            @foreach($items as $item)
                                 <tr class="hover:bg-gray-100">
                                     <td class="py-4 px-6 border-b border-gray-100">
-                                        {{ $event->name }}
+                                        {{ $item->name }}
                                     </td>
                                     <td class="py-4 px-6 border-b border-gray-100">
-                                        <span>{{ $event->start_date->format('D, M jS') }}</span>
-                                        <br />
-                                        <small class="text-xs">
-                                            {{ $event->start_time }}
-                                        </small>
-
-                                        @if(!empty($event->end_time))
-                                            <small class="text-xs ml-1">
-                                                - {{ $event->end_time }}
-                                            </small>
-                                        @endif
+                                        {{ $item->email }}
                                     </td>
                                     <td class="py-4 px-6 border-b border-gray-100">
-                                        {{ $event->location_id ? $event->location->name : 'N/A' }}
+                                        {{ $item->reviewed ? 'Yes' : 'No' }}
                                     </td>
                                     <td class="py-4 px-6 border-b border-gray-100">
-                                        {{ $event->category->name }}
+                                        {{ $item->created_at->format('F j, Y') }}
                                     </td>
                                     <td class="py-4 px-6 border-b border-gray-100">
-                                        <a href="{{ route('admin.events.edit', [ 'event' => $event->id ]) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 border border-black rounded">
-                                            @if($event->source === 'submission')
-                                                <i class="fa fa-check-circle mr-1"></i>
-                                                <span>Review</span>
-                                            @else
-                                                <i class="fa fa-pencil-alt mr-1"></i>
-                                                <span>Edit</span>
-                                            @endif
+                                        <a
+                                            href="{{ route('admin.contact_submissions.delete', [ 'submission' => $item->id ]) }}"
+                                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded"
+                                            onclick="return confirm('Are you sure you want to delete this submission?');"
+                                        >
+                                            <i class="fa fa-trash"></i>
+                                            <span>Delete</span>
                                         </a>
                                     </td>
                                 </tr>
@@ -74,7 +65,7 @@
                 </div>
             </div>
 
-            {{ $events->links('pagination::tailwindcss') }}
+            {{ $items->links('pagination::tailwindcss') }}
         @endif
     </div>
 @endsection

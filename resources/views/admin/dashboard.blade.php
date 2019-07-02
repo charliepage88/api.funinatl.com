@@ -5,132 +5,189 @@
         <div class="w-full md:w-1/2 xl:w-1/3 p-3">
             <!--Metric Card-->
             <div class="bg-white border rounded shadow p-2">
-                <div class="flex flex-row items-center">
-                    <div class="w-1/5 pr-0">
-                        <div class="rounded p-3 pl-4 bg-purple-700">
-                            <i class="fa fa-calendar-alt fa-2x fa-fw fa-inverse"></i>
+                <a href="/admin/events">
+                    <div class="flex flex-row items-center">
+                        <div class="w-1/5 pr-0">
+                            <div class="rounded p-3 pl-4 bg-purple-700">
+                                <i class="fa fa-calendar-alt fa-2x fa-fw fa-inverse"></i>
+                            </div>
+                        </div>
+                        <div class="w-3/4 text-right md:text-center">
+                            <h5 class="uppercase text-gray-500">Upcoming Events</h5>
+
+                            <h3 class="text-3xl">
+                                <span>{{ number_format($stats['events']['upcoming']) }}</span>
+
+                                @if($stats['events']['upcoming_increase'] > 0)
+                                    <span class="text-blue-700">
+                                        @if ($stats['events']['upcoming_increase'] === 2)
+                                            <i class="fas fa-caret-up"></i>
+                                        @else
+                                            <i class="fas fa-caret-down"></i>
+                                        @endif
+                                    </span>
+                                @endif
+                            </h3>
                         </div>
                     </div>
-                    <div class="w-3/4 text-right md:text-center">
-                        <h5 class="uppercase text-gray-500">Upcoming Events</h5>
-
-                        <h3 class="text-3xl">
-                            <span>{{ number_format($stats['events']['upcoming']) }}</span>
-
-                            @if($stats['events']['upcoming_increase'] > 0)
-                                <span class="text-blue-700">
-                                    @if ($stats['events']['upcoming_increase'] === 2)
-                                        <i class="fas fa-caret-up"></i>
-                                    @else
-                                        <i class="fas fa-caret-down"></i>
-                                    @endif
-                                </span>
-                            @endif
-                        </h3>
-                    </div>
-                </div>
+                </a>
             </div>
             <!--/Metric Card-->
         </div>
         <div class="w-full md:w-1/2 xl:w-1/3 p-3">
             <!--Metric Card-->
             <div class="bg-white border rounded shadow p-2">
-                <div class="flex flex-row items-center">
-                    <div class="w-1/5 pr-0">
-                        <div class="rounded p-3 pl-4 bg-purple-700">
-                            <i class="fa fa-users fa-2x fa-fw fa-inverse"></i>
+                <a href="/admin/users">
+                    <div class="flex flex-row items-center">
+                        <div class="w-1/5 pr-0">
+                            <div class="rounded p-3 pl-4 bg-purple-700">
+                                <i class="fa fa-users fa-2x fa-fw fa-inverse"></i>
+                            </div>
+                        </div>
+                        <div class="w-3/4 text-right md:text-center">
+                            <h5 class="uppercase text-gray-500">Total Users</h5>
+
+                            <h3 class="text-3xl">
+                                <span>{{ number_format($stats['users']['total']) }}</span>
+                            </h3>
                         </div>
                     </div>
-                    <div class="w-3/4 text-right md:text-center">
-                        <h5 class="uppercase text-gray-500">Total Users</h5>
-
-                        <h3 class="text-3xl">
-                            <span>{{ number_format($stats['users']['total']) }}</span>
-                        </h3>
-                    </div>
-                </div>
+                </a>
             </div>
             <!--/Metric Card-->
         </div>
         <div class="w-full md:w-1/2 xl:w-1/3 p-3">
             <!--Metric Card-->
             <div class="bg-white border rounded shadow p-2">
-                <div class="flex flex-row items-center">
-                    <div class="w-1/5 pr-0">
-                        <div class="rounded p-3 pl-4 bg-purple-700">
-                            <i class="fa fa-user-plus fa-2x fa-fw fa-inverse"></i>
+                <a href="/admin/users">
+                    <div class="flex flex-row items-center">
+                        <div class="w-1/5 pr-0">
+                            <div class="rounded p-3 pl-4 bg-purple-700">
+                                <i class="fa fa-user-plus fa-2x fa-fw fa-inverse"></i>
+                            </div>
+                        </div>
+                        <div class="w-3/4 text-right md:text-center">
+                            <h5 class="uppercase text-gray-500">New Users</h5>
+
+                            <h3 class="text-3xl">
+                                <span>{{ number_format($stats['users']['new']) }}</span>
+
+                                @if($stats['users']['new_increase'] > 0)
+                                    <span class="text-blue-700">
+                                        @if ($stats['users']['new_increase'] === 2)
+                                            <i class="fas fa-caret-up"></i>
+                                        @else
+                                            <i class="fas fa-caret-down"></i>
+                                        @endif
+                                    </span>
+                                @endif
+                            </h3>
                         </div>
                     </div>
-                    <div class="w-3/4 text-right md:text-center">
-                        <h5 class="uppercase text-gray-500">New Users</h5>
+                </a>
+            </div>
+            <!--/Metric Card-->
+        </div>
+        <div class="w-full md:w-1/2 xl:w-1/3 p-3">
+            <!--Metric Card-->
+            <div class="bg-white border rounded shadow p-2">
+                <a href="/admin/events?source=submission">
+                    <div class="flex flex-row items-center">
+                        <div class="w-1/5 pr-0">
+                            <div class="rounded p-3 pl-4 bg-purple-700">
+                                <i class="fa fa-calendar-week fa-2x fa-fw fa-inverse"></i>
+                            </div>
+                        </div>
+                        <div class="w-3/4 text-right md:text-center">
+                            <h5 class="uppercase text-gray-500">Event Submissions</h5>
 
-                        <h3 class="text-3xl">
-                            <span>{{ number_format($stats['users']['new']) }}</span>
+                            <h3 class="text-3xl">
+                                <span>{{ number_format($stats['events']['submissions_pending']) }}</span>
 
-                            @if($stats['users']['new_increase'] > 0)
-                                <span class="text-blue-700">
-                                    @if ($stats['users']['new_increase'] === 2)
-                                        <i class="fas fa-caret-up"></i>
-                                    @else
-                                        <i class="fas fa-caret-down"></i>
-                                    @endif
-                                </span>
-                            @endif
-                        </h3>
+                                @if($stats['events']['submissions_pending_increase'] > 0)
+                                    <span class="text-blue-700">
+                                        @if ($stats['events']['submissions_pending_increase'] === 2)
+                                            <i class="fas fa-caret-up"></i>
+                                        @else
+                                            <i class="fas fa-caret-down"></i>
+                                        @endif
+                                    </span>
+                                @endif
+                            </h3>
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
             <!--/Metric Card-->
         </div>
         <div class="w-full md:w-1/2 xl:w-1/3 p-3">
             <!--Metric Card-->
             <div class="bg-white border rounded shadow p-2">
-                <div class="flex flex-row items-center">
-                    <div class="flex-shrink pr-4">
-                        <div class="rounded p-3 bg-blue-dark"><i class="fas fa-server fa-2x fa-fw fa-inverse"></i></div>
+                <a href="/admin/locations?source=submission">
+                    <div class="flex flex-row items-center">
+                        <div class="w-1/5 pr-0">
+                            <div class="rounded p-3 pl-4 bg-purple-700">
+                                <i class="fa fa-map fa-2x fa-fw fa-inverse"></i>
+                            </div>
+                        </div>
+                        <div class="w-3/4 text-right md:text-center">
+                            <h5 class="uppercase text-gray-500">Location Submissions</h5>
+
+                            <h3 class="text-3xl">
+                                <span>{{ number_format($stats['locations']['submissions_pending']) }}</span>
+
+                                @if($stats['locations']['submissions_pending_increase'] > 0)
+                                    <span class="text-blue-700">
+                                        @if ($stats['locations']['submissions_pending_increase'] === 2)
+                                            <i class="fas fa-caret-up"></i>
+                                        @else
+                                            <i class="fas fa-caret-down"></i>
+                                        @endif
+                                    </span>
+                                @endif
+                            </h3>
+                        </div>
                     </div>
-                    <div class="flex-1 text-right md:text-center">
-                        <h5 class="uppercase text-grey">Server Uptime</h5>
-                        <h3 class="text-3xl">152 days</h3>
-                    </div>
-                </div>
+                </a>
             </div>
             <!--/Metric Card-->
         </div>
         <div class="w-full md:w-1/2 xl:w-1/3 p-3">
             <!--Metric Card-->
             <div class="bg-white border rounded shadow p-2">
-                <div class="flex flex-row items-center">
-                    <div class="flex-shrink pr-4">
-                        <div class="rounded p-3 bg-indigo-dark"><i class="fas fa-tasks fa-2x fa-fw fa-inverse"></i></div>
+                <a href="/admin/contact-submissions">
+                    <div class="flex flex-row items-center">
+                        <div class="w-1/5 pr-0">
+                            <div class="rounded p-3 pl-4 bg-purple-700">
+                                <i class="fa fa-envelope-open-text fa-2x fa-fw fa-inverse"></i>
+                            </div>
+                        </div>
+                        <div class="w-3/4 text-right md:text-center">
+                            <h5 class="uppercase text-gray-500">Contact Submissions</h5>
+
+                            <h3 class="text-3xl">
+                                <span>{{ number_format($stats['site']['contact_pending']) }}</span>
+
+                                @if($stats['site']['contact_pending_increase'] > 0)
+                                    <span class="text-blue-700">
+                                        @if ($stats['site']['contact_pending_increase'] === 2)
+                                            <i class="fas fa-caret-up"></i>
+                                        @else
+                                            <i class="fas fa-caret-down"></i>
+                                        @endif
+                                    </span>
+                                @endif
+                            </h3>
+                        </div>
                     </div>
-                    <div class="flex-1 text-right md:text-center">
-                        <h5 class="uppercase text-grey">To Do List</h5>
-                        <h3 class="text-3xl">7 tasks</h3>
-                    </div>
-                </div>
-            </div>
-            <!--/Metric Card-->
-        </div>
-        <div class="w-full md:w-1/2 xl:w-1/3 p-3">
-            <!--Metric Card-->
-            <div class="bg-white border rounded shadow p-2">
-                <div class="flex flex-row items-center">
-                    <div class="flex-shrink pr-4">
-                        <div class="rounded p-3 bg-red-dark"><i class="fas fa-inbox fa-2x fa-fw fa-inverse"></i></div>
-                    </div>
-                    <div class="flex-1 text-right md:text-center">
-                        <h5 class="uppercase text-grey">Issues</h5>
-                        <h3 class="text-3xl">3 <span class="text-red"><i class="fas fa-caret-up"></i></span></h3>
-                    </div>
-                </div>
+                </a>
             </div>
             <!--/Metric Card-->
         </div>
     </div>
 
     <!--Divider-->
-    <hr class="border-b-2 border-grey-light my-8 mx-4">
+    <hr class="border-b-2 border-gray-light my-8 mx-4">
 
     <div class="flex flex-row flex-wrap flex-grow mt-2">
 
@@ -138,7 +195,7 @@
             <!--Graph Card-->
             <div class="bg-white border rounded shadow">
                 <div class="border-b p-3">
-                    <h5 class="uppercase text-grey-800">Events Timeline</h5>
+                    <h5 class="uppercase text-gray-800">Events Timeline</h5>
                 </div>
                 <div class="p-5">
                     <chart-events-timeline
@@ -154,7 +211,7 @@
             <!--Graph Card-->
             <div class="bg-white border rounded shadow">
                 <div class="border-b p-3">
-                    <h5 class="uppercase text-grey-dark">Graph</h5>
+                    <h5 class="uppercase text-gray-dark">Graph</h5>
                 </div>
                 <div class="p-5">
                     {{-- <canvas id="chartjs-0" class="chartjs" width="undefined" height="undefined"></canvas>
@@ -183,7 +240,7 @@
             <!--Graph Card-->
             <div class="bg-white border rounded shadow">
                 <div class="border-b p-3">
-                    <h5 class="uppercase text-grey-dark">Graph</h5>
+                    <h5 class="uppercase text-gray-dark">Graph</h5>
                 </div>
                 <div class="p-5">
                     {{-- <canvas id="chartjs-1" class="chartjs" width="undefined" height="undefined"></canvas>
@@ -221,7 +278,7 @@
             <!--Graph Card-->
             <div class="bg-white border rounded shadow">
                 <div class="border-b p-3">
-                    <h5 class="uppercase text-grey-dark">Graph</h5>
+                    <h5 class="uppercase text-gray-dark">Graph</h5>
                 </div>
                 <div class="p-5">
                     {{-- <canvas id="chartjs-4" class="chartjs" width="undefined" height="undefined"></canvas>
@@ -247,10 +304,10 @@
             <!--Template Card-->
             <div class="bg-white border rounded shadow">
                 <div class="border-b p-3">
-                    <h5 class="uppercase text-grey-dark">Template</h5>
+                    <h5 class="uppercase text-gray-dark">Template</h5>
                 </div>
                 <div class="p-5">
-     
+
                 </div>
             </div>
             <!--/Template Card-->
@@ -260,10 +317,10 @@
             <!--Table Card-->
             <div class="bg-white border rounded shadow">
                 <div class="border-b p-3">
-                    <h5 class="uppercase text-grey-dark">Table</h5>
+                    <h5 class="uppercase text-gray-dark">Table</h5>
                 </div>
                 <div class="p-5">
-                    <table class="w-full p-5 text-grey-darker">
+                    <table class="w-full p-5 text-gray-darker">
                         <thead>
                             <tr>
                                 <th class="text-left text-blue-darkest">Name</th>
@@ -287,7 +344,7 @@
                                 <td>Darth Vader</td>
                                 <td>Dark</td>
                                 <td>Sith</td>
-                            </tr>                                   
+                            </tr>
                         </tbody>
                     </table>
 

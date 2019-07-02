@@ -21,4 +21,5 @@ Route::namespace('Api')->group(function () {
     Route::post('/newsletter/subscribe', 'NewsletterController@subscribe');
     Route::post('/events/submit', 'EventsController@submit');
     Route::post('/locations/submit', 'LocationsController@submit');
+    Route::post('/contact/submit', 'ContactSubmissionsController@submit');
 });

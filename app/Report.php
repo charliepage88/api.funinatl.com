@@ -19,14 +19,26 @@ class Report extends Model
         // init stats array
         $stats = [
             'events' => [
-                'upcoming'          => 0,
-                'upcoming_increase' => 0
+                'upcoming'                     => 0,
+                'upcoming_increase'            => 0,
+                'submissions_pending'          => 0,
+                'submissions_pending_increase' => 0
             ],
 
             'users' => [
                 'total'        => 0,
                 'new'          => 0,
                 'new_increase' => 0
+            ],
+
+            'locations' => [
+                'submissions_pending'          => 0,
+                'submissions_pending_increase' => 0
+            ],
+
+            'site' => [
+                'contact_pending'          => 0,
+                'contact_pending_increase' => 0
             ]
         ];
 
@@ -57,6 +69,34 @@ class Report extends Model
             $stats['events']['upcoming_increase'] = 1;
         }
 
+        // get stats for user submitted events
+        $items = DB::table('events')
+            ->where('source', '=', 'submission')
+            ->where('active', '=', 0)
+            ->get();
+
+        $stats['events']['submissions_pending'] = $items->count();
+
+        // compare to last week to see if it has
+        // increased or not
+        if ($items->count()) {
+            $startDate = Carbon::now()->subWeek();
+            $endDate = $startDate->copy()->addMonth();
+
+            $lastWeekCount = DB::table('events')
+                ->where('source', '=', 'submission')
+                ->where('start_date', '>=', $startDate->format('Y-m-d'))
+                ->where('start_date', '<=', $endDate->format('Y-m-d'))
+                ->whereNotIn('id', $items->pluck('id'))
+                ->count();
+
+            if ($stats['events']['submissions_pending'] > $lastWeekCount) {
+                $stats['events']['submissions_pending_increase'] = 2;
+            } elseif($stats['events']['submissions_pending'] < $lastWeekCount) {
+                $stats['events']['submissions_pending_increase'] = 1;
+            }
+        }
+
         // user stats
 
         // get total count
@@ -80,6 +120,64 @@ class Report extends Model
             $stats['users']['new_increase'] = 2;
         } elseif ($stats['users']['new'] < $lastWeekCount) {
             $stats['users']['new_increase'] = 1;
+        }
+
+        // location stats
+
+        // get stats for user submitted locations
+        $items = DB::table('locations')
+            ->where('source', '=', 'submission')
+            ->where('active', '=', 0)
+            ->get();
+
+        $stats['locations']['submissions_pending'] = $items->count();
+
+        // compare to last week to see if it has
+        // increased or not
+        if ($items->count()) {
+            $startDate = Carbon::now()->subWeek();
+            $endDate = $startDate->copy()->addMonth();
+
+            $lastWeekCount = DB::table('locations')
+                ->where('source', '=', 'submission')
+                ->where('created_at', '>=', $startDate->format('Y-m-d H:i:s'))
+                ->where('created_at', '<=', $endDate->format('Y-m-d H:i:s'))
+                ->whereNotIn('id', $items->pluck('id'))
+                ->count();
+
+            if ($stats['locations']['submissions_pending'] > $lastWeekCount) {
+                $stats['locations']['submissions_pending_increase'] = 2;
+            } elseif($stats['locations']['submissions_pending'] < $lastWeekCount) {
+                $stats['locations']['submissions_pending_increase'] = 1;
+            }
+        }
+
+        // site stats
+
+        // get stats for contact submissions
+        $items = DB::table('contact_submissions')
+            ->where('reviewed', '=', false)
+            ->get();
+
+        $stats['site']['contact_pending'] = $items->count();
+
+        // compare to last week to see if it has
+        // increased or not
+        if ($items->count()) {
+            $startDate = Carbon::now()->subWeek();
+            $endDate = $startDate->copy()->addMonth();
+
+            $lastWeekCount = DB::table('contact_submissions')
+                ->where('created_at', '>=', $startDate->format('Y-m-d H:i:s'))
+                ->where('created_at', '<=', $endDate->format('Y-m-d H:i:s'))
+                ->whereNotIn('id', $items->pluck('id'))
+                ->count();
+
+            if ($stats['site']['contact_pending'] > $lastWeekCount) {
+                $stats['site']['contact_pending_increase'] = 2;
+            } elseif($stats['site']['contact_pending'] < $lastWeekCount) {
+                $stats['site']['contact_pending_increase'] = 1;
+            }
         }
 
         return $stats;

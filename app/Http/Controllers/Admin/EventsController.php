@@ -44,6 +44,10 @@ class EventsController extends Controller
             $events->where('start_date', '<=', $request->get('end_date'));
         }
 
+        if ($source = $request->get('source')) {
+            $events->where('source', '=', $source);
+        }
+
         // get paginated results
         $events = $events->paginate(15);
         $categories = Category::select([ 'id', 'name' ])->orderBy('name', 'asc')->get();

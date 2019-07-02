@@ -12,29 +12,29 @@ use Validator;
 class EventsController extends Controller
 {
     /**
-    * Subscribe
+    * Submit
     *
-    * @param Request $reqest
+    * @param Request $request
     *
     * @return Response
     */
-    public function subscribe(Request $reqest)
+    public function submit(Request $request)
     {
         // validate
         $validator = Validator::make($request->all(), [
             'name' => 'required|max:255',
             'category_id' => 'required',
-            'location_id' => 'required',
             'start_date' => 'required',
             'start_time' => 'required',
             'price' => 'required',
-            'website' => 'required'
+            'website' => 'required',
+            'recaptcha_token' => 'required|recaptchav3:login,0.5'
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'errors' => $validator->errors()
-            ], 422);            
+            ], 422);
         }
 
         // save event

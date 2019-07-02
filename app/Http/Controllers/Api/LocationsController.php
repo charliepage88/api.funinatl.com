@@ -12,13 +12,13 @@ use Validator;
 class LocationsController extends Controller
 {
     /**
-    * Subscribe
+    * Submit
     *
-    * @param Request $reqest
+    * @param Request $request
     *
     * @return Response
     */
-    public function subscribe(Request $reqest)
+    public function submit(Request $request)
     {
         // validate
         $validator = Validator::make($request->all(), [
@@ -26,15 +26,15 @@ class LocationsController extends Controller
             'category_id' => 'required',
             'address' => 'required',
             'city' => 'required',
-            'state' => 'required',
             'zip' => 'required',
-            'website' => 'required'
+            'website' => 'required',
+            'recaptcha_token' => 'required|recaptchav3:login,0.5'
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'errors' => $validator->errors()
-            ], 422);            
+            ], 422);
         }
 
         // save location
@@ -44,6 +44,7 @@ class LocationsController extends Controller
 
         $location->active = false;
         $location->source = 'submission';
+        $location->state = 'GA';
 
         $location->save();
 

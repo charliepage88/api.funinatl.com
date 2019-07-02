@@ -150,6 +150,42 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: 'admin-filter-events',
   props: ['categoriesJson', 'locationsJson', 'createEventUrl'],
@@ -165,6 +201,7 @@ __webpack_require__.r(__webpack_exports__);
     return {
       category_id: null,
       location_id: null,
+      source: null,
       urlParams: new URLSearchParams(window.location.search)
     };
   },
@@ -200,6 +237,10 @@ __webpack_require__.r(__webpack_exports__);
 
     if (urlParams.get('location_id')) {
       this.location_id = urlParams.get('location_id');
+    }
+
+    if (urlParams.get('source')) {
+      this.source = urlParams.get('source');
     }
   }
 });
@@ -36613,7 +36654,7 @@ var render = function() {
     _vm._m(0),
     _vm._v(" "),
     _vm.categories.length
-      ? _c("div", { staticClass: "w-1/4 mr-4 mt-4" }, [
+      ? _c("div", { staticClass: "w-1/5 mr-4 mt-4" }, [
           _c("div", { staticClass: "relative" }, [
             _c(
               "select",
@@ -36658,13 +36699,7 @@ var render = function() {
                   return _c(
                     "option",
                     { key: category.id, domProps: { value: category.id } },
-                    [
-                      _vm._v(
-                        "\n            " +
-                          _vm._s(category.name) +
-                          "\n          "
-                      )
-                    ]
+                    [_vm._v(_vm._s(category.name))]
                   )
                 })
               ],
@@ -36702,7 +36737,7 @@ var render = function() {
         ])
       : _vm._e(),
     _vm._v(" "),
-    _c("div", { staticClass: "w-1/4 mr-16 mt-4" }, [
+    _c("div", { staticClass: "w-1/5 mr-4 mt-4" }, [
       _c("div", { staticClass: "relative" }, [
         _c(
           "select",
@@ -36747,15 +36782,94 @@ var render = function() {
               return _c(
                 "option",
                 { key: location.id, domProps: { value: location.id } },
-                [
-                  _vm._v(
-                    "\n            " + _vm._s(location.name) + "\n          "
-                  )
-                ]
+                [_vm._v(_vm._s(location.name))]
               )
             })
           ],
           2
+        ),
+        _vm._v(" "),
+        _c(
+          "div",
+          {
+            staticClass:
+              "pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
+          },
+          [
+            _c(
+              "svg",
+              {
+                staticClass: "fill-current h-4 w-4",
+                attrs: {
+                  xmlns: "http://www.w3.org/2000/svg",
+                  viewBox: "0 0 20 20"
+                }
+              },
+              [
+                _c("path", {
+                  attrs: {
+                    d:
+                      "M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"
+                  }
+                })
+              ]
+            )
+          ]
+        )
+      ])
+    ]),
+    _vm._v(" "),
+    _c("div", { staticClass: "w-auto mr-16 mt-4" }, [
+      _c("div", { staticClass: "relative" }, [
+        _c(
+          "select",
+          {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.source,
+                expression: "source"
+              }
+            ],
+            staticClass:
+              "block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500",
+            on: {
+              change: [
+                function($event) {
+                  var $$selectedVal = Array.prototype.filter
+                    .call($event.target.options, function(o) {
+                      return o.selected
+                    })
+                    .map(function(o) {
+                      var val = "_value" in o ? o._value : o.value
+                      return val
+                    })
+                  _vm.source = $event.target.multiple
+                    ? $$selectedVal
+                    : $$selectedVal[0]
+                },
+                function($event) {
+                  return _vm.filterUpdate("source")
+                }
+              ]
+            }
+          },
+          [
+            _c("option", { attrs: { value: "null" } }, [
+              _vm._v("Choose Source")
+            ]),
+            _vm._v(" "),
+            _c("option", { attrs: { value: "provider" } }, [
+              _vm._v("Provider")
+            ]),
+            _vm._v(" "),
+            _c("option", { attrs: { value: "submission" } }, [
+              _vm._v("Submission")
+            ]),
+            _vm._v(" "),
+            _c("option", { attrs: { value: "custom" } }, [_vm._v("Custom")])
+          ]
         ),
         _vm._v(" "),
         _c(
@@ -36816,7 +36930,7 @@ var staticRenderFns = [
       _c(
         "h1",
         { staticClass: "bg-brand font-bold text-3xl md:text-5xl px-3 mt-0" },
-        [_vm._v("\n        Events\n      ")]
+        [_vm._v("Events")]
       )
     ])
   }

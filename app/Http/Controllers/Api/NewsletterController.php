@@ -14,11 +14,11 @@ class NewsletterController extends Controller
     /**
     * Subscribe
     *
-    * @param Request $reqest
+    * @param Request $request
     *
     * @return Response
     */
-    public function subscribe(Request $reqest)
+    public function subscribe(Request $request)
     {
         // validate
         $validator = Validator::make($request->all(), [
@@ -26,7 +26,7 @@ class NewsletterController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([ 'errors' => $validator->errors() ], 422);            
+            return response()->json([ 'errors' => $validator->errors() ], 422);
         }
 
         $isSubscribed = Newsletter::isSubscribed($request->email);

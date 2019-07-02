@@ -71,4 +71,10 @@ Route::middleware('auth')->namespace('Admin')->prefix('admin')->group(function (
         ->name('admin.events.create');
     Route::any('/events/edit/{event}', 'EventsController@edit')
         ->name('admin.events.edit');
+
+    // Contact Submissions
+    Route::get('/contact-submissions', 'ContactSubmissionsController@index')
+        ->name('admin.contact_submissions.index');
+    Route::get('/contact-submissions/delete/{submission}', 'ContactSubmissionsController@destroy')
+        ->name('admin.contact_submissions.delete');
 });
