@@ -165,6 +165,7 @@ return [
         /*
          * Package Service Providers...
          */
+        Scottybo\Twitter\TwitterServiceProvider::class,
 
         /*
          * Application Service Providers...
@@ -228,6 +229,7 @@ return [
 
         // Custom
         'SiteHelper' => App\Facades\SiteHelper::class,
+        'Twitter' => Scottybo\Twitter\Facades\Twitter::class,
     ],
 
 ];

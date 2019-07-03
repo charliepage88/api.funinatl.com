@@ -7,7 +7,7 @@
 <script>
   import flatPickr from 'vue-flatpickr-component'
   import 'flatpickr/dist/flatpickr.css'
-  
+
   export default {
     name: 'date-picker',
 
@@ -18,15 +18,19 @@
 
     watch: {
       value (newVal, oldVal) {
-        this.updateInput(newVal)
+        if (newVal && newVal !== oldVal) {
+          this.updateInput(newVal)
 
-        this.date = newVal
+          this.date = newVal
+        }
       },
 
       date (newVal, oldVal) {
-        this.updateInput(newVal)
+        if (newVal && newVal !== oldVal) {
+          this.updateInput(newVal)
 
-        this.$emit('change', newVal)
+          this.$emit('change', newVal)
+        }
       }
     },
 
@@ -53,7 +57,9 @@
     },
 
     mounted () {
-      this.date = this.value
+      if (this.value) {
+        this.date = this.value
+      }
     }
   }
 </script>

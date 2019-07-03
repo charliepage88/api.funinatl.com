@@ -21,6 +21,7 @@ window.Vue = require('vue');
 
 // admin components
 Vue.component('admin-filter-events', require('./components/AdminFilterEvents.vue').default);
+Vue.component('admin-filter-locations', require('./components/AdminFilterLocations.vue').default);
 Vue.component('date-picker', require('./components/DatePicker.vue').default);
 
 // chart components
@@ -63,7 +64,7 @@ function check(e){
     userMenuDiv.classList.add("invisible");
   }
   }
-  
+
   //Nav Menu
   if (!checkParent(target, navMenuDiv)) {
   // click NOT on the menu
@@ -77,7 +78,7 @@ function check(e){
     navMenuDiv.classList.add("hidden");
   }
   }
-  
+
 }
 
 function checkParent(t, elm) {

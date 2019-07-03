@@ -50,6 +50,8 @@ class EventsController extends Controller
 
         // get paginated results
         $events = $events->paginate(15);
+
+        // get filter data
         $categories = Category::select([ 'id', 'name' ])->orderBy('name', 'asc')->get();
         $locations = Location::select([ 'id', 'name' ])->orderBy('name', 'asc')->get();
 

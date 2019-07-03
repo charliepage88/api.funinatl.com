@@ -19,9 +19,24 @@ class LocationsController extends Controller
     */
     public function index(Request $request)
     {
-        $locations = Location::orderBy('name', 'asc')->paginate(15);
+        $locations = Location::orderBy('name', 'asc');
 
-        return view('admin.locations.index', compact('locations'));
+        // filters - tmp solution
+        if ($request->get('category_id')) {
+            $locations->where('category_id', '=', $request->get('category_id'));
+        }
+
+        if ($request->get('source')) {
+            $locations->where('source', '=', $request->get('source'));
+        }
+
+        // paginated results
+        $locations = $locations->paginate(15);
+
+        // get filter data
+        $categories = Category::select([ 'id', 'name' ])->orderBy('name', 'asc')->get();
+
+        return view('admin.locations.index', compact('locations', 'categories'));
     }
 
     /**
@@ -48,7 +63,7 @@ class LocationsController extends Controller
 
             $location->fill($request->except('photo', 'tags'));
 
-            $location->source = 'admin';
+            $location->source = 'custom';
 
             $location->save();
 

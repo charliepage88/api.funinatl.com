@@ -10,12 +10,12 @@
 
         <div class="flex flex-wrap -mx-3 mb-6">
             <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-name">
-                    Name 
+                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="name">
+                    Name
                     <span class="text-red-500 text-xs italic">*</span>
                 </label>
-                
-                <input class="appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight" name="name" id="grid-name" type="text" value="{{ $event->name }}">
+
+                <input class="appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight" name="name" id="name" type="text" value="{{ old('name') ?? $event->name }}">
 
                 @if ($errors->has('name'))
                     <span class="text-red-500 text-sm" role="alert">
@@ -25,16 +25,16 @@
             </div>
 
             <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-category">
-                    Category 
+                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="category">
+                    Category
                     <span class="text-red-500 text-xs italic">*</span>
                 </label>
-                
+
                 <div class="relative">
-                    <select class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-category" name="category_id">
+                    <select class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="category" name="category_id">
                         <option value="">Choose Category</option>
                         @foreach($categories as $id => $name)
-                            <option value="{{ $id }}"{{ $event->category_id === $id ? ' selected' : '' }}>
+                            <option value="{{ $id }}"{{ (old('category_id') ?? $event->category_id) == $id ? ' selected' : '' }}>
                                 {{ $name }}
                             </option>
                         @endforeach
@@ -53,16 +53,16 @@
             </div>
 
             <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-location">
-                    Location 
+                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="location">
+                    Location
                     <span class="text-red-500 text-xs italic">*</span>
                 </label>
-                
+
                 <div class="relative">
-                    <select class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-location" name="location_id">
+                    <select class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="location" name="location_id">
                         <option value="">Choose Location</option>
                         @foreach($locations as $id => $name)
-                            <option value="{{ $id }}"{{ $event->location_id === $id ? ' selected' : '' }}>{{ $name }}</option>
+                            <option value="{{ $id }}"{{ (old('location_id') ?? $event->location_id) == $id ? ' selected' : '' }}>{{ $name }}</option>
                         @endforeach
                     </select>
 
@@ -81,28 +81,28 @@
 
         <div class="flex flex-wrap -mx-3 mb-6">
             <div class="w-full md:w-1/3 px-3">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-photo">
+                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="photo">
                     Photo
                 </label>
 
                 @if(!empty($event->photo_url))
                     <img class="h-128 w-128 mx-auto mb-2" src="{{ $event->photo_url }}">
                 @endif
-                
-                <input class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:border-gray-500" name="photo" id="grid-photo" type="file">
+
+                <input class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:border-gray-500" name="photo" id="photo" type="file">
             </div>
 
             <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-start-date">
-                    Start Date 
+                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="start-date">
+                    Start Date
                     <span class="text-red-500 text-xs italic">*</span>
                 </label>
-                
+
                 <div>
-                    <date-picker name="start_date" value="{{ $event->start_date }}" input-id="start_date" />
+                    <date-picker value="{{ old('start_date') ?? $event->start_date }}" input-id="start_date" />
                 </div>
 
-                <input type="hidden" id="start_date" value="{{ $event->start_date }}">
+                <input type="hidden" name="start_date" id="start_date" value="{{ old('start_date') ?? $event->start_date }}">
 
                 @if ($errors->has('start_date'))
                     <span class="text-red-500 text-sm" role="alert">
@@ -112,15 +112,15 @@
             </div>
 
             <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-end-date">
-                    End Date 
+                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="end-date">
+                    End Date
                 </label>
-                
+
                 <div>
-                    <date-picker name="end_date" value="{{ $event->end_date }}" input-id="end_date" />
+                    <date-picker value="{{ old('end_date') ?? $event->end_date }}" input-id="end_date" />
                 </div>
 
-                <input type="hidden" id="end_date" value="{{ $event->end_date }}">
+                <input type="hidden" name="end_date" id="end_date" value="{{ old('end_date') ?? $event->end_date }}">
 
                 @if ($errors->has('end_date'))
                     <span class="text-red-500 text-sm" role="alert">
@@ -132,12 +132,12 @@
 
         <div class="flex flex-wrap -mx-3 mb-2">
             <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-price">
-                    Price 
+                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="price">
+                    Price
                     <span class="text-red-500 text-xs italic">*</span>
                 </label>
-                
-                <input class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-price" type="text" name="price" value="{{ $event->price }}">
+
+                <input class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="price" type="text" name="price" value="{{ old('price') ?? $event->price }}">
 
                 @if ($errors->has('price'))
                     <span class="text-red-500 text-sm" role="alert">
@@ -145,14 +145,14 @@
                     </span>
                 @endif
             </div>
-            
+
             <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-start-time">
-                    Start Time 
+                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="start-time">
+                    Start Time
                     <span class="text-red-500 text-xs italic">*</span>
                 </label>
-                
-                <input class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-start-time" type="text" name="start_time" value="{{ $event->start_time }}">
+
+                <input class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="start-time" type="text" name="start_time" value="{{ old('start_time') ?? $event->start_time }}">
 
                 @if ($errors->has('start_time'))
                     <span class="text-red-500 text-sm" role="alert">
@@ -160,13 +160,13 @@
                     </span>
                 @endif
             </div>
-            
+
             <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-end-time">
+                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="end-time">
                     End Time
                 </label>
-                
-                <input class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-end-time" type="text" name="end_time" value="{{ $event->end_time }}">
+
+                <input class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="end-time" type="text" name="end_time" value="{{ old('end_time') ?? $event->end_time }}">
 
                 @if ($errors->has('end_time'))
                     <span class="text-red-500 text-sm" role="alert">
@@ -178,11 +178,11 @@
 
         <div class="flex flex-wrap -mx-3 mb-2 pt-4">
             <div class="w-full md:w-auto pl-3 pr-12 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-is-family-friendly">
-                    Family Friendly 
+                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="is-family-friendly">
+                    Family Friendly
                 </label>
 
-                <div class="mb-2">                
+                <div class="mb-2">
                     <div class="form-switch inline-block align-middle">
                         <input
                             type="checkbox"
@@ -190,7 +190,7 @@
                             id="is_family_friendly"
                             class="form-switch-checkbox"
                             value="1"
-                            {{ $event->is_family_friendly ? 'checked' : '' }}
+                            {{ (old('is_family_friendly') ?? $event->is_family_friendly) ? 'checked' : '' }}
                         >
                         <label class="form-switch-label" for="is_family_friendly"></label>
                     </div>
@@ -198,12 +198,12 @@
             </div>
 
             <div class="w-full md:w-auto px-8 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-active">
+                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="active">
                     Active
                     <span class="text-red-500 text-xs italic">*</span>
                 </label>
 
-                <div class="mb-2">                
+                <div class="mb-2">
                     <div class="form-switch inline-block align-middle">
                         <input
                             type="checkbox"
@@ -219,11 +219,11 @@
             </div>
 
             <div class="w-full md:w-auto pl-12 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-featured">
+                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="featured">
                     Featured
                 </label>
 
-                <div class="mb-2">                
+                <div class="mb-2">
                     <div class="form-switch inline-block align-middle">
                         <input
                             type="checkbox"
@@ -231,21 +231,36 @@
                             id="featured"
                             class="form-switch-checkbox"
                             value="1"
-                            {{ $event->featured ? 'checked' : '' }}
+                            {{ (old('featured') ?? $event->featured) ? 'checked' : '' }}
                         >
                         <label class="form-switch-label" for="featured"></label>
                     </div>
                 </div>
             </div>
+
+            <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0 pl-10">
+                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="website">
+                    Website
+                    <span class="text-red-500 text-xs italic">*</span>
+                </label>
+
+                <input class="appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight" name="website" id="website" type="text" value="{{ old('website') ?? $event->website }}">
+
+                @if ($errors->has('website'))
+                    <span class="text-red-500 text-sm" role="alert">
+                        {{ $errors->first('website') }}
+                    </span>
+                @endif
+            </div>
         </div>
 
         <div class="flex flex-wrap -mx-3 mb-2">
             <div class="w-1/2 md:w-1/2 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-short-description">
+                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="short-description">
                     Short Description
                 </label>
 
-                <textarea class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-short-description" name="short_description">{{ $event->short_description }}</textarea>
+                <textarea class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="short-description" name="short_description">{{ old('short_description') ?? $event->short_description }}</textarea>
 
                 @if ($errors->has('short_description'))
                     <span class="text-red-500 text-sm" role="alert">
@@ -255,11 +270,11 @@
             </div>
 
             <div class="w-1/2 md:w-1/2 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-description">
+                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="description">
                     Description
                 </label>
 
-                <textarea class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-description" name="description">{{ $event->description }}</textarea>
+                <textarea class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="description" name="description">{{ old('description') ?? $event->description }}</textarea>
 
                 @if ($errors->has('description'))
                     <span class="text-red-500 text-sm" role="alert">
