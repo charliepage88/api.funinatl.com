@@ -12,6 +12,10 @@ use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Spatie\Tags\HasTags;
 
+use App\Collections\MusicBandCollection;
+
+use DB;
+
 class Event extends Model implements HasMedia
 {
     use HasMediaTrait,
@@ -45,7 +49,6 @@ class Event extends Model implements HasMedia
         'active',
         'website',
         'is_sold_out',
-        'spotify_artist_id',
         'is_family_friendly'
     ];
 
@@ -108,6 +111,16 @@ class Event extends Model implements HasMedia
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /**
+    * Bands
+    *
+    * @return Collection
+    */
+    public function bands()
+    {
+        return $this->belongsToMany(MusicBand::class, 'event_music_bands', 'event_id', 'music_band_id');
     }
 
     /**
@@ -242,7 +255,6 @@ class Event extends Model implements HasMedia
             'featured',
             'is_sold_out',
             'website',
-            'spotify_artist_id',
             'is_family_friendly'
         ];
 
@@ -268,6 +280,10 @@ class Event extends Model implements HasMedia
 
         $event['event_type'] = $this->eventType->name;
         $event['location'] = $this->location->toSearchableArray();
+
+        if ($this->bands->count()) {
+            $event['bands'] = $this->bands->toSearchableArray();
+        }
 
         return $event;
     }
@@ -300,7 +316,6 @@ class Event extends Model implements HasMedia
             'featured',
             'is_sold_out',
             'website',
-            'spotify_artist_id',
             'is_family_friendly'
         ];
 
@@ -327,6 +342,80 @@ class Event extends Model implements HasMedia
         $event['event_type'] = $this->eventType->name;
         $event['location'] = $this->location->getMongoArray(false);
 
+        if ($this->bands->count()) {
+            $event['bands'] = $this->bands->getMongoArray();
+        }
+
         return $event;
+    }
+
+    /**
+    * Sync Bands
+    *
+    * @param array $bands
+    *
+    * @return Event
+    */
+    public function syncBands(array $bands)
+    {
+        if (!empty($bands)) {
+            // create band records or retrieve model
+            // put ID's into array to sync after
+            $bandIds = [];
+            foreach($bands as $bandName) {
+                $band = MusicBand::firstOrCreate([ 'name' => $bandName ]);
+
+                if (!empty($band)) {
+                    $bandIds[] = $band->id;
+                }
+            }
+
+            // get unique band ids
+            // and sync to event
+            if (!empty($bandIds)) {
+                $bandIds = array_unique($bandIds);
+
+                $this->bands()->sync($bandIds);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+    * Get First Band With Image
+    *
+    * @return MusicBand|null
+    */
+    public function getFirstBandWithImage()
+    {
+        $band = null;
+        if ($this->bands->count()) {
+            $bands = $this->bands()->get();
+            $bandIds = $bands->pluck('id')->toArray();
+
+            $mediaFind = DB::table('media')
+                ->where('model_type', '=', 'App\MusicBand')
+                ->whereIn('model_id', $bandIds)
+                ->orderBy('order_column', 'asc')
+                ->first();
+
+            if (!empty($mediaFind)) {
+                $band = $bands->where('id', '=', $mediaFind->model_id)->first();
+            }
+        }
+
+        return $band;
+    }
+
+    /**
+     * Create a new Eloquent Collection instance.
+     *
+     * @param  array  $models
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function newCollection(array $models = [])
+    {
+        return new MusicBandCollection($models);
     }
 }

@@ -35,7 +35,7 @@ class DevCommand extends Command
     /**
      * @var boolean
      */
-    public $enableSync = true;
+    public $enableSync = false;
 
     /**
      * Execute the console command.
@@ -45,6 +45,8 @@ class DevCommand extends Command
     public function handle()
     {
         // $this->truncateMongo();
+        $this->eventsWithoutPhoto();
+        $this->syncMusicBands();
 
         if ($this->enableSync) {
             $this->syncCategoriesToMongo();
@@ -72,6 +74,8 @@ class DevCommand extends Command
     */
     public function eventsWithoutPhoto()
     {
+        $this->info('eventsWithoutPhoto');
+
         $events = Event::isActive()->get();
 
         foreach($events as $event) {
@@ -227,5 +231,23 @@ class DevCommand extends Command
             ->where('collection_name', '=', 'images')
             ->where('model_type', '=', 'App\Event')
             ->update([ 'collection_name' => 'events' ]);
+    }
+
+    /**
+    * Sync Music Bands
+    *
+    * @return void
+    */
+    public function syncMusicBands()
+    {
+        $this->info('syncMusicBands');
+
+        $events = Event::isActive()->get();
+
+        foreach($events as $event) {
+            if (!$event->bands()->count() && $event->category_id === 1) {
+                $this->info($event->name);
+            }
+        }
     }
 }

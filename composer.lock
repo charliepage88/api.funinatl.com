@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "152e76d2ec290dc624d31aa27417a1ab",
+    "content-hash": "8ab0d1c3343debff4eeb8675c55b7973",
     "packages": [
         {
             "name": "algolia/algoliasearch-client-php",
@@ -77,6 +77,59 @@
             "time": "2019-05-15T09:16:37+00:00"
         },
         {
+            "name": "appstract/laravel-meta",
+            "version": "1.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/appstract/laravel-meta.git",
+                "reference": "6ec758db0d329ab0d5b22e160aa2f551a397d262"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/appstract/laravel-meta/zipball/6ec758db0d329ab0d5b22e160aa2f551a397d262",
+                "reference": "6ec758db0d329ab0d5b22e160aa2f551a397d262",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.6"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^5.7"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Appstract\\Meta\\MetaServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Appstract\\Meta\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Gijs Jorissen",
+                    "email": "hello@appstract.team",
+                    "homepage": "https://appstract.team",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Model meta",
+            "homepage": "https://github.com/appstract/laravel-meta",
+            "keywords": [
+                "appstract",
+                "laravel-meta"
+            ],
+            "time": "2019-06-11T12:05:50+00:00"
+        },
+        {
             "name": "asm89/stack-cors",
             "version": "1.2.0",
             "source": {
@@ -130,16 +183,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.104.0",
+            "version": "3.104.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "9feac27d183fa08f210f38c8cb6d449cf2411d29"
+                "reference": "295706ab2134bf842837fa0b0162ff3aef8b0aa4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/9feac27d183fa08f210f38c8cb6d449cf2411d29",
-                "reference": "9feac27d183fa08f210f38c8cb6d449cf2411d29",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/295706ab2134bf842837fa0b0162ff3aef8b0aa4",
+                "reference": "295706ab2134bf842837fa0b0162ff3aef8b0aa4",
                 "shasum": ""
             },
             "require": {
@@ -209,7 +262,7 @@
                 "s3",
                 "sdk"
             ],
-            "time": "2019-07-02T18:21:12+00:00"
+            "time": "2019-07-03T18:08:50+00:00"
         },
         {
             "name": "babenkoivan/scout-elasticsearch-driver",
@@ -4090,16 +4143,16 @@
         },
         {
             "name": "spatie/laravel-medialibrary",
-            "version": "7.6.0",
+            "version": "7.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-medialibrary.git",
-                "reference": "6ffb8a41e60f024abd35ff47e08628354d6efd0e"
+                "reference": "ba5437eb92c537530538d68cb29181233d257fa0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-medialibrary/zipball/6ffb8a41e60f024abd35ff47e08628354d6efd0e",
-                "reference": "6ffb8a41e60f024abd35ff47e08628354d6efd0e",
+                "url": "https://api.github.com/repos/spatie/laravel-medialibrary/zipball/ba5437eb92c537530538d68cb29181233d257fa0",
+                "reference": "ba5437eb92c537530538d68cb29181233d257fa0",
                 "shasum": ""
             },
             "require": {
@@ -4169,7 +4222,7 @@
                 "media",
                 "spatie"
             ],
-            "time": "2019-02-27T09:31:55+00:00"
+            "time": "2019-07-04T11:01:02+00:00"
         },
         {
             "name": "spatie/laravel-newsletter",
@@ -6310,16 +6363,16 @@
         },
         {
             "name": "filp/whoops",
-            "version": "2.4.0",
+            "version": "2.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/filp/whoops.git",
-                "reference": "1a1a1044ad00e285bd2825fac4c3a0443d90ad33"
+                "reference": "6fb502c23885701a991b0bba974b1a8eb6673577"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/filp/whoops/zipball/1a1a1044ad00e285bd2825fac4c3a0443d90ad33",
-                "reference": "1a1a1044ad00e285bd2825fac4c3a0443d90ad33",
+                "url": "https://api.github.com/repos/filp/whoops/zipball/6fb502c23885701a991b0bba974b1a8eb6673577",
+                "reference": "6fb502c23885701a991b0bba974b1a8eb6673577",
                 "shasum": ""
             },
             "require": {
@@ -6367,7 +6420,7 @@
                 "throwable",
                 "whoops"
             ],
-            "time": "2019-06-23T09:00:00+00:00"
+            "time": "2019-07-04T09:00:00+00:00"
         },
         {
             "name": "fzaninotto/faker",

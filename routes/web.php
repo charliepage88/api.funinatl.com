@@ -75,6 +75,8 @@ Route::middleware('auth')->namespace('Admin')->prefix('admin')->group(function (
     // Contact Submissions
     Route::get('/contact-submissions', 'ContactSubmissionsController@index')
         ->name('admin.contact_submissions.index');
+    Route::any('/contact-submissions/review/{submission}', 'ContactSubmissionsController@review')
+        ->name('admin.contact_submissions.review');
     Route::get('/contact-submissions/delete/{submission}', 'ContactSubmissionsController@destroy')
         ->name('admin.contact_submissions.delete');
 });

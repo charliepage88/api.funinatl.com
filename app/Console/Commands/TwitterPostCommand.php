@@ -31,6 +31,7 @@ class TwitterPostCommand extends Command
      */
     public function handle()
     {
+        /*
         // post tweet
         Twitter::postTweet([
             'status' => 'Laravel is beautiful',
@@ -48,6 +49,7 @@ class TwitterPostCommand extends Command
         Twitter::postTweet([
             'status' => 'Laravel is beautiful',
             'media_ids' => $uploaded_media->media_id_string
-        ])
+        ]);
+        */
     }
 }
