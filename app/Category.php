@@ -74,7 +74,7 @@ class Category extends Model implements HasMedia
     */
     public function activeEvents()
     {
-        return $this->events()->isActive()->get();
+        return $this->events()->shouldShow()->get();
     }
 
     /**

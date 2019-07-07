@@ -45,8 +45,8 @@ class DevCommand extends Command
     public function handle()
     {
         // $this->truncateMongo();
-        $this->eventsWithoutPhoto();
-        $this->syncMusicBands();
+        // $this->eventsWithoutPhoto();
+        // $this->syncMusicBands();
 
         if ($this->enableSync) {
             $this->syncCategoriesToMongo();
@@ -92,7 +92,7 @@ class DevCommand extends Command
     */
     private function syncEventsToMongo()
     {
-        $mysqlEvents = Event::isActive()->get();
+        $mysqlEvents = Event::shouldShow()->get();
 
         foreach($mysqlEvents as $event) {
             $find = DB::connection('mongodb')

@@ -49,7 +49,8 @@ class Event extends Model implements HasMedia
         'active',
         'website',
         'is_sold_out',
-        'is_family_friendly'
+        'is_family_friendly',
+        'is_explicit'
     ];
 
     /**
@@ -145,6 +146,19 @@ class Event extends Model implements HasMedia
     public function scopeIsFeatured($query)
     {
         return $query->where('featured', '=', true);
+    }
+
+    /**
+    * Should Show
+    *
+    * @param object $query
+    *
+    * @return object
+    */
+    public function scopeShouldShow($query)
+    {
+        return $query->where('active', '=', true)
+            ->where('is_explicit', '=', false);
     }
 
     /**

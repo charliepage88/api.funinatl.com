@@ -45,6 +45,8 @@ class PopulateEventsCommand extends Command
      */
     public function handle()
     {
+        define('MAX_FILE_SIZE', 600000);
+
         // init spotify
         $spotify = $this->initSpotify();
 
@@ -54,7 +56,7 @@ class PopulateEventsCommand extends Command
 
         $providers = Provider::isActive()
             // ->where('last_scraped', '<=', $today)
-            ->where('id', '=', 9)
+            ->where('id', '=', 1)
             // ->orWhereNull('last_scraped')
             ->get();
 
@@ -171,11 +173,12 @@ class PopulateEventsCommand extends Command
     */
     public function providerTheEarl(Provider $provider, $scraper, SpotifyWebAPI $spotify)
     {
+        // get crawler
         $crawler = $scraper->request('GET', $provider->scrape_url);
 
         // Get the latest post in this category and display the titles
-        $results = $crawler->filter('.schedule-show-container')->each(function ($node) use ($provider) {
-            $data = [
+        $events = $crawler->filter('.schedule-show-container')->each(function ($node) use ($provider) {
+            $event = [
                 'name' => '',
                 'location_id' => $provider->location_id,
                 'user_id' => 1,
@@ -186,7 +189,11 @@ class PopulateEventsCommand extends Command
                 'start_time' => '',
                 'end_time' => '',
                 'website' => '',
-                'is_sold_out' => false
+                'is_sold_out' => false,
+                'is_family_friendly' => $provider->location->is_family_friendly,
+                'is_explicit' => false,
+                'bands' => [],
+                'tags' => []
             ];
 
             // get date & start/end time
@@ -201,9 +208,9 @@ class PopulateEventsCommand extends Command
             $start_time = $dateObj->format('g:i A');
             $end_time = $dateObj->copy()->addHours(3)->format('g:i A');
 
-            $data['start_time'] = $start_time;
-            $data['end_time'] = $end_time;
-            $data['start_date'] = Carbon::parse(trim($date[0]))->format('Y-m-d');
+            $event['start_time'] = $start_time;
+            $event['end_time'] = $end_time;
+            $event['start_date'] = Carbon::parse(trim($date[0]))->format('Y-m-d');
 
             // get pricing
             $prices = $node->filter('.schedule-show-right > .schedule-ui-elements > .schedule-prices-contain > .schedule-price')->each(function ($childNode) {
@@ -212,33 +219,38 @@ class PopulateEventsCommand extends Command
 
             if (!empty($prices)) {
                 if ($prices[0] === $prices[1]) {
-                    $data['price'] = $prices[0];
+                    $event['price'] = $prices[0];
                 } else {
-                    $data['price'] = $prices[0] . ' - ' . $prices[1];
+                    $event['price'] = $prices[0] . ' - ' . $prices[1];
                 }
             }
 
             // donations check & sold out check
-            if (empty($data['price'])) {
-                try {
-                    $soldOutCheck = $node->filter('.schedule-show-right > .schedule-ui-elements > .schedule-sold-out');
+            try {
+                $soldOutText = trim($node->filter('.schedule-show-right > .schedule-ui-elements > .schedule-sold-out')->text());
+                $soldOutText = strtolower($soldOutText);
 
-                    if ($text = $soldOutCheck->text()) {
-                        if ($text === 'DONATIONS') {
-                            $data['price'] = 'Donations';
-                        } elseif ($text === 'SOLD OUT') {
-                            $data['is_sold_out'] = true;
-                        }
-                    }
-                } catch (\Exception $e) {
-                    \Log::error($e->getMessage());
+                switch ($soldOutText) {
+                    case 'donations':
+                        $event['price'] = 'Donations';
+                    break;
+
+                    case 'sold out':
+                        $event['is_sold_out'] = true;
+                    break;
+
+                    case 'free show':
+                        $event['price'] = 'Free';
+                    break;
                 }
+            } catch (\Exception $e) {
+
             }
 
             // get event basic info
             $info = $node->filter('.schedule-show-left > .schedule-show-B-headliner > a');
 
-            $data['website'] = $provider->location->website . $info->attr('href');
+            $event['website'] = $provider->location->website . rtrim($info->attr('href'), '/');
 
             // check for multiple artists
             $html = $info->html();
@@ -246,18 +258,79 @@ class PopulateEventsCommand extends Command
             if (strstr($html, '<br>')) {
                 $name = str_replace('<br>', ', ', $html);
 
-                $data['name'] = Str::title(trim($name));
+                $event['name'] = Str::title(trim($name));
+
+                // collect band names
+                $ex = explode('<br>', $html);
+
+                if (!empty($ex)) {
+                    foreach($ex as $row) {
+                        $event['bands'][] = Str::title(trim($row));
+                    }
+                }
             } else {
-                $data['name'] = Str::title(trim($info->text()));
+                $event['name'] = Str::title(trim($info->text()));
+
+                $event['bands'][] = $event['name'];
             }
 
-            return $data;
+            // get band names
+            try {
+                $bands = trim($node->filter('.schedule-show-support')->text());
+
+                $ex = explode(' | ', $bands);
+
+                if (!empty($ex)) {
+                    foreach($ex as $row) {
+                        $event['bands'][] = trim($row);
+                    }
+                }
+            } catch (\Exception $e) {
+
+            }
+
+            // unique array for bands
+            if (count($event['bands'])) {
+                $event['bands'] = array_unique($event['bands']);
+
+                foreach($event['bands'] as $key => $row) {
+                    $band = strtolower($row);
+
+                    if (strstr($band, 'fuck')) {
+                        $event['is_explicit'] = true;
+                    }
+
+                    if (strstr($band, 'the official')) {
+                        // unset($event['bands'][$key]);
+                    }
+                }
+            }
+
+            // is event non-smoking?
+            try {
+                $node->filter('.schedule-show-nonsmoking')->text();
+
+                $event['tags'][] = 'No Smoking';
+            } catch (\Exception $e) {
+
+            }
+
+            return $event;
         });
 
-        $this->info(count($results) . ' events found for provider `' . $provider->name . '`');
+        $this->info(count($events) . ' events found for provider `' . $provider->name . '`');
+
+        // validate
+        $validator = $this->validate($events);
+
+        if (!$validator) {
+            return false;
+        }
+
+        dd($events);
 
         // fire off data into queue
-        foreach($results as $event) {
+        foreach($events as $event) {
             ParseMusicEvent::dispatch($event, $spotify);
 
             $this->info('Dispatching job for event `' . $event['name'] . '`');
