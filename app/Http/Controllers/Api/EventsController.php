@@ -59,4 +59,35 @@ class EventsController extends Controller
 
         return response()->json(compact('event'));
     }
+
+    /**
+    * Search
+    *
+    * @param Request $request
+    *
+    * @return Response
+    */
+    public function search(Request $request)
+    {
+        // init query
+        $events = Event::search($request->get('query'));
+
+        // filters
+        if ($request->get('is_family_friendly')) {
+            $events->where('is_family_friendly', '=', true);
+        }
+
+        if ($request->get('category')) {
+            $events->where('category_id', '=', $request->get('category'));
+        }
+
+        if ($request->get('location')) {
+            $events->where('location_id', '=', $request->get('location'));
+        }
+
+        $events = $events->get();
+
+        // return response
+        return response()->json(compact('events'));
+    }
 }

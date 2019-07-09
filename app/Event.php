@@ -21,7 +21,6 @@ class Event extends Model implements HasMedia
     use HasMediaTrait,
         HasSlug,
         HasTags,
-        HybridRelations,
         Searchable;
 
     /**
@@ -73,6 +72,11 @@ class Event extends Model implements HasMedia
         'is_sold_out'        => 'boolean',
         'is_family_friendly' => 'boolean'
     ];
+
+    /**
+    * @var boolean
+    */
+    public $asYouType = true;
 
     /**
     * Location
