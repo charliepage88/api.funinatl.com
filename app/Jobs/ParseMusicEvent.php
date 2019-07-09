@@ -81,14 +81,12 @@ class ParseMusicEvent implements ShouldQueue
 
             $event->fill($data);
 
-            $event->save();
-
             // if family friendly value not set, use location default
             if (!isset($data['is_family_friendly'])) {
                 $event->is_family_friendly = $event->location->is_family_friendly;
-
-                $event->save();
             }
+
+            $event->save();
 
             // sync tags
             if (!empty($tags)) {
@@ -120,18 +118,29 @@ class ParseMusicEvent implements ShouldQueue
                 'start_time',
                 'is_family_friendly'
             ];
-            $dataToSave = [];
 
+            $dataToSave = [];
             foreach($fields as $field) {
                 if (isset($this->event[$field]) && ($this->event[$field] !== $find->$field)) {
                     $dataToSave[$field] = $this->event[$field];
                 }
             }
 
+            // save event data
             if (!empty($dataToSave)) {
                 $find->fill($dataToSave);
 
                 $find->save();
+            }
+
+            // sync tags
+            if (!empty($this->event['tags'])) {
+                $find->syncTags($this->event['tags']);
+            }
+
+            // sync bands
+            if (!empty($this->event['bands'])) {
+                $find->syncBands($this->event['bands']);
             }
 
             // if no photo URL, try and find one

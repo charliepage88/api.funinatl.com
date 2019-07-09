@@ -373,6 +373,14 @@ class Event extends Model implements HasMedia
     public function syncBands(array $bands)
     {
         if (!empty($bands)) {
+            // lookup current band names first
+            // if exact match, don't do anything
+            $currentBands = $this->bands()->pluck('name')->toArray();
+
+            if (!empty($currentBands) && $currentBands === $bands) {
+                return $this;
+            }
+
             // create band records or retrieve model
             // put ID's into array to sync after
             $bandIds = [];
