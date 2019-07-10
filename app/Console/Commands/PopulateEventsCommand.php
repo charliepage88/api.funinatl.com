@@ -54,9 +54,9 @@ class PopulateEventsCommand extends Command
         $today = Carbon::today()->startOfDay()->format('Y-m-d H:i:s');
 
         $providers = Provider::isActive()
-            // ->where('last_scraped', '<=', $today)
-            ->where('id', '=', 3)
-            // ->orWhereNull('last_scraped')
+            ->where('last_scraped', '<=', $today)
+            // ->where('id', '=', 9)
+            ->orWhereNull('last_scraped')
             ->get();
 
         $scraper = new WebScraper;
@@ -730,10 +730,23 @@ class PopulateEventsCommand extends Command
         }
 
         // fire off data into queue
+        $delays = [];
+        $max = 300;
         foreach($events as $event) {
-            CrawlTerminalWestLink::dispatch($event, $spotify, $categories);
+            do {
+                $rand = rand(15, $max);
 
-            $this->info('Dispatching job for event `' . $event['name'] . '`');
+                if (!in_array($rand, $delays)) {
+                    $delays[] = $rand;
+
+                    break;
+                }
+            } while (0);
+
+            CrawlTerminalWestLink::dispatch($event, $spotify, $categories)
+                ->delay(now()->addSeconds($rand));
+
+            $this->info('Dispatching crawler for url: ' . $event['website'] . '. Delay: ' . $rand);
         }
 
         // save last scraped time
@@ -753,10 +766,27 @@ class PopulateEventsCommand extends Command
     */
     public function provider529(Provider $provider, $scraper, SpotifyWebAPI $spotify)
     {
+        // get crawler
         $crawler = $scraper->request('GET', $provider->scrape_url);
 
+        // get categories
+        $items = Category::all();
+
+        $categories = [];
+        foreach($items as $item) {
+            $categories[$item->slug] = $item;
+        }
+
+        // get event types
+        $items = EventType::all();
+
+        $eventTypes = [];
+        foreach($items as $item) {
+            $eventTypes[$item->slug] = $item;
+        }
+
         // Get the latest post in this category and display the titles
-        $events = $crawler->filter('.event-container-single')->each(function ($node) use ($provider) {
+        $events = $crawler->filter('.event-container-single')->each(function ($node) use ($provider, $categories, $eventTypes) {
             $event = [
                 'name' => '',
                 'location_id' => $provider->location_id,
@@ -769,8 +799,11 @@ class PopulateEventsCommand extends Command
                 'end_time' => '',
                 'website' => '',
                 'is_sold_out' => false,
-                'tags' => []
+                'tags' => [],
+                'bands' => []
             ];
+
+            $addHeadliners = true;
 
             // get date for event
             $date = trim($node->filter('.event-date-single > .right')->text());
@@ -778,41 +811,87 @@ class PopulateEventsCommand extends Command
             $event['start_date'] = Carbon::parse($date)->format('Y-m-d');
 
             // get website
-            $event['website'] = $node->filter('.event-info > .left-column > .event-buttons > a')
+            $event['website'] = rtrim($node->filter('.event-info > .left-column > .event-buttons > a')
                 ->reduce(function ($childNode) {
                     return strtolower(trim($childNode->text())) === 'info';
-                })->attr('href');
+                })->attr('href'), '/');
 
             // get meta info
             // for price, time & tags
             $meta = trim($node->filter('.event-info > .left-column > .event-meta')->text());
             $meta = explode('|', $meta);
+
+            $findToReplace = [
+                'adv',
+                'dos',
+                'door',
+                'Dos',
+                'DOS',
+                'ADV',
+                'Adv'
+            ];
             
             foreach($meta as $index => $value) {
                 $value = trim($value);
+                $valueLower = strtolower($value);
 
                 if ($value === '21+' || $value === '18+') {
                     $event['tags'][] = $value;
-                } elseif (strstr(strtolower($value), ' pm')) {
+                } elseif (strstr($valueLower, ' pm')) {
                     $dateObj = Carbon::parse($event['start_date'] . ' ' . $value);
 
                     $event['start_time'] = $dateObj->format('g:i A');
                     $event['end_time'] = $dateObj->copy()->addHours(3)->format('g:i A');
-                } else {
-                    $ex = explode('/', $value);
+                } elseif (strstr($value, 'Weekend Pass')) {
+                    $event['event_type_id'] = $eventTypes['festival']->id;
 
-                    if (count($ex) === 2) {
-                        $find = [
-                            'ADV',
-                            'DOS'
-                        ];
+                    $prices = str_replace('Weekend Pass ', '', $value);
 
-                        $price_from = str_replace($find, '', trim($ex[0]));
-                        $price_to = str_replace($find, '', trim($ex[1]));
+                    $ex = explode('/', $prices);
 
-                        $event['price'] = $price_from . ' - ' . $price_to;
+                    $price = trim(str_replace($findToReplace, '', $ex[1]));
+
+                    if (!empty($event['price'])) {
+                        $event['price'] = $event['price'] . ' - ' . $price;
                     } else {
-                        $event['price'] = trim($ex[0]);
+                        $event['price'] = $price;
+                    }
+
+                    $addHeadliners = false;
+                } elseif (strstr($valueLower, 'free')) {
+                    $event['price'] = 'Free';
+                } elseif (strstr($valueLower, 'donation')) {
+                    $event['price'] = Str::title(trim($value));
+                } elseif (!strstr($value, '/') && !strstr($value, ', ')) {
+                    $event['price'] = Str::title(trim(str_replace($findToReplace, '', $value)));
+                } else {
+                    if (!strstr($value, 'Single Day')) {
+                        if (strstr($value, '/')) {
+                            $ex = explode('/', $value);
+                        } elseif (strstr($value, ', ')) {
+                            $ex = explode(', ', $value);
+                        }
+
+                        $ex[0] = trim($ex[0]);
+
+                        if (count($ex) === 2) {
+                            $ex[1] = trim($ex[1]);
+
+                            $price_from = str_replace($findToReplace, '', $ex[0]);
+                            $price_to = str_replace($findToReplace, '', $ex[1]);
+
+                            $event['price'] = trim($price_from) . ' - ' . trim($price_to);
+                        } else {
+                            $event['price'] = trim(str_replace($findToReplace, '', $ex[0]));
+                        }
+                    } else {
+                        $prices = str_replace('Single Day ', '', $value);
+
+                        $ex = explode('/', $prices);
+
+                        $ex[0] = trim($ex[0]);
+
+                        $event['price'] = trim(str_replace($findToReplace, '', $ex[0]));
                     }
                 }
             }
@@ -827,38 +906,123 @@ class PopulateEventsCommand extends Command
             }
 
             // get band name(s)
-            $bands = $node->filter('.event-info > .left-column > .event-headliners')
+            $headliners = $node->filter('.event-info > .left-column > .event-headliners')
                 ->each(function ($childNode) {
                     return trim($childNode->text());
                 });
 
-            if (!empty($bands)) {
-                $event['name'] = $bands[0];
+            if (!empty($headliners)) {
+                $event['name'] = $headliners[0];
+            }
 
-                if (count($bands) > 1) {
-                    $bandsAfterFirst = $bands;
+            if (!empty($event['name'])) {
+                // parse event name
+                if (strstr(strtolower($event['name']), 'festival')) {
+                    $event['event_type_id'] = $eventTypes['festival']->id;
+                    $event['name'] = Str::title($event['name']);
+
+                    $addHeadliners = false;
+                }
+
+                if (strstr($event['name'], 'Weird Movie')) {
+                    $event['category_id'] = $categories['arts-theatre']->id;
+
+                    $addHeadliners = false;
+                }
+
+                if (strstr($event['name'], ' (')) {
+                    $ex = explode(' (', $event['name']);
+
+                    $event['bands'][] = trim($ex[0]);
+
+                    $addHeadliners = false;
+                }
+            }
+
+            if ($addHeadliners && !empty($headliners)) {
+                foreach($headliners as $band) {
+                    $event['bands'][] = $band;
+                }
+
+                if (count($headliners) > 1) {
+                    $bandsAfterFirst = $headliners;
 
                     unset($bandsAfterFirst[0]);
 
-                    $event['description'] = implode(' | ', $bandsAfterFirst);
+                    $event['short_description'] = 'With ' . implode(', ', $bandsAfterFirst);
                 }
             }
 
             // include lesser known bands in description
             try {
                 $backupBands = trim($node->filter('.event-info > .left-column > .event-bands')->text());
+                $backupBands = explode(' | ', $backupBands);
 
-                $value = str_replace(' | ', ', ', $backupBands);
+                if (!empty($backupBands)) {
+                    if (!empty($event['short_description'])) {
+                        $event['short_description'] .= ', ' . implode(', ', $backupBands);
+                    } else {
+                        $event['short_description'] = 'With ' . implode(', ', $backupBands);
+                    }
 
-                $event['short_description'] = 'Also with music from: ' . $value;
+                    if (empty($event['name'])) {
+                        $event['name'] = $backupBands[0];
+                    }
 
-                if (empty($event['name'])) {
-                    $ex = explode(' | ', $backupBands);
-
-                    $event['name'] = $ex[0];
+                    foreach($backupBands as $band) {
+                        $event['bands'][] = $band;
+                    }
                 }
             } catch (\Exception $e) {
                 // do nothing
+            }
+
+            // unset bands if not music show/festival
+            if ($event['category_id'] !== $categories['music']->id) {
+                $event['bands'] = [];
+            }
+
+            // manual price assignment, temporary
+            if (empty($event['price'])) {
+                if ($event['name'] === 'A Drug Called Tradition') {
+                    $event['price'] = '$10';
+                }
+
+                if ($event['name'] === 'Hannah Thomas') {
+                    $event['price'] = '$5';
+                }
+            }
+
+            // cleanup price if needed
+            if (strstr($event['price'], '-') && !strstr($event['price'], ' - ')) {
+                $event['price'] = str_replace('-', ' - ', $event['price']);
+            }
+
+            // if festival, see if empty bands array
+            if ($event['event_type_id'] === $eventTypes['festival']->id && empty($event['bands'])) {
+                $bands = null;
+
+                switch ($event['name']) {
+                    case 'Irrelevant Music Festival 2019: Opening Reception':
+                        $bands = 'Patois Counselors, Riboflavin, Shouldies, Sarah Swillum, USGS, Night Cleaner';
+                    break;
+
+                    case 'Irrelevant Music Festival 2019: Night 2':
+                        $bands = 'YUKONS, Lord Narf, Upchuck, Kibi James, Harmacy, Jamee Cornelia';
+                    break;
+
+                    case 'Irrelevant Music Festival 2019: Night 3':
+                        $bands = 'Fantasy Guys, Breathers, Ed Schrader\'s Music Beat, The Queendom, Dot.s, True Blossom';
+                    break;
+
+                    case 'Irrelevant Music Festival 2019: Closing Reception':
+                        $bands = 'Lyonnais, DiCaprio, Warm Red, Blammo, Pure Joy';
+                    break;
+                }
+
+                if (!empty($bands)) {
+                    $event['bands'] = explode(', ', $bands);
+                }
             }
 
             return $event;
@@ -930,14 +1094,17 @@ class PopulateEventsCommand extends Command
 
                     if ($startDate->greaterThanOrEqualTo($today)) {
                         $parentNode->filter('.tribe_events')->each(function ($linkNode) use ($startDate, &$links, $provider) {
-                            $url = $linkNode->filter('.tribe-events-month-event-title > a')->attr('href');
+                            $url = rtrim($linkNode->filter('.tribe-events-month-event-title > a')->attr('href'), '/');
+                            $title = strtolower($linkNode->filter('.tribe-events-month-event-title > a')->text());
 
-                            $links[] = [
-                                'website' => $url,
-                                'start_date' => $startDate,
-                                'location_id' => $provider->location_id,
-                                'category_id' => $provider->location->category_id
-                            ];
+                            if (!strstr($title, 'closed for')) {
+                                $links[] = [
+                                    'website' => $url,
+                                    'start_date' => $startDate,
+                                    'location_id' => $provider->location_id,
+                                    'category_id' => $provider->location->category_id
+                                ];
+                            }
 
                             return true;
                         });
@@ -1035,7 +1202,7 @@ class PopulateEventsCommand extends Command
                 $startDate = Carbon::parse(trim($node->filter('.dtstart > span')->attr('title')));
 
                 $url = 'https://www.aisle5atl.com';
-                $url .= trim($node->filter('.one-event > a')->eq(0)->attr('href'));
+                $url .= rtrim($node->filter('.one-event > a')->eq(0)->attr('href'), '/');
 
                 $event = [
                     'website' => $url,
@@ -1093,12 +1260,24 @@ class PopulateEventsCommand extends Command
         $startDate = $startDate->format('Y-m-d');
 
         // get json contents of events
-        $json = file_get_contents($provider->scrape_url . '?fromDate=' . $startDate . '&thruDate=' . $endDate);
+        $fullUrl = $provider->scrape_url . '?fromDate=' . $startDate . '&thruDate=' . $endDate;
+
+        $this->info($fullUrl);
+
+        $json = file_get_contents($fullUrl);
         $json = json_decode($json, true);
+
+        // get event types
+        $items = EventType::all();
+
+        $eventTypes = [];
+        foreach($items as $item) {
+            $eventTypes[$item->slug] = $item;
+        }
 
         // parse through data
         $events = [];
-        foreach($json as $event) {
+        foreach($json as $data) {
             $event = [
                 'name' => '',
                 'location_id' => $provider->location_id,
@@ -1111,26 +1290,52 @@ class PopulateEventsCommand extends Command
                 'end_time' => '',
                 'website' => '',
                 'is_sold_out' => false,
-                'tags' => []
+                'tags' => [],
+                'bands' => []
             ];
 
             // set basic info
-            $event['name'] = $event['title'];
-            $event['website'] = str_replace('?utm_medium=api', '', $event['url']);
+            $event['name'] = $data['title'];
+            $event['website'] = str_replace('?utm_medium=api', '', $data['url']);
 
-            if (!empty($event['supportsName'])) {
-                $event['short_description'] = 'With: ' . $event['supportsName'];
+            // get supporting bands
+            if (!empty($data['supportsName'])) {
+                $event['short_description'] = 'With ' . $data['supportsName'];
+
+                // collect bands
+                $ex = explode(', ', $data['supportsName']);
+
+                foreach($ex as $row) {
+                    $event['bands'][] = trim($row);
+                }
+            }
+
+            // parse name
+            if (strstr($event['name'], ', ')) {
+                $ex = explode(', ', $event['name']);
+
+                foreach($ex as $row) {
+                    $event['bands'][] = trim($row);
+                }
+            } else {
+                $event['bands'][] = $event['name'];
+            }
+
+            if (strstr($event['name'], 'Open Mic')) {
+                $event['event_type_id'] = $eventTypes['on-going']->id;
+
+                $event['bands'] = [];
             }
 
             // set date/time
-            $date = Carbon::parse($event['start']);
+            $date = Carbon::parse($data['start']);
 
             $event['start_date'] = $date->copy()->format('Y-m-d');
             $event['start_time'] = $date->copy()->format('g:i A');
             $event['end_time'] = $date->copy()->addHours(3)->format('g:i A');
 
             // get price
-            $crawler = new Crawler($event['popoverContent']);
+            $crawler = new Crawler($data['popoverContent']);
 
             $priceLookup = $crawler->filter('p')
                 ->each(function ($node) {
@@ -1147,7 +1352,7 @@ class PopulateEventsCommand extends Command
 
             foreach($priceLookup as $row) {
                 if (!empty($row)) {
-                    $event['price'] = trim($row);
+                    $event['price'] = str_replace('.00', '', trim($row));
 
                     break;
                 }
@@ -1194,17 +1399,19 @@ class PopulateEventsCommand extends Command
 
         $feed->initUrl($provider->scrape_url);
 
+        $feedEvents = $feed->events();
+
         $events = [];
-        foreach($feed->events() as $event) {
+        foreach($feedEvents as $row) {
             // init event data, including date
-            $startDate = Carbon::parse($event->dtstart);
+            $startDate = Carbon::parse($row->dtstart);
 
             $event = [
                 'start_date' => $startDate->copy()->format('Y-m-d'),
                 'start_time' => $startDate->copy()->format('g:i A'),
-                'description' => trim($event->description),
-                'website' => trim($event->url),
-                'image_url' => !empty($event->attach) ? $event->attach : '',
+                'description' => trim($row->description),
+                'website' => rtrim($row->url, '/'),
+                'image_url' => !empty($row->attach) ? $row->attach : '',
                 'location_id' => $provider->location_id,
                 'category_id' => $provider->location->category_id,
                 'user_id' => 1,
@@ -1213,16 +1420,21 @@ class PopulateEventsCommand extends Command
             ];
 
             // set name
-            $event['name'] = str_replace('City permit: ', '', trim($event->summary));
+            $findToReplace = [
+                'City permit: ',
+                'City Permit: '
+            ];
+
+            $event['name'] = str_replace($findToReplace, '', trim($row->summary));
 
             // tags
-            if (!empty($event->categories)) {
-                $event['tags'] = explode(',', trim($event->categories));
+            if (!empty($row->categories)) {
+                $event['tags'] = explode(',', trim($row->categories));
             }
 
             // get end date/time
-            if (!empty($event->dtend)) {
-                $endDate = Carbon::parse($event->dtend);
+            if (!empty($row->dtend)) {
+                $endDate = Carbon::parse($row->dtend);
 
                 $event['end_date'] = $endDate->copy()->format('Y-m-d');
                 $event['end_time'] = $endDate->copy()->format('g:i A');
@@ -1234,7 +1446,7 @@ class PopulateEventsCommand extends Command
                 $event['price'] = 'Free';
             }
 
-            if (!empty($event->categories) && strstr(strtolower($event->categories), 'free')) {
+            if (!empty($event->row) && strstr(strtolower($event->row), 'free')) {
                 $event['price'] = 'Free';
             }
 

@@ -64,14 +64,12 @@ class ParseEvent implements ShouldQueue
 
             $event->fill($data);
 
-            $event->save();
-
             // if family friendly value not set, use location default
             if (!isset($data['is_family_friendly'])) {
                 $event->is_family_friendly = $event->location->is_family_friendly;
-
-                $event->save();
             }
+
+            $event->save();
 
             if (!empty($tags)) {
                 $event->syncTags($tags);
@@ -97,8 +95,8 @@ class ParseEvent implements ShouldQueue
                 'start_time',
                 'is_family_friendly'
             ];
-            $dataToSave = [];
 
+            $dataToSave = [];
             foreach($fields as $field) {
                 if (isset($this->event[$field]) && ($this->event[$field] !== $find->$field)) {
                     $dataToSave[$field] = $this->event[$field];
@@ -109,6 +107,11 @@ class ParseEvent implements ShouldQueue
                 $find->fill($dataToSave);
 
                 $find->save();
+            }
+
+            // sync tags
+            if (!empty($this->event['tags'])) {
+                $find->syncTags($this->event['tags']);
             }
 
             // if no photo URL, try and find one

@@ -193,6 +193,23 @@ class Location extends Model implements HasMedia
     }
 
     /**
+    * Get List Tags String Attribute
+    *
+    * @return array
+    */
+    public function getListTagsStringAttribute()
+    {
+        $data = $this->tags;
+
+        $tags = [];
+        foreach($data as $tag) {
+            $tags[] = $tag->name;
+        }
+
+        return implode(', ', $tags);
+    }
+
+    /**
      * Get Slug options
      *
      * @return SlugOptions
@@ -244,23 +261,13 @@ class Location extends Model implements HasMedia
         }
 
         $location['photo'] = $this->photo_url;
-        $location['tags'] = $this->list_tags;
+        $location['tags'] = $this->list_tags_string;
         $location['created_at'] = $this->created_at->toAtomString();
         $location['updated_at'] = $this->updated_at->toAtomString();
 
         // category
         if (!empty($this->category)) {
-            $category = [];
-
-            $category['id'] = $this->category->id;
-            $category['name'] = $this->category->name;
-            $category['slug'] = $this->category->slug;
-            $category['is_default'] = $this->category->is_default;
-            $category['photo'] = $this->category->photo_url;
-            $category['created_at'] = $this->category->created_at->toAtomString();
-            $category['updated_at'] = $this->category->updated_at->toAtomString();
-
-            $location['category'] = $category;
+            $location['category'] = $this->category->name;
         }
 
         return $location;

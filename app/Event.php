@@ -2,7 +2,9 @@
 
 namespace App;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Jenssegers\Mongodb\Eloquent\HybridRelations;
 use Laravel\Scout\Searchable;
@@ -21,7 +23,8 @@ class Event extends Model implements HasMedia
     use HasMediaTrait,
         HasSlug,
         HasTags,
-        Searchable;
+        Searchable,
+        SoftDeletes;
 
     /**
     * @var string
@@ -161,8 +164,11 @@ class Event extends Model implements HasMedia
     */
     public function scopeShouldShow($query)
     {
+        $now = Carbon::now()->format('Y-m-d');
+
         return $query->where('active', '=', true)
-            ->where('is_explicit', '=', false);
+            ->where('is_explicit', '=', false)
+            ->where('start_date', '>=', $now);
     }
 
     /**
@@ -226,6 +232,23 @@ class Event extends Model implements HasMedia
     }
 
     /**
+    * Get List Tags String Attribute
+    *
+    * @return array
+    */
+    public function getListTagsStringAttribute()
+    {
+        $data = $this->tags;
+
+        $tags = [];
+        foreach($data as $tag) {
+            $tags[] = $tag->name;
+        }
+
+        return implode(', ', $tags);
+    }
+
+    /**
      * Get Slug options
      *
      * @return SlugOptions
@@ -282,7 +305,7 @@ class Event extends Model implements HasMedia
         }
 
         $event['photo'] = $this->photo_url;
-        $event['tags'] = $this->list_tags;
+        $event['tags'] = $this->list_tags_string;
         $event['created_at'] = $this->created_at->toAtomString();
         $event['updated_at'] = $this->updated_at->toAtomString();
         $event['start_date'] = $this->start_date->format('Y-m-d');
@@ -291,16 +314,12 @@ class Event extends Model implements HasMedia
             $event['end_date'] = $this->end_date->format('Y-m-d');
         }
 
-        $event['category'] = [
-            'name' => $this->category->name,
-            'slug' => $this->category->slug
-        ];
-
+        $event['category'] = $this->category->name;
         $event['event_type'] = $this->eventType->name;
-        $event['location'] = $this->location->toSearchableArray();
+        $event['location'] = $this->location->name;
 
         if ($this->bands->count()) {
-            $event['bands'] = $this->bands->toSearchableArray();
+            $event['bands'] = implode(', ', $this->bands()->pluck('name')->toArray());
         }
 
         return $event;

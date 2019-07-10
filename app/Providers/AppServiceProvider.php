@@ -6,8 +6,10 @@ use Geocoder\Provider\AlgoliaPlaces\AlgoliaPlaces;
 use Http\Adapter\Guzzle6\Client;
 use Illuminate\Support\ServiceProvider;
 
+use App\Event;
 use App\Location;
 use App\Helpers\SiteHelper;
+use App\Observers\EventObserver;
 use App\Observers\LocationObserver;
 
 class AppServiceProvider extends ServiceProvider
@@ -47,5 +49,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Location::observe(LocationObserver::class);
+        Event::observe(EventObserver::class);
     }
 }

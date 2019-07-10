@@ -86,7 +86,8 @@ class CrawlVenkmansLink implements ShouldQueue
             'end_time' => '',
             'website' => trim($data['website']),
             'is_sold_out' => false,
-            'tags' => []
+            'tags' => [],
+            'bands' => []
         ];
 
         // get the name of the event
@@ -104,11 +105,13 @@ class CrawlVenkmansLink implements ShouldQueue
             $event['price'] = 'Free';
             $event['is_family_friendly'] = true;
             $event['category_id'] = $categories['food-drinks']->id;
+
             $is_special = true;
         }
 
         if (strstr($lowerName, 'bottomless mimosa')) {
             $event['category_id'] = $categories['food-drinks']->id;
+
             $is_special = true;
         }
 
@@ -116,6 +119,7 @@ class CrawlVenkmansLink implements ShouldQueue
             $event['price'] = 'Special';
             $event['is_family_friendly'] = true;
             $event['category_id'] = $categories['food-drinks']->id;
+
             $is_special = true;
         }
 
@@ -123,18 +127,21 @@ class CrawlVenkmansLink implements ShouldQueue
             $event['price'] = 'Free';
             $event['is_family_friendly'] = true;
             $event['category_id'] = $categories['food-drinks']->id;
+
             $is_special = true;
         }
 
         if (strstr($lowerName, 'brunch dine out')) {
             $event['is_family_friendly'] = true;
             $event['category_id'] = $categories['food-drinks']->id;
+
             $is_special = true;
         }
 
         if (strstr($lowerName, 'trivia')) {
             $event['price'] = 'Free';
             $event['category_id'] = $categories['food-drinks']->id;
+
             $is_special = true;
         }
 
@@ -172,8 +179,28 @@ class CrawlVenkmansLink implements ShouldQueue
 
         }
 
+        // set a default price if empty
         if (empty($event['price'])) {
             $event['price'] = 'Special';
+        }
+
+        // if event is music related, collect the bands
+        if ($event['category_id'] === $categories['music']->id) {
+            if (strstr($event['name'], 'Yacht Rock')) {
+                $event['bands'][] = 'Yacht Rock Revue';
+            }
+
+            if (strstr($event['name'], 'w/')) {
+                $ex = explode('w/ ', $event['name']);
+
+                $event['bands'][] = trim($ex[1]);
+            }
+
+            if (strstr($event['name'], 'Tribute with')) {
+                $ex = explode('Tribute with ', $event['name']);
+
+                $event['bands'][] = trim($ex[1]);
+            }
         }
 
         dispatch(new ParseMusicEvent($event, $spotify));

@@ -73,7 +73,8 @@ class CrawlAisleFiveLink implements ShouldQueue
             'end_time' => '',
             'website' => $data['website'],
             'is_sold_out' => false,
-            'tags' => []
+            'tags' => [],
+            'bands' => []
         ];
 
         // get the name of the event
@@ -102,9 +103,51 @@ class CrawlAisleFiveLink implements ShouldQueue
 
         }
 
-        // put in backup bands if applicable
+        // check if sold out
         try {
-            $event['short_description'] = 'With: ' . trim($crawler->filter('.supports.description')->text());
+            $is_sold_out = $crawler->filter('.ticket-price > .sold-out')->text();
+
+            if (!empty($is_sold_out)) {
+                $event['is_sold_out'] = true;
+            }
+        } catch (\Exception $e) {
+
+        }
+
+        // get list of bands
+
+        // first, let's get the main band
+        try {
+            $headliner = $crawler->filter('.artist-box-headliner > .artist-headline > .artist-name')->text();
+
+            if (!empty($headliner)) {
+                $headliner = trim($headliner);
+
+                $event['bands'][] = $headliner;
+            }
+        } catch (\Exception $e) {
+
+        }
+
+        // now, let's get any supporting bands
+        try {
+            $checkForSupportingBands = $crawler->filter('.artist-box-support')->text();
+
+            if (!empty($checkForSupportingBands)) {
+                $bands = $crawler->filter('.artist-box-support')->each(function ($node) {
+                    return trim($node->filter('.artist-headline > .artist-name')->text());
+                });
+
+                if (!empty($bands)) {
+                    foreach($bands as $row) {
+                        if (!empty($row)) {
+                            $event['bands'][] = $row;
+                        }
+                    }
+
+                    $event['short_description'] = 'With ' . implode(', ', $bands);
+                }
+            }
         } catch (\Exception $e) {
 
         }
