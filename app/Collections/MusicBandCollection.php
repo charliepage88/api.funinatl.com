@@ -26,7 +26,7 @@ class MusicBandCollection extends Collection
         });
 
         // format into array
-        return $mapped->collapse()->values()->all();
+        return $mapped->all();
     }
 
     /**
@@ -49,6 +49,6 @@ class MusicBandCollection extends Collection
         });
 
         // format into array
-        return $mapped->collapse()->values()->all();
+        return $mapped->all();
     }
 }

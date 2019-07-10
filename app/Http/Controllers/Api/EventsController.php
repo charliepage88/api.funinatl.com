@@ -70,22 +70,28 @@ class EventsController extends Controller
     public function search(Request $request)
     {
         // init query
-        $events = Event::search($request->get('query'));
+        $query = Event::shouldShow()
+            ->where('name', 'like', '%' . $request->get('query') . '%');
 
         // filters
         if ($request->get('is_family_friendly')) {
-            $events->where('is_family_friendly', '=', true);
+            $query->where('is_family_friendly', '=', true);
         }
 
         if ($request->get('category')) {
-            $events->where('category_id', '=', $request->get('category'));
+            $query->where('category_id', '=', $request->get('category'));
         }
 
         if ($request->get('location')) {
-            $events->where('location_id', '=', $request->get('location'));
+            $query->where('location_id', '=', $request->get('location'));
         }
 
-        $events = $events->get();
+        $items = $query->get();
+
+        $events = [];
+        foreach($items as $event) {
+            $events[] = $event->toSearchableArray();
+        }
 
         // return response
         return response()->json(compact('events'));

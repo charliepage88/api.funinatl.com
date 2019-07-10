@@ -8,6 +8,8 @@ use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
+use App\Collections\MusicBandCollection;
+
 class MusicBand extends Model implements HasMedia
 {
     use HasMediaTrait,
@@ -68,5 +70,16 @@ class MusicBand extends Model implements HasMedia
         }
 
         return $photo;
+    }
+
+    /**
+     * Create a new Eloquent Collection instance.
+     *
+     * @param  array  $models
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function newCollection(array $models = [])
+    {
+        return new MusicBandCollection($models);
     }
 }

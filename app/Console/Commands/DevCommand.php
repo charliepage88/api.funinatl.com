@@ -44,7 +44,7 @@ class DevCommand extends Command
      */
     public function handle()
     {
-        $this->truncateMongo();
+        // $this->truncateMongo();
         // $this->eventsWithoutPhoto();
         // $this->syncMusicBands();
 
