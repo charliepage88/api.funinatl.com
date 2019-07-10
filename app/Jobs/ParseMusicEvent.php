@@ -48,6 +48,11 @@ class ParseMusicEvent implements ShouldQueue
      */
     public function handle()
     {
+        // parse event data
+        if (strstr($this->event['price'], ' Suggested ') {
+            $this->event['price'] = str_replace(' Suggested ', '', $this->event['price']);
+        }
+
         // look for existing event with these details
         $find = Event::where('start_date', '=', $this->event['start_date'])
             ->where('location_id', '=', $this->event['location_id'])

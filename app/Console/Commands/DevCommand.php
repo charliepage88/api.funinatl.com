@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Str;
 
 use App\Category;
 use App\Event;
@@ -30,7 +31,7 @@ class DevCommand extends Command
     /**
      * @var boolean
      */
-    public $enableSyncToSearch = false;
+    public $enableSyncToSearch = true;
 
     /**
      * @var boolean
@@ -47,6 +48,24 @@ class DevCommand extends Command
         // $this->truncateMongo();
         // $this->eventsWithoutPhoto();
         // $this->syncMusicBands();
+
+        $events = Event::all();
+
+        foreach($events as $event) {
+            $event->price = Str::title($event->price);
+
+            if (strstr($event->price, ' Suggested ')) {
+                $event->price = str_replace(' Suggested', '', $event->price);
+
+                $event->save();
+            }
+
+            if (strstr($event->price, 'Suggested ')) {
+                $event->price = str_replace('Suggested ', '', $event->price);
+
+                $event->save();
+            }
+        }
 
         if ($this->enableSync) {
             $this->syncCategoriesToMongo();
