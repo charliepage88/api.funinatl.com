@@ -16,7 +16,7 @@
         "lodash": "^4.17.14",
         "popper.js": "^1.15",
         "resolve-url-loader": "^3.1.0",
-        "sass": "^1.22.3",
+        "sass": "^1.22.4",
         "sass-loader": "^7.1.0",
         "vue": "^2.6.10",
         "vue-template-compiler": "^2.6.10"
@@ -25,7 +25,7 @@
         "chart.js": "^2.8.0",
         "flatpickr": "^4.6.1",
         "lodash.get": "^4.4.2",
-        "tailwindcss": "^1.0.4",
+        "tailwindcss": "^1.0.5",
         "vue-chartjs": "^3.4.2",
         "vue-flatpickr-component": "^8.1.2"
     }
