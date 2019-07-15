@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 use App\Event;
@@ -46,6 +47,20 @@ class EventsController extends Controller
         $event->event_type_id = 1;
         $event->source = 'submission';
         $event->active = false;
+
+        // parse start time
+        if ($request->input('start_date') && $event->has('start_time')) {
+            $date = $request->input('start_date') . ' ' . $request->input('start_time');
+
+            $event->start_time = Carbon::parse($date)->format('g:i A');
+        }
+
+        // parse end time
+        if ($request->input('end_date') && $event->has('end_time')) {
+            $date = $request->input('end_date') . ' ' . $request->input('end_time');
+
+            $event->end_time = Carbon::parse($date)->format('g:i A');
+        }
 
         $event->save();
 

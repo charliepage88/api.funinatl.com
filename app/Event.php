@@ -374,6 +374,9 @@ class Event extends Model implements HasMedia
             'slug' => $this->category->slug
         ];
 
+        $event['category_slug'] = $this->category->slug;
+        $event['location_slug'] = $this->location->slug;
+
         $event['event_type'] = $this->eventType->name;
         $event['location'] = $this->location->getMongoArray(false);
 

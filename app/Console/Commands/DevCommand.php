@@ -49,24 +49,6 @@ class DevCommand extends Command
         // $this->eventsWithoutPhoto();
         // $this->syncMusicBands();
 
-        $events = Event::all();
-
-        foreach($events as $event) {
-            $event->price = Str::title($event->price);
-
-            if (strstr($event->price, ' Suggested ')) {
-                $event->price = str_replace(' Suggested', '', $event->price);
-
-                $event->save();
-            }
-
-            if (strstr($event->price, 'Suggested ')) {
-                $event->price = str_replace('Suggested ', '', $event->price);
-
-                $event->save();
-            }
-        }
-
         if ($this->enableSync) {
             $this->syncCategoriesToMongo();
             $this->syncLocationsToMongo();
