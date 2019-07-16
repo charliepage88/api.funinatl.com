@@ -56,7 +56,7 @@
                     </tbody>
                 </table>
 
-                {{ $users->links('pagination::tailwindcss') }}
+                {{ $users->links('pagination::bulma') }}
             @endif
         </div>
     </div>

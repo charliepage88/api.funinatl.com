@@ -6,8 +6,9 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Support\Str;
 use Jenssegers\Mongodb\Eloquent\HybridRelations;
-use Laravel\Scout\Searchable;
+use ScoutElastic\Searchable;
 use Spatie\MediaLibrary\HasMedia\HasMedia;
 use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
 use Spatie\Sluggable\HasSlug;
@@ -78,6 +79,245 @@ class Event extends Model implements HasMedia
     * @var boolean
     */
     public $asYouType = true;
+
+    /**
+    * @var string
+    */
+    protected $indexConfigurator = EventIndexConfigurator::class;
+
+    /**
+    * @var array
+    */
+    protected $searchRules = [
+        SearchEventsRule::class
+    ];
+
+    /**
+    * @var array
+    */
+    protected $mapping = [
+        'properties' => [
+            'id' => [
+                'type' => 'integer'
+            ],
+            'name' => [
+                'type' => 'text',
+                'fields' => [
+                    'raw' => [
+                        'type' => 'keyword'
+                    ]
+                ],
+                'analyzer' => 'event_analyzer'
+            ],
+            'slug' => [
+                'type' => 'text'
+            ],
+            'location_id' => [
+                'type' => 'integer'
+            ],
+            'user_id' => [
+                'type' => 'integer'
+            ],
+            'category_id' => [
+                'type' => 'integer'
+            ],
+            'event_type_id' => [
+                'type' => 'integer'
+            ],
+            'start_date' => [
+                'type' => 'date'
+            ],
+            'end_date' => [
+                'type' => 'date'
+            ],
+            'start_time' => [
+                'type' => 'text'
+            ],
+            'end_time' => [
+                'type' => 'text'
+            ],
+            'price' => [
+                'type' => 'text'
+            ],
+            'short_description' => [
+                'type' => 'text'
+            ],
+            'description' => [
+                'type' => 'text'
+            ],
+            'featured' => [
+                'type' => 'boolean'
+            ],
+            'is_sold_out' => [
+                'type' => 'boolean'
+            ],
+            'website' => [
+                'type' => 'text'
+            ],
+            'is_family_friendly' => [
+                'type' => 'boolean'
+            ],
+            'photo' => [
+                'type' => 'text'
+            ],
+            'created_at' => [
+                'type' => 'date'
+            ],
+            'updated_at' => [
+                'type' => 'date'
+            ],
+            'event_type' => [
+                'type' => 'text'
+            ],
+
+            // relations
+            'tags' => [
+                'type' => 'nested',
+
+                'properties' => [
+                    'name' => [
+                        'type' => 'text'
+                    ],
+
+                    'slug' => [
+                        'type' => 'text'
+                    ]
+                ]
+            ],
+
+            'category' => [
+                'properties' => [
+                    'id' => [
+                        'type' => 'integer'
+                    ],
+
+                    'name' => [
+                        'type' => 'text'
+                    ],
+
+                    'slug' => [
+                        'type' => 'text'
+                    ],
+
+                    'is_default' => [
+                        'type' => 'boolean'
+                    ],
+
+                    'photo' => [
+                        'type' => 'text'
+                    ],
+
+                    'created_at' => [
+                        'type' => 'date'
+                    ],
+
+                    'updated_at' => [
+                        'type' => 'date'
+                    ]
+                ]
+            ],
+
+            'location' => [
+                'properties' => [
+                    'id' => [
+                        'type' => 'integer'
+                    ],
+
+                    'name' => [
+                        'type' => 'text'
+                    ],
+
+                    'slug' => [
+                        'type' => 'text'
+                    ],
+
+                    'category_id' => [
+                        'type' => 'integer'
+                    ],
+
+                    'website' => [
+                        'type' => 'text'
+                    ],
+
+                    'address' => [
+                        'type' => 'text'
+                    ],
+
+                    'city' => [
+                        'type' => 'text'
+                    ],
+
+                    'state' => [
+                        'type' => 'text'
+                    ],
+
+                    'zip' => [
+                        'type' => 'text'
+                    ],
+
+                    'geo' => [
+                        'type' => 'geo_point'
+                    ],
+
+                    'description' => [
+                        'type' => 'text'
+                    ],
+
+                    'is_family_friendly' => [
+                        'type' => 'boolean'
+                    ],
+
+                    'photo' => [
+                        'type' => 'text'
+                    ],
+
+                    'created_at' => [
+                        'type' => 'date'
+                    ],
+
+                    'updated_at' => [
+                        'type' => 'date'
+                    ],
+
+                    'tags' => [
+                        'type' => 'nested',
+
+                        'properties' => [
+                            'name' => [
+                                'type' => 'text'
+                            ],
+
+                            'slug' => [
+                                'type' => 'text'
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+
+            'bands' => [
+                'type' => 'nested',
+
+                'properties' => [
+                    'id' => [
+                        'type' => 'integer'
+                    ],
+
+                    'name' => [
+                        'type' => 'text'
+                    ],
+
+                    'slug' => [
+                        'type' => 'text'
+                    ],
+
+                    'photo' => [
+                        'type' => 'text'
+                    ]
+                ]
+            ]
+        ]
+    ];
 
     /**
     * Location
@@ -254,8 +494,16 @@ class Event extends Model implements HasMedia
     public function getSlugOptions() : SlugOptions
     {
         return SlugOptions::create()
-            ->generateSlugsFrom('name')
-            ->saveSlugsTo('slug');
+            ->generateSlugsFrom(function ($event) {
+                $name = Str::slug($event->name, '-');
+                $date = Str::slug($event->start_date->format('F-j-Y'), '-');
+                $category = Str::slug($event->category->name, '-');
+                $location = Str::slug($event->location->name, '-');
+
+                return $name . '-' . $date . '-' . $category . '-' . $location;
+            })
+            ->saveSlugsTo('slug')
+            ->doNotGenerateSlugsOnUpdate();
     }
 
     /**
@@ -303,7 +551,7 @@ class Event extends Model implements HasMedia
         }
 
         $event['photo'] = $this->photo_url;
-        $event['tags'] = $this->list_tags_string;
+        $event['tags'] = $this->list_tags;
         $event['created_at'] = $this->created_at->toAtomString();
         $event['updated_at'] = $this->updated_at->toAtomString();
         $event['start_date'] = $this->start_date->format('Y-m-d');
@@ -312,12 +560,12 @@ class Event extends Model implements HasMedia
             $event['end_date'] = $this->end_date->format('Y-m-d');
         }
 
-        $event['category'] = $this->category->name;
+        $event['category'] = $this->category->toSearchableArray();
         $event['event_type'] = $this->eventType->name;
-        $event['location'] = $this->location->name;
+        $event['location'] = $this->location->toSearchableArray();
 
         if ($this->bands->count()) {
-            $event['bands'] = implode(', ', $this->bands()->pluck('name')->toArray());
+            $event['bands'] = $this->bands->toSearchableArray();
         }
 
         return $event;

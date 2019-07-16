@@ -3,7 +3,9 @@
 @import 'variables';
 
 // CSS Framework
-@import 'tailwind';
+@import "~bulmaswatch/pulse/_variables.scss";
+@import "~bulma";
+@import "~bulmaswatch/pulse/_overrides.scss";
 
 // Components
 @import 'components/index';

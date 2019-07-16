@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use ScoutElastic\Searchable;
 use Spatie\MediaLibrary\HasMedia\HasMedia;
 use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
 use Spatie\Sluggable\HasSlug;
@@ -13,7 +14,8 @@ use App\Collections\MusicBandCollection;
 class MusicBand extends Model implements HasMedia
 {
     use HasMediaTrait,
-        HasSlug;
+        HasSlug,
+        Searchable;
 
     /**
     * @var array
@@ -30,6 +32,50 @@ class MusicBand extends Model implements HasMedia
     */
     protected $casts = [
         'spotify_json' => 'array'
+    ];
+
+    /**
+    * @var string
+    */
+    protected $indexConfigurator = MusicBandIndexConfigurator::class;
+
+    /**
+    * @var array
+    */
+    protected $searchRules = [
+        SearchMusicBandsRule::class
+    ];
+
+    /**
+    * @var array
+    */
+    protected $mapping = [
+        'properties' => [
+            'id' => [
+                'type' => 'integer'
+            ],
+            'name' => [
+                'type' => 'text',
+                'fields' => [
+                    'raw' => [
+                        'type' => 'keyword'
+                    ]
+                ],
+                'analyzer' => 'band_analyzer'
+            ],
+            'slug' => [
+                'type' => 'text'
+            ],
+            'photo' => [
+                'type' => 'text'
+            ],
+            'created_at' => [
+                'type' => 'date'
+            ],
+            'updated_at' => [
+                'type' => 'date'
+            ]
+        ]
     ];
 
     /**
@@ -51,7 +97,8 @@ class MusicBand extends Model implements HasMedia
     {
         return SlugOptions::create()
             ->generateSlugsFrom('name')
-            ->saveSlugsTo('slug');
+            ->saveSlugsTo('slug')
+            ->doNotGenerateSlugsOnUpdate();
     }
 
     /**
@@ -70,6 +117,56 @@ class MusicBand extends Model implements HasMedia
         }
 
         return $photo;
+    }
+
+    /**
+    * To Searchable Array
+    *
+    * @return array
+    */
+    public function toSearchableArray()
+    {
+        $fields = [
+            'id',
+            'name',
+            'slug'
+        ];
+
+        $band = [];
+        foreach($fields as $field) {
+            $band[$field] = $this->$field;
+        }
+
+        $band['photo'] = $this->photo_url;
+        $band['created_at'] = $this->created_at->toAtomString();
+        $band['updated_at'] = $this->updated_at->toAtomString();
+
+        return $band;
+    }
+
+    /**
+     * Get Mongo Array
+     *
+     * @return array
+     */
+    public function getMongoArray()
+    {
+        $fields = [
+            'id',
+            'name',
+            'slug'
+        ];
+
+        $band = [];
+        foreach($fields as $field) {
+            $band[$field] = $this->$field;
+        }
+
+        $band['photo'] = $this->photo_url;
+        $band['created_at'] = $this->created_at->toAtomString();
+        $band['updated_at'] = $this->updated_at->toAtomString();
+
+        return $band;
     }
 
     /**

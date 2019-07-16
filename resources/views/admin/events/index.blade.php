@@ -74,7 +74,7 @@
                 </div>
             </div>
 
-            {{ $events->links('pagination::tailwindcss') }}
+            {{ $events->links('pagination::bulma') }}
         @endif
     </div>
 @endsection

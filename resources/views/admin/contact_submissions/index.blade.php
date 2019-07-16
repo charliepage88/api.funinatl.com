@@ -72,7 +72,7 @@
                 </div>
             </div>
 
-            {{ $items->links('pagination::tailwindcss') }}
+            {{ $items->links('pagination::bulma') }}
         @endif
     </div>
 @endsection

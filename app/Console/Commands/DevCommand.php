@@ -2,12 +2,14 @@
 
 namespace App\Console\Commands;
 
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 
 use App\Category;
 use App\Event;
 use App\Location;
+use App\MusicBand;
 
 use DB;
 use Storage;
@@ -48,8 +50,10 @@ class DevCommand extends Command
         // $this->truncateMongo();
         // $this->eventsWithoutPhoto();
         // $this->syncMusicBands();
+        // $this->regenerateEventSlugs();
 
         if ($this->enableSync) {
+            $this->syncMusicBandsToMongo();
             $this->syncCategoriesToMongo();
             $this->syncLocationsToMongo();
             $this->syncEventsToMongo();
@@ -63,9 +67,31 @@ class DevCommand extends Command
      */
     public function truncateMongo()
     {
+        DB::connection('mongodb')->collection('music_bands')->delete();
         DB::connection('mongodb')->collection('categories')->delete();
         DB::connection('mongodb')->collection('locations')->delete();
         DB::connection('mongodb')->collection('events')->delete();
+    }
+
+    /**
+    * Regenerate Event Slugs
+    *
+    * @return void
+    */
+    public function regenerateEventSlugs()
+    {
+        $this->info('regenerateEventSlugs');
+
+        $now = Carbon::now();
+        $events = Event::all();
+
+        foreach($events as $event) {
+            $event->updated_at = $now;
+
+            $event->save();
+
+            $this->info($event->id . ' :: ' . $event->name);
+        }
     }
 
     /**
@@ -218,6 +244,51 @@ class DevCommand extends Command
             $this->info('Categories synced to Mongo and Scout.');
         } else {
             $this->info('Categories synced to Mongo.');
+        }
+    }
+
+    /**
+    * Sync Music Bands To Mongo
+    *
+    * @return void
+    */
+    private function syncMusicBandsToMongo()
+    {
+        $items = MusicBand::all();
+
+        foreach($items as $item) {
+            $find = DB::connection('mongodb')
+                ->collection('music_bands')
+                ->where('id', $item->id)
+                ->first();
+
+            if (empty($find)) {
+                $value = $item->getMongoArray();
+
+                DB::connection('mongodb')
+                    ->collection('music_bands')
+                    ->insert($value);
+
+                $this->info('Inserted music band #' . $item->id . ' into MongoDB.');
+            } else {
+                $value = $item->getMongoArray();
+
+                DB::connection('mongodb')
+                    ->collection('music_bands')
+                    ->where('id', $item->id)
+                    ->update($value);
+
+                $this->info('Updated music band #' . $item->id . ' with MongoDB.');
+            }
+        }
+
+        // sync to search
+        if ($this->enableSyncToSearch) {
+            MusicBand::query()->get()->searchable();
+
+            $this->info('Music bands synced to Mongo and Scout.');
+        } else {
+            $this->info('Music bands synced to Mongo.');
         }
     }
 

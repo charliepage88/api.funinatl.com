@@ -60,7 +60,7 @@
                     </div>
                 </div>
 
-                {{ $tags->links('pagination::tailwindcss') }}
+                {{ $tags->links('pagination::bulma') }}
             @endif
         </div>
     </div>

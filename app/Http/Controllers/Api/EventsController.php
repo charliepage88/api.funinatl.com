@@ -85,10 +85,13 @@ class EventsController extends Controller
     public function search(Request $request)
     {
         // init query
-        $query = Event::shouldShow()
-            ->where('name', 'like', '%' . $request->get('query') . '%');
+        $query = Event::shouldShow();
 
         // filters
+        if ($request->has('query')) {
+            $query->search($request->get('query'));
+        }
+
         if ($request->get('is_family_friendly')) {
             $query->where('is_family_friendly', '=', true);
         }
@@ -101,12 +104,7 @@ class EventsController extends Controller
             $query->where('location_id', '=', $request->get('location'));
         }
 
-        $items = $query->get();
-
-        $events = [];
-        foreach($items as $event) {
-            $events[] = $event->toSearchableArray();
-        }
+        $events = $query->raw();
 
         // return response
         return response()->json(compact('events'));

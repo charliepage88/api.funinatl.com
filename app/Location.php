@@ -5,7 +5,7 @@ namespace App;
 use Geocoder\Query\GeocodeQuery;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Laravel\Scout\Searchable;
+use ScoutElastic\Searchable;
 use Spatie\MediaLibrary\HasMedia\HasMedia;
 use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
 use Spatie\Sluggable\HasSlug;
@@ -61,6 +61,131 @@ class Location extends Model implements HasMedia
     protected $casts = [
         'is_family_friendly' => 'boolean',
         'active'             => 'boolean'
+    ];
+
+    /**
+    * @var string
+    */
+    protected $indexConfigurator = LocationIndexConfigurator::class;
+
+    /**
+    * @var array
+    */
+    protected $searchRules = [
+        SearchLocationsRule::class
+    ];
+
+    /**
+    * @var array
+    */
+    protected $mapping = [
+        'properties' => [
+            'id' => [
+                'type' => 'integer'
+            ],
+
+            'name' => [
+                'type' => 'text'
+            ],
+
+            'slug' => [
+                'type' => 'text'
+            ],
+
+            'category_id' => [
+                'type' => 'integer'
+            ],
+
+            'website' => [
+                'type' => 'text'
+            ],
+
+            'address' => [
+                'type' => 'text'
+            ],
+
+            'city' => [
+                'type' => 'text'
+            ],
+
+            'state' => [
+                'type' => 'text'
+            ],
+
+            'zip' => [
+                'type' => 'text'
+            ],
+
+            'geo' => [
+                'type' => 'geo_point'
+            ],
+
+            'description' => [
+                'type' => 'text'
+            ],
+
+            'is_family_friendly' => [
+                'type' => 'boolean'
+            ],
+
+            'photo' => [
+                'type' => 'text'
+            ],
+
+            'created_at' => [
+                'type' => 'date'
+            ],
+
+            'updated_at' => [
+                'type' => 'date'
+            ],
+
+            'tags' => [
+                'type' => 'nested',
+
+                'properties' => [
+                    'name' => [
+                        'type' => 'text'
+                    ],
+
+                    'slug' => [
+                        'type' => 'text'
+                    ]
+                ]
+            ],
+
+            'category' => [
+                'properties' => [
+                    'id' => [
+                        'type' => 'integer'
+                    ],
+
+                    'name' => [
+                        'type' => 'text'
+                    ],
+
+                    'slug' => [
+                        'type' => 'text'
+                    ],
+
+                    'is_default' => [
+                        'type' => 'boolean'
+                    ],
+
+                    'photo' => [
+                        'type' => 'text'
+                    ],
+
+                    'created_at' => [
+                        'type' => 'date'
+                    ],
+
+                    'updated_at' => [
+                        'type' => 'date'
+                    ]
+                ]
+            ]
+        ]
     ];
 
     /**
@@ -218,7 +343,8 @@ class Location extends Model implements HasMedia
     {
         return SlugOptions::create()
             ->generateSlugsFrom('name')
-            ->saveSlugsTo('slug');
+            ->saveSlugsTo('slug')
+            ->doNotGenerateSlugsOnUpdate();
     }
 
     /**
@@ -249,8 +375,6 @@ class Location extends Model implements HasMedia
             'city',
             'state',
             'zip',
-            'latitude',
-            'longitude',
             'description',
             'is_family_friendly'
         ];
@@ -260,14 +384,18 @@ class Location extends Model implements HasMedia
             $location[$field] = $this->$field;
         }
 
+        $location['geo'] = [
+            'lat' => $this->latitude,
+            'lon' => $this->longitude
+        ];
         $location['photo'] = $this->photo_url;
-        $location['tags'] = $this->list_tags_string;
+        $location['tags'] = $this->list_tags;
         $location['created_at'] = $this->created_at->toAtomString();
         $location['updated_at'] = $this->updated_at->toAtomString();
 
         // category
         if (!empty($this->category)) {
-            $location['category'] = $this->category->name;
+            $location['category'] = $this->category->toSearchableArray();
         }
 
         return $location;
