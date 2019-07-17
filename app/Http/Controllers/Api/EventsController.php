@@ -85,13 +85,12 @@ class EventsController extends Controller
     public function search(Request $request)
     {
         // init query
-        $query = Event::shouldShow();
+        $now = Carbon::now()->format('Y-m-d');
+
+        $query = Event::search($request->get('query'))
+            ->where('start_date', '>=', $now);
 
         // filters
-        if ($request->has('query')) {
-            $query->search($request->get('query'));
-        }
-
         if ($request->get('is_family_friendly')) {
             $query->where('is_family_friendly', '=', true);
         }
@@ -105,6 +104,12 @@ class EventsController extends Controller
         }
 
         $events = $query->raw();
+
+        if (!empty($events['hits']['hits'])) {
+            $events = $events['hits']['hits'];
+        } else {
+            $events = [];
+        }
 
         // return response
         return response()->json(compact('events'));
