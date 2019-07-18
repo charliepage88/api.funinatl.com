@@ -10,6 +10,7 @@ use App\Category;
 use App\Event;
 use App\Location;
 use App\MusicBand;
+use App\Tag;
 
 use DB;
 use Storage;
@@ -49,10 +50,12 @@ class DevCommand extends Command
     {
         // $this->truncateMongo();
         // $this->eventsWithoutPhoto();
+        // $this->locationsWithoutPhoto();
         // $this->syncMusicBands();
         // $this->regenerateEventSlugs();
 
         if ($this->enableSync) {
+            $this->syncTagsToMongo();
             $this->syncMusicBandsToMongo();
             $this->syncCategoriesToMongo();
             $this->syncLocationsToMongo();
@@ -67,6 +70,7 @@ class DevCommand extends Command
      */
     public function truncateMongo()
     {
+        DB::connection('mongodb')->collection('tags')->delete();
         DB::connection('mongodb')->collection('music_bands')->delete();
         DB::connection('mongodb')->collection('categories')->delete();
         DB::connection('mongodb')->collection('locations')->delete();
@@ -108,6 +112,24 @@ class DevCommand extends Command
         foreach($events as $event) {
             if (empty($event->photo_url)) {
                 $this->info($event->id . ' :: ' . $event->name);
+            }
+        }
+    }
+
+    /**
+    * Locations Without Photo
+    *
+    * @return void
+    */
+    public function locationsWithoutPhoto()
+    {
+        $this->info('locationsWithoutPhoto');
+
+        $locations = Location::isActive()->get();
+
+        foreach($locations as $location) {
+            if (empty($location->photo_url)) {
+                $this->info($location->id . ' :: ' . $location->name);
             }
         }
     }
@@ -290,6 +312,44 @@ class DevCommand extends Command
         } else {
             $this->info('Music bands synced to Mongo.');
         }
+    }
+
+    /**
+    * Sync Tags To Mongo
+    *
+    * @return void
+    */
+    private function syncTagsToMongo()
+    {
+        $items = Tag::all();
+
+        foreach($items as $item) {
+            $find = DB::connection('mongodb')
+                ->collection('tags')
+                ->where('id', $item->id)
+                ->first();
+
+            if (empty($find)) {
+                $value = $item->getMongoArray();
+
+                DB::connection('mongodb')
+                    ->collection('tags')
+                    ->insert($value);
+
+                $this->info('Inserted tag #' . $item->id . ' into MongoDB.');
+            } else {
+                $value = $item->getMongoArray();
+
+                DB::connection('mongodb')
+                    ->collection('tags')
+                    ->where('id', $item->id)
+                    ->update($value);
+
+                $this->info('Updated tag #' . $item->id . ' with MongoDB.');
+            }
+        }
+
+        $this->info('Tags synced to Mongo.');
     }
 
     /**
