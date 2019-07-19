@@ -1,2 +1,225 @@
-.has-cursor-pointer:hover
+.has-cursor-pointer
   cursor: pointer!important
+
+  &:hover
+    cursor: pointer!important
+
+.is-indigo
+  background-color: indigo
+  color: #fff
+
+  &:hover
+    color: #fafafa!important
+
+// misc
+.media-content
+  overflow: hidden
+
+.card
+  overflow: hidden
+
+  &.large
+    height: 730px
+    -webkit-backface-visibility: hidden
+    backface-visibility: initial
+    border-radius: 5px
+
+.is-centered
+  margin: 0 auto!important
+  display: block
+
+.has-text-normal
+  text-transform: initial
+  letter-spacing: initial
+
+.control.is-fullwidth
+  span.select
+    min-width: 100%!important
+
+    select
+      min-width: 100%!important
+
+.has-no-underline
+  text-decoration: none!important
+
+  &:hover
+    text-decoration: none!important
+
+// margin & padding helpers
+@for $i from 1 through 8
+  // margin
+  .mt-#{$i}
+    margin-top: (1rem * $i)!important
+
+  .mr-#{$i}
+    margin-right: (1rem * $i)!important
+
+  .ml-#{$i}
+    margin-left: (1rem * $i)!important
+
+  .mb-#{$i}
+    margin-bottom: (1rem * $i)!important
+
+  .m-#{$i}
+    margin: (1rem * $i) (1rem * $i) (1rem * $i) (1rem * $i)!important
+
+  // padding
+  .pt-#{$i}
+    padding-top: (1rem * $i)!important
+
+  .pr-#{$i}
+    padding-right: (1rem * $i)!important
+
+  .pl-#{$i}
+    padding-left: (1rem * $i)!important
+
+  .pb-#{$i}
+    padding-bottom: (1rem * $i)!important
+
+  .p-#{$i}
+    padding: (1rem * $i) (1rem * $i) (1rem * $i) (1rem * $i)!important
+
+// px helpers for margin/padding
+@for $i from 1 through 30
+  // margin
+  .mt-px-#{$i}
+    margin-top: (1px * $i)!important
+
+  .mr-px-#{$i}
+    margin-right: (1px * $i)!important
+
+  .ml-px-#{$i}
+    margin-left: (1px * $i)!important
+
+  .mb-px-#{$i}
+    margin-bottom: (1px * $i)!important
+
+  .m-px-#{$i}
+    margin: (1px * $i) (1px * $i) (1px * $i) (1px * $i)!important
+
+  // padding
+  .pt-px-#{$i}
+    padding-top: (1px * $i)!important
+
+  .pr-px-#{$i}
+    padding-right: (1px * $i)!important
+
+  .pl-px-#{$i}
+    padding-left: (1px * $i)!important
+
+  .pb-px-#{$i}
+    padding-bottom: (1px * $i)!important
+
+  .p-px-#{$i}
+    padding: (1px * $i) (1px * $i) (1px * $i) (1px * $i)!important
+
+// no padding
+.p-0
+  padding: 0!important
+
+.pt-0
+  padding-top: 0!important
+
+.pb-0
+  padding-bottom: 0!important
+
+.pl-0
+  padding-left: 0!important
+
+.pr-0
+  padding-right: 0!important
+
+// no margin
+.m-0
+  margin: 0!important
+
+.mt-0
+  margin-top: 0!important
+
+.mb-0
+  margin-bottom: 0!important
+
+.ml-0
+  margin-left: 0!important
+
+.mr-0
+  margin-right: 0!important
+
+// position classes
+.relative
+  position: relative!important
+
+.absolute
+  position: absolute!important
+
+.bottom-0
+  bottom: 0!important
+
+// shadows
+
+.shadow
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)
+
+.shadow-md
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)
+
+.shadow-lg
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)
+
+.shadow-xl
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)
+
+.shadow-2xl
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25)
+
+.shadow-inner
+  box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)
+
+.shadow-outline
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5)
+
+.shadow-none
+  box-shadow: none
+
+// borders
+@for $i from 1 through 5
+  // primary
+  .border-primary-#{$i}
+    border: (1px * $i) solid #209cee
+
+  .border-t-primary-#{$i}
+    border-top: (1px * $i) solid #209cee
+
+  .border-b-primary-#{$i}
+    border-bottom: (1px * $i) solid #209cee
+
+  .border-l-primary-#{$i}
+    border-left: (1px * $i) solid #209cee
+
+  .border-r-primary-#{$i}
+    border-right: (1px * $i) solid #209cee
+
+  // danger
+  .border-danger-#{$i}
+    border: (1px * $i) solid #d9534f
+
+  .border-t-danger-#{$i}
+    border-top: (1px * $i) solid #d9534f
+
+  .border-b-danger-#{$i}
+    border-bottom: (1px * $i) solid #d9534f
+
+  .border-l-danger-#{$i}
+    border-left: (1px * $i) solid #d9534f
+
+  .border-r-danger-#{$i}
+    border-right: (1px * $i) solid #d9534f
+
+// MOBILE
+@media screen and (max-width: 480px)
+  .is-fullwidth-mobile
+    width: 100%!important
+
+  section.section.is-content
+    padding-top: 10px!important
+

@@ -2,30 +2,46 @@
 
 @section('content')
     <div class="container">
-        <form method="POST" action="{{ route('login') }}" class="bg-blue-500 text-center w-1/3 px-3 py-4 text-gray-600 mx-auto rounded">
+        <h1 class="title is-1 is-size-2-tablet">Login</h1>
+
+        <form method="POST" action="{{ route('login') }}" class="form">
             @csrf
 
-            <input type="text" name="email" placeholder="E-Mail Address" class="block w-full mx-auto text-sm py-2 px-3 rounded" required autofocus autocomplete="email" />
+            <div class="field">
+                <label class="label">Email Address</label>
 
-            @error('email')
-                <span class="block bg-red-400 mx-auto" role="alert">
-                    <strong class="font-bold">{{ $message }}</strong>
-                </span>
-            @enderror
+                <div class="control">
+                    <input type="email" name="email" class="input is-large" required autofocus autocomplete="email" />
+                </div>
 
-            <input type="password" name="password" placeholder="Password" class="block w-full mx-auto text-sm py-2 px-3 rounded my-3" />
+                @error('email')
+                    <p class="help is-danger">
+                        {{ $message }}
+                    </p>
+                @enderror
+            </div>
 
-            @error('password')
-                <span class="block bg-red-400 mx-auto" role="alert">
-                    <strong class="font-bold">{{ $message }}</strong>
-                </span>
-            @enderror
+            <div class="field">
+                <label class="label">Password</label>
+
+                <div class="control">
+                    <input type="password" name="password" class="input is-large" required autofocus autocomplete="password" />
+                </div>
+
+                @error('password')
+                    <p class="help is-danger">
+                        {{ $message }}
+                    </p>
+                @enderror
+            </div>
 
             <input type="hidden" name="remember" value="1">
 
-            <button class="bg-blue-500 text-white font-bold py-2 px-4 rounded border block mx-auto w-full">
-                Login
-            </button>
+            <div class="field">
+                <button class="button is-primary is-fullwidth-mobile">
+                    Login
+                </button>
+            </div>
         </form>
     </div>
 @endsection

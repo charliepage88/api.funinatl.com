@@ -113,16 +113,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.107.1",
+            "version": "3.107.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "ccd3d13ae49a45bdf6a394d701f207c276dbf05a"
+                "reference": "2ea91e93b9b1d9b01055896ac5e4f2e8448d141f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/ccd3d13ae49a45bdf6a394d701f207c276dbf05a",
-                "reference": "ccd3d13ae49a45bdf6a394d701f207c276dbf05a",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/2ea91e93b9b1d9b01055896ac5e4f2e8448d141f",
+                "reference": "2ea91e93b9b1d9b01055896ac5e4f2e8448d141f",
                 "shasum": ""
             },
             "require": {
@@ -192,7 +192,7 @@
                 "s3",
                 "sdk"
             ],
-            "time": "2019-07-12T18:07:41+00:00"
+            "time": "2019-07-18T19:28:55+00:00"
         },
         {
             "name": "babenkoivan/scout-elasticsearch-driver",
@@ -1817,21 +1817,21 @@
         },
         {
             "name": "johngrogg/ics-parser",
-            "version": "v2.1.12",
+            "version": "v2.1.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/u01jmg3/ics-parser.git",
-                "reference": "e9d8d4dd9929cd60524c8856f8373a05b57012a3"
+                "reference": "8def454ec4f44be28c8e8e1ddf5b97bf84f3abd8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/u01jmg3/ics-parser/zipball/e9d8d4dd9929cd60524c8856f8373a05b57012a3",
-                "reference": "e9d8d4dd9929cd60524c8856f8373a05b57012a3",
+                "url": "https://api.github.com/repos/u01jmg3/ics-parser/zipball/8def454ec4f44be28c8e8e1ddf5b97bf84f3abd8",
+                "reference": "8def454ec4f44be28c8e8e1ddf5b97bf84f3abd8",
                 "shasum": ""
             },
             "require": {
                 "ext-mbstring": "*",
-                "nesbot/carbon": "^1.38.4 || ^2.0",
+                "nesbot/carbon": "^1.39.0 || ^2.0",
                 "php": ">=5.3.9"
             },
             "require-dev": {
@@ -1869,7 +1869,7 @@
                 "ics-parser",
                 "ifb"
             ],
-            "time": "2019-07-10T13:00:53+00:00"
+            "time": "2019-07-18T15:14:46+00:00"
         },
         {
             "name": "josiasmontag/laravel-recaptchav3",
@@ -2693,16 +2693,16 @@
         },
         {
             "name": "nesbot/carbon",
-            "version": "2.21.2",
+            "version": "2.21.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/briannesbitt/Carbon.git",
-                "reference": "a8bfb6631e3bc982427406d13ad817fc45d47b61"
+                "reference": "58bdbbfab17ccd2ec7347b99e997f18232def4dc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/a8bfb6631e3bc982427406d13ad817fc45d47b61",
-                "reference": "a8bfb6631e3bc982427406d13ad817fc45d47b61",
+                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/58bdbbfab17ccd2ec7347b99e997f18232def4dc",
+                "reference": "58bdbbfab17ccd2ec7347b99e997f18232def4dc",
                 "shasum": ""
             },
             "require": {
@@ -2756,7 +2756,7 @@
                 "datetime",
                 "time"
             ],
-            "time": "2019-07-17T07:49:05+00:00"
+            "time": "2019-07-18T18:47:28+00:00"
         },
         {
             "name": "nikic/php-parser",

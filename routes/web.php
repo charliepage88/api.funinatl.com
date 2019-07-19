@@ -23,6 +23,7 @@ Route::middleware('auth')->namespace('Admin')->prefix('admin')->group(function (
     });
 
     Route::get('/dashboard', 'DashboardController@adminDashboard')->name('admin.dashboard');
+    Route::get('/logout', 'DashboardController@logout')->name('admin.logout');
 
     // Categories
     Route::get('/categories', 'CategoriesController@index')

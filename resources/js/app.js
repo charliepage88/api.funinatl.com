@@ -27,7 +27,6 @@ Vue.use(Buefy)
 // admin components
 Vue.component('admin-filter-events', require('./components/AdminFilterEvents.vue').default);
 Vue.component('admin-filter-locations', require('./components/AdminFilterLocations.vue').default);
-Vue.component('date-picker', require('./components/DatePicker.vue').default);
 
 // chart components
 Vue.component('chart-events-timeline', require('./components/Charts/ChartEventsTimeline.vue').default);
@@ -92,4 +91,31 @@ function checkParent(t, elm) {
   t = t.parentNode;
   }
   return false;
+}
+
+// bulma navbar burger
+if (document.getElementById('appNavMenu')) {
+  document.addEventListener('DOMContentLoaded', () => {
+    // Get all "navbar-burger" elements
+    const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0)
+
+    // Check if there are any navbar burgers
+    if ($navbarBurgers.length > 0) {
+
+      // Add a click event on each of them
+      $navbarBurgers.forEach( el => {
+        el.addEventListener('click', () => {
+
+          // Get the target from the "data-target" attribute
+          const target = el.dataset.target
+          const $target = document.getElementById(target)
+
+          // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+          el.classList.toggle('is-active')
+          $target.classList.toggle('is-active')
+
+        })
+      })
+    }
+  })
 }

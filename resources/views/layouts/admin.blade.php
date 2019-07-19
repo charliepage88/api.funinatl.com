@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+
     <title>{{ config('app.name', 'Laravel') }}</title>
     
     <!-- CSRF Token -->
@@ -20,7 +25,55 @@
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 </head>
 
-<body class="bg-gray-200 leading-normal tracking-normal">
+<body class="has-navbar-fixed-top">
+    <nav class="navbar is-fixed-top is-primary" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a href="{{ route('admin.dashboard') }}" class="navbar-item">
+                <img src="https://funinatl.nyc3.digitaloceanspaces.com/site/funinatl-logo.jpg" alt="FunInATL Admin" />
+            </a>
+
+            <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="appNavMenu">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+                <div class="column is-3">
+                    <div class="header-search">
+                        <div class="field has-addons">
+                            <div class="control">
+                                <input class="input" type="text" placeholder="Search here">
+                            </div>
+                            <div class="control">
+                                <a class="button is-white">
+                                    <i class="fa fa-search"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column is-2">
+                    <ul class="alert">
+                        <li><a href=""><img src="images/alart.png" alt="" /></a></li>
+                        <li><a href=""><img src="images/env.png" alt="" /></a></li>
+                    </ul>
+                </div>
+                <div class="column is-2">
+                    <div class="user">
+                        <img src="images/user.png" alt="">
+                        <div class="select">
+                            <select>
+                                <option>James Don</option>
+                                <option>Settings</option>
+                                <option>Log Out</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
     <nav id="header" class="bg-white fixed w-full z-10 pin-t shadow">
         <div class="w-full container mx-auto flex flex-wrap items-center mt-0 pt-3 pb-3 md:pb-0">
             

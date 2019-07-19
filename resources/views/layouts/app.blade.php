@@ -1,8 +1,14 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -18,81 +24,108 @@
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 </head>
 <body class="has-navbar-fixed-top">
-    <nav id="header" class="bg-white fixed w-full z-10 pin-t shadow">
-        <div class="w-full container mx-auto flex flex-wrap items-center px-8 mt-0 pt-3 pb-3 md:pb-0">
-            
-            <div class="w-1/2 pl-2 md:pl-0">
-                <a class="text-black text-base xl:text-xl no-underline hover:no-underline font-bold"  href="{{ route('admin.dashboard') }}"> 
-                    <i class="fas fa-calendar-week text-orange-700 pr-3"></i>
-                    <span>FunInATL</span>
+    <nav class="navbar is-fixed-top is-primary" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="{{ env('PUBLIC_URL') }}">
+              <img src="https://funinatl.nyc3.digitaloceanspaces.com/site/funinatl-logo.jpg" width="112" height="28">
+            </a>
+
+            <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="appNavMenu">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+
+        <div id="appNavMenu" class="navbar-menu">
+            <div class="navbar-start">
+                <a href="{{ env('PUBLIC_URL') }}" class="navbar-item">
+                    Public Site
                 </a>
+
+                @if(Auth::check())
+                    <a href="{{ route('admin.dashboard') }}" class="navbar-item">
+                        Admin
+                    </a>
+                @endif
             </div>
 
-            <div class="w-1/2 pr-0">
-                <div class="flex relative inline-block float-right">
-                    @if(Auth::check())
-                        <div class="relative text-sm">
-                            <button id="userButton" class="flex items-center focus:outline-none mr-3">
-                                {{-- <img class="w-8 h-8 rounded-full mr-4" src="http://i.pravatar.cc/300" alt="Avatar of User"> --}}
-                                <span class="hidden md:inline-block">Hi, {{ Auth::user()->name }}</span>
-                                <i class="fas fa-angle-down fa-fw mr-3 text-black"></i>
-                            </button>
-                            
-                            <div id="userMenu" class="bg-white rounded shadow-md mt-2 absolute mt-12 pin-t pin-r min-w-full overflow-auto z-30 invisible">
-                                <ul class="list-reset">
-                                    <li>
-                                        <a href="{{ route('admin.dashboard') }}" class="px-4 py-2 block text-black hover:bg-gray-300 no-underline hover:no-underline">
-                                            Dashboard
-                                        </a>
-                                    </li>
-                                    <li><hr class="border-t mx-2 border-gray-300"></li>
-                                    <li>
-                                        <a href="{{ route('logout') }}" class="px-4 py-2 block text-black hover:bg-gray-300 no-underline hover:no-underline">
-                                            Logout
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    @else
-                        <div class="relative text-sm">
-                            <button id="userButton" class="flex items-center focus:outline-none mr-3">
-                                <span class="hidden md:inline-block">Hi Guest,</span>
-                                <i class="fas fa-angle-down fa-fw mr-3 text-black"></i>
-                            </button>
-                            
-                            <div id="userMenu" class="bg-white rounded shadow-md mt-2 absolute mt-12 pin-t pin-r min-w-full overflow-auto z-30 invisible">
-                                <ul class="list-reset">
-                                    <li>
-                                        <a href="{{ route('login') }}" class="px-4 py-2 block text-black hover:bg-gray-300 no-underline hover:no-underline">
-                                            Login
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    @endif
+            <div class="navbar-end">
+                @if(Auth::check())
+                    <div class="navbar-item has-dropdown is-hoverable">
+                        <a class="navbar-link">
+                            Hi, {{ Auth::user()->name }}
+                        </a>
 
-                    <div class="block lg:hidden pr-4">
-                        <button id="nav-toggle" class="flex items-center px-3 py-2 border rounded text-gray border-gray-600 hover:text-black hover:border-teal appearance-none focus:outline-none">
-                            <svg class="fill-current h-3 w-3" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><title>Menu</title><path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z"/></svg>
-                        </button>
+                        <div class="navbar-dropdown">
+                            <a href="{{ route('admin.dashboard') }}" class="navbar-item">
+                                Admin
+                            </a>
+
+                            <a href="{{ route('admin.logout') }}" class="navbar-item">
+                                Logout
+                            </a>
+                        </div>
                     </div>
-                </div>
+                @else
+                    <a href="{{ route('login') }}" class="navbar-item">
+                        Login
+                    </a>
+                @endif
             </div>
         </div>
     </nav>
 
-    <div class="container w-full mx-auto px-16 pt-20">
-        <div class="w-full px-4 md:px-0 md:mt-8 mb-16 text-gray-700 leading-normal">
-            @yield('content')
+    <section class="section is-content has-background-white-bis pr-0 pl-0" id="app">
+        <div class="container is-fluid pl-4 pr-4">
+            <div class="centered-container">
+                <div class="box shadow-md rounded">
+                    @if (session('is-danger'))
+                        <article class="message is-danger">
+                            <div class="message-header">
+                                <p>Error</p>
+                            </div>
+
+                            <div class="message-body">
+                                {{ session('is-danger') }}
+                            </div>
+                        </article>
+                    @endif
+
+                    @if (session('is-success'))
+                        <article class="message is-success">
+                            <div class="message-header">
+                                <p>Success</p>
+                            </div>
+
+                            <div class="message-body">
+                                {{ session('is-success') }}
+                            </div>
+                        </article>
+                    @endif
+
+                    @if (session('status'))
+                        <article class="message is-success">
+                            <div class="message-header">
+                                <p>Success</p>
+                            </div>
+
+                            <div class="message-body">
+                                {{ session('status') }}
+                            </div>
+                        </article>
+                    @endif
+
+                    @yield('content')
+                </div>
+            </div>
         </div>
     </div>
 
-    <footer class="bg-white border-t border-gray-300 shadow"> 
-        <div class="container mx-auto flex py-8 mb-4">
-            <p class="w-full text-gray-600 text-sm text-center">
-              Copyright &copy; {{ date('Y') }} Charles Page. 
+    <footer class="footer">
+        <div class="container">
+            <p class="has-text-centered">
+                Copyright &copy; {{ date('Y') }} Charles Page. 
             </p>
         </div>
     </footer>
