@@ -193,7 +193,9 @@ class Report extends Model
         // init charts array
         $charts = [
             'events_timeline' => [
-                'options' => [],
+                'options' => [
+                    'responsive' => true
+                ],
                 'data' => []
             ]
         ];
