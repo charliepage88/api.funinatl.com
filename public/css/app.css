@@ -14015,6 +14015,16 @@ label.panel-block:hover {
     height: 60px !important;
     max-height: 60px !important;
   }
+
+  .responsive-table-container {
+    overflow-x: scroll;
+  }
+}
+
+@media screen and (min-width: 481px) and (max-width: 1024px) {
+  .responsive-table-container {
+    overflow-x: scroll;
+  }
 }
 
 span.icon.is-5x {

@@ -177,15 +177,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: 'admin-filter-events',
   props: ['categoriesJson', 'locationsJson', 'createEventUrl'],
@@ -49975,272 +49966,176 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "flex flex-wrap" }, [
+  return _c("div", { staticClass: "columns" }, [
     _vm._m(0),
     _vm._v(" "),
     _vm.categories.length
-      ? _c("div", { staticClass: "w-1/5 mr-4 mt-4" }, [
-          _c("div", { staticClass: "relative" }, [
+      ? _c(
+          "div",
+          { staticClass: "column" },
+          [
             _c(
-              "select",
-              {
-                directives: [
+              "b-field",
+              [
+                _c(
+                  "b-select",
                   {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.category_id,
-                    expression: "category_id"
-                  }
-                ],
-                staticClass:
-                  "block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500",
-                on: {
-                  change: [
-                    function($event) {
-                      var $$selectedVal = Array.prototype.filter
-                        .call($event.target.options, function(o) {
-                          return o.selected
-                        })
-                        .map(function(o) {
-                          var val = "_value" in o ? o._value : o.value
-                          return val
-                        })
-                      _vm.category_id = $event.target.multiple
-                        ? $$selectedVal
-                        : $$selectedVal[0]
+                    staticClass: "is-fullwidth",
+                    attrs: {
+                      icon: "tasks",
+                      "icon-pack": "fas",
+                      size: "is-large"
                     },
-                    function($event) {
-                      return _vm.filterUpdate("category_id")
+                    on: {
+                      input: function($event) {
+                        return _vm.filterUpdate("category_id")
+                      }
+                    },
+                    model: {
+                      value: _vm.category_id,
+                      callback: function($$v) {
+                        _vm.category_id = $$v
+                      },
+                      expression: "category_id"
                     }
-                  ]
+                  },
+                  [
+                    _c("option", { attrs: { value: "null" } }, [
+                      _vm._v("Choose Category")
+                    ]),
+                    _vm._v(" "),
+                    _vm._l(_vm.categories, function(category) {
+                      return _c(
+                        "option",
+                        { key: category.id, domProps: { value: category.id } },
+                        [
+                          _vm._v(
+                            "\n          " +
+                              _vm._s(category.name) +
+                              "\n        "
+                          )
+                        ]
+                      )
+                    })
+                  ],
+                  2
+                )
+              ],
+              1
+            )
+          ],
+          1
+        )
+      : _vm._e(),
+    _vm._v(" "),
+    _c(
+      "div",
+      { staticClass: "column" },
+      [
+        _c(
+          "b-field",
+          [
+            _c(
+              "b-select",
+              {
+                staticClass: "is-fullwidth",
+                attrs: { icon: "tasks", "icon-pack": "fas", size: "is-large" },
+                on: {
+                  input: function($event) {
+                    return _vm.filterUpdate("location_id")
+                  }
+                },
+                model: {
+                  value: _vm.location_id,
+                  callback: function($$v) {
+                    _vm.location_id = $$v
+                  },
+                  expression: "location_id"
                 }
               },
               [
                 _c("option", { attrs: { value: "null" } }, [
-                  _vm._v("Choose Category")
+                  _vm._v("Choose Location")
                 ]),
                 _vm._v(" "),
-                _vm._l(_vm.categories, function(category) {
+                _vm._l(_vm.locations, function(location) {
                   return _c(
                     "option",
-                    { key: category.id, domProps: { value: category.id } },
-                    [_vm._v(_vm._s(category.name))]
+                    { key: location.id, domProps: { value: location.id } },
+                    [
+                      _vm._v(
+                        "\n          " + _vm._s(location.name) + "\n        "
+                      )
+                    ]
                   )
                 })
               ],
               2
-            ),
-            _vm._v(" "),
-            _c(
-              "div",
-              {
-                staticClass:
-                  "pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
-              },
-              [
-                _c(
-                  "svg",
-                  {
-                    staticClass: "fill-current h-4 w-4",
-                    attrs: {
-                      xmlns: "http://www.w3.org/2000/svg",
-                      viewBox: "0 0 20 20"
-                    }
-                  },
-                  [
-                    _c("path", {
-                      attrs: {
-                        d:
-                          "M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"
-                      }
-                    })
-                  ]
-                )
-              ]
             )
-          ])
-        ])
-      : _vm._e(),
-    _vm._v(" "),
-    _c("div", { staticClass: "w-1/5 mr-4 mt-4" }, [
-      _c("div", { staticClass: "relative" }, [
-        _c(
-          "select",
-          {
-            directives: [
-              {
-                name: "model",
-                rawName: "v-model",
-                value: _vm.location_id,
-                expression: "location_id"
-              }
-            ],
-            staticClass:
-              "block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500",
-            on: {
-              change: [
-                function($event) {
-                  var $$selectedVal = Array.prototype.filter
-                    .call($event.target.options, function(o) {
-                      return o.selected
-                    })
-                    .map(function(o) {
-                      var val = "_value" in o ? o._value : o.value
-                      return val
-                    })
-                  _vm.location_id = $event.target.multiple
-                    ? $$selectedVal
-                    : $$selectedVal[0]
-                },
-                function($event) {
-                  return _vm.filterUpdate("location_id")
-                }
-              ]
-            }
-          },
-          [
-            _c("option", { attrs: { value: "null" } }, [
-              _vm._v("Choose Location")
-            ]),
-            _vm._v(" "),
-            _vm._l(_vm.locations, function(location) {
-              return _c(
-                "option",
-                { key: location.id, domProps: { value: location.id } },
-                [_vm._v(_vm._s(location.name))]
-              )
-            })
           ],
-          2
-        ),
-        _vm._v(" "),
-        _c(
-          "div",
-          {
-            staticClass:
-              "pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
-          },
-          [
-            _c(
-              "svg",
-              {
-                staticClass: "fill-current h-4 w-4",
-                attrs: {
-                  xmlns: "http://www.w3.org/2000/svg",
-                  viewBox: "0 0 20 20"
-                }
-              },
-              [
-                _c("path", {
-                  attrs: {
-                    d:
-                      "M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"
-                  }
-                })
-              ]
-            )
-          ]
+          1
         )
-      ])
-    ]),
+      ],
+      1
+    ),
     _vm._v(" "),
-    _c("div", { staticClass: "w-auto mr-16 mt-4" }, [
-      _c("div", { staticClass: "relative" }, [
+    _c(
+      "div",
+      { staticClass: "column" },
+      [
         _c(
-          "select",
-          {
-            directives: [
-              {
-                name: "model",
-                rawName: "v-model",
-                value: _vm.source,
-                expression: "source"
-              }
-            ],
-            staticClass:
-              "block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500",
-            on: {
-              change: [
-                function($event) {
-                  var $$selectedVal = Array.prototype.filter
-                    .call($event.target.options, function(o) {
-                      return o.selected
-                    })
-                    .map(function(o) {
-                      var val = "_value" in o ? o._value : o.value
-                      return val
-                    })
-                  _vm.source = $event.target.multiple
-                    ? $$selectedVal
-                    : $$selectedVal[0]
-                },
-                function($event) {
-                  return _vm.filterUpdate("source")
-                }
-              ]
-            }
-          },
-          [
-            _c("option", { attrs: { value: "null" } }, [
-              _vm._v("Choose Source")
-            ]),
-            _vm._v(" "),
-            _c("option", { attrs: { value: "provider" } }, [
-              _vm._v("Provider")
-            ]),
-            _vm._v(" "),
-            _c("option", { attrs: { value: "submission" } }, [
-              _vm._v("Submission")
-            ]),
-            _vm._v(" "),
-            _c("option", { attrs: { value: "custom" } }, [_vm._v("Custom")])
-          ]
-        ),
-        _vm._v(" "),
-        _c(
-          "div",
-          {
-            staticClass:
-              "pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
-          },
+          "b-field",
           [
             _c(
-              "svg",
+              "b-select",
               {
-                staticClass: "fill-current h-4 w-4",
-                attrs: {
-                  xmlns: "http://www.w3.org/2000/svg",
-                  viewBox: "0 0 20 20"
+                staticClass: "is-fullwidth",
+                attrs: { icon: "cogs", "icon-pack": "fas", size: "is-large" },
+                on: {
+                  input: function($event) {
+                    return _vm.filterUpdate("source")
+                  }
+                },
+                model: {
+                  value: _vm.source,
+                  callback: function($$v) {
+                    _vm.source = $$v
+                  },
+                  expression: "source"
                 }
               },
               [
-                _c("path", {
-                  attrs: {
-                    d:
-                      "M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"
-                  }
-                })
+                _c("option", { attrs: { value: "null" } }, [
+                  _vm._v("Choose Source")
+                ]),
+                _vm._v(" "),
+                _c("option", { attrs: { value: "provider" } }, [
+                  _vm._v("Provider")
+                ]),
+                _vm._v(" "),
+                _c("option", { attrs: { value: "submission" } }, [
+                  _vm._v("Submission")
+                ]),
+                _vm._v(" "),
+                _c("option", { attrs: { value: "custom" } }, [_vm._v("Custom")])
               ]
             )
-          ]
+          ],
+          1
         )
-      ])
-    ]),
+      ],
+      1
+    ),
     _vm._v(" "),
     _vm.createEventUrl
-      ? _c("div", { staticClass: "w-auto mt-6" }, [
+      ? _c("div", { staticClass: "column is-narrow has-text-right" }, [
           _c(
             "a",
             {
-              staticClass:
-                "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded",
+              staticClass: "button is-success is-large is-fullwidth-mobile",
               attrs: { href: _vm.createEventUrl }
             },
-            [
-              _c("i", { staticClass: "fa fa-plus mr-1" }),
-              _vm._v(" "),
-              _c("span", [_vm._v("Create Event")])
-            ]
+            [_vm._m(1), _vm._v(" "), _c("span", [_vm._v("Create Event")])]
           )
         ])
       : _vm._e()
@@ -50251,12 +50146,16 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "w-1/4 text-left mr-4" }, [
-      _c(
-        "h1",
-        { staticClass: "bg-brand font-bold text-3xl md:text-5xl px-3 mt-0" },
-        [_vm._v("Events")]
-      )
+    return _c("div", { staticClass: "column" }, [
+      _c("h1", { staticClass: "title is-1" }, [_vm._v("Events")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("span", { staticClass: "icon" }, [
+      _c("i", { staticClass: "fa fa-plus" })
     ])
   }
 ]

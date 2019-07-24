@@ -1,88 +1,79 @@
 <template>
-  <div class="flex flex-wrap">
-    <div class="w-1/4 text-left mr-4">
-      <h1 class="bg-brand font-bold text-3xl md:text-5xl px-3 mt-0">Events</h1>
+  <div class="columns">
+    <div class="column">
+      <h1 class="title is-1">Events</h1>
     </div>
 
-    <div class="w-1/5 mr-4 mt-4" v-if="categories.length">
-      <div class="relative">
-        <select
-          class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+    <div class="column" v-if="categories.length">
+      <b-field>
+        <b-select
           v-model="category_id"
-          @change="filterUpdate('category_id')"
+          icon="tasks"
+          icon-pack="fas"
+          size="is-large"
+          @input="filterUpdate('category_id')"
+          class="is-fullwidth"
         >
           <option value="null">Choose Category</option>
           <option
             v-for="category in categories"
             :key="category.id"
             :value="category.id"
-          >{{ category.name }}</option>
-        </select>
-
-        <div
-          class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
-        >
-          <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-            <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-          </svg>
-        </div>
-      </div>
+          >
+            {{ category.name }}
+          </option>
+        </b-select>
+      </b-field>
     </div>
 
-    <div class="w-1/5 mr-4 mt-4">
-      <div class="relative">
-        <select
-          class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+    <div class="column">
+      <b-field>
+        <b-select
           v-model="location_id"
-          @change="filterUpdate('location_id')"
+          icon="tasks"
+          icon-pack="fas"
+          size="is-large"
+          @input="filterUpdate('location_id')"
+          class="is-fullwidth"
         >
           <option value="null">Choose Location</option>
           <option
             v-for="location in locations"
             :key="location.id"
             :value="location.id"
-          >{{ location.name }}</option>
-        </select>
-
-        <div
-          class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
-        >
-          <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-            <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-          </svg>
-        </div>
-      </div>
+          >
+            {{ location.name }}
+          </option>
+        </b-select>
+      </b-field>
     </div>
 
-    <div class="w-auto mr-16 mt-4">
-      <div class="relative">
-        <select
-          class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+    <div class="column">
+      <b-field>
+        <b-select
           v-model="source"
-          @change="filterUpdate('source')"
+          icon="cogs"
+          icon-pack="fas"
+          size="is-large"
+          @input="filterUpdate('source')"
+          class="is-fullwidth"
         >
           <option value="null">Choose Source</option>
           <option value="provider">Provider</option>
           <option value="submission">Submission</option>
           <option value="custom">Custom</option>
-        </select>
-
-        <div
-          class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
-        >
-          <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-            <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-          </svg>
-        </div>
-      </div>
+        </b-select>
+      </b-field>
     </div>
 
-    <div class="w-auto mt-6" v-if="createEventUrl">
+    <div class="column is-narrow has-text-right" v-if="createEventUrl">
       <a
         :href="createEventUrl"
-        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded"
+        class="button is-success is-large is-fullwidth-mobile"
       >
-        <i class="fa fa-plus mr-1"></i>
+        <span class="icon">
+          <i class="fa fa-plus"></i>
+        </span>
         <span>Create Event</span>
       </a>
     </div>
