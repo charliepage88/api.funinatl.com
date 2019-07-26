@@ -6,6 +6,7 @@
       size="is-medium"
       icon="clock"
       icon-pack="fas"
+      :mobile-native="false"
     />
 
     <input type="hidden" :name="name" v-model="timeHidden" />
@@ -16,7 +17,7 @@
 import moment from 'moment'
 
 export default {
-  name: 'admin-form-time-picker',
+  name: 'form-time-picker',
 
   props: [
     'name',

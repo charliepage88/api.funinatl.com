@@ -1,202 +1,234 @@
 @extends('layouts.admin')
 
 @section('content')
-    <form class="w-full" method="POST" action="{{ route('admin.locations.edit', [ 'location' => $location->id ]) }}" enctype="multipart/form-data">
+    <form class="form" method="POST" action="{{ route('admin.locations.edit', [ 'location' => $location->id ]) }}" enctype="multipart/form-data">
         @csrf
 
-        <h1 class="bg-brand font-bold text-center text-3xl md:text-5xl px-3">
+        <h1 class="title is-1">
             Edit Location
         </h1>
 
-        <div class="flex flex-wrap -mx-3 mb-6">
-            <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-name">
-                    Name 
-                    <span class="text-red-500 text-xs italic">*</span>
-                </label>
-                
-                <input class="appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight" name="name" id="grid-name" type="text" value="{{ $location->name }}">
+        <div class="columns is-multiline">
+            <div class="column is-half">
+                <div class="field">
+                    <label class="label">
+                        Name 
+                        <span class="has-text-danger is-italic">*</span>
+                    </label>
+                    
+                    <div class="control">
+                        <input class="input is-medium" name="name" type="text" value="{{ old('name') ?? $location->name }}">
+                    </div>
 
-                @if ($errors->has('name'))
-                    <span class="text-red-500 text-sm" role="alert">
-                        {{ $errors->first('name') }}
-                    </span>
-                @endif
-            </div>
-            <div class="w-full md:w-1/3 px-3">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-website">
-                    Website 
-                    <span class="text-red-500 text-xs italic">*</span>
-                </label>
-                
-                <input class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight" name="website" id="grid-website" type="text" value="{{ $location->website }}">
-
-                @if ($errors->has('website'))
-                    <span class="text-red-500 text-sm" role="alert">
-                        {{ $errors->first('website') }}
-                    </span>
-                @endif
+                    @if ($errors->has('name'))
+                        <p class="help is-danger">
+                            {{ $errors->first('name') }}
+                        </span>
+                    @endif
+                </div>
             </div>
 
-            <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-category">
-                    Category 
-                    <span class="text-red-500 text-xs italic">*</span>
-                </label>
-                
-                <div class="relative">
-                    <select class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-category" name="category_id">
-                        <option value="">Choose category</option>
-                        @foreach($categories as $id => $name)
-                            <option value="{{ $id }}" {{ $location->category_id === $id ? ' selected' : '' }}>
-                                {{ $name }}
-                            </option>
-                        @endforeach
-                    </select>
+            <div class="column is-half">
+                <div class="field">
+                    <label class="label">
+                        Website 
+                        <span class="has-text-danger is-italic">*</span>
+                    </label>
+                    
+                    <div class="field">
+                        <input class="input is-medium" name="website" type="text" value="{{ old('website') ?? $location->website }}">
+                    </div>
 
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                    @if ($errors->has('website'))
+                        <p class="help is-danger">
+                            {{ $errors->first('website') }}
+                        </p>
+                    @endif
+                </div>
+            </div>
+
+            <div class="column is-one-quarter">
+                <div class="field">
+                    <label class="label">
+                        Photo
+                    </label>
+
+                    <div class="file is-warning is-boxed">
+                        <label class="file-label">
+                            <input class="file-input" type="file" name="photo">
+                            <span class="file-cta">
+                                <span class="file-icon">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                </span>
+                                <span class="file-label">
+                                    Choose a photo
+                                </span>
+                            </span>
+                        </label>
                     </div>
                 </div>
-
-                @if ($errors->has('category_id'))
-                    <span class="text-red-500 text-sm" role="alert">
-                        {{ $errors->first('category_id') }}
-                    </span>
-                @endif
-            </div>
-        </div>
-
-        <div class="flex flex-wrap -mx-3 mb-6">
-            <div class="w-full md:w-1/3 px-3">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-photo">
-                    Photo
-                </label>
-
-                @if(!empty($location->photo_url))
-                    <img class="h-128 w-128 mx-auto mb-2" src="{{ $location->photo_url }}">
-                @endif
-                
-                <input class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:border-gray-500" name="photo" id="grid-photo" type="file">
             </div>
 
-            <div class="w-full md:w-2/3 px-3">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-address">
-                    Address 
-                    <span class="text-red-500 text-xs italic">*</span>
-                </label>
-                
-                <input class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:border-gray-500" name="address" id="grid-address" type="text" value="{{ $location->address }}">
+            @if(!empty($location->photo_url))
+                <div class="column is-one-quarter">
+                    <figure class="image is-128x128">
+                        <img src="{{ $location->photo_url }}">
+                    </figure>
+                </div>
+            @endif
 
-                @if ($errors->has('address'))
-                    <span class="text-red-500 text-sm" role="alert">
-                        {{ $errors->first('address') }}
-                    </span>
-                @endif
+            <div class="column is-half">
+                <div class="field">
+                    <label class="label">
+                        Category
+                        <span class="has-text-danger is-italic">*</span>
+                    </label>
+
+                    <div class="control">
+                        <div class="select is-medium is-fullwidth">
+                            <select name="category_id">
+                                <option value="">Choose Category</option>
+                                @foreach($categories as $id => $name)
+                                    <option
+                                        value="{{ $id }}"
+                                        {{ (old('category_id') ?? $location->category_id) === $id ? 'selected' : '' }}
+                                    >
+                                        {{ $name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    @if ($errors->has('category_id'))
+                        <p class="help is-danger">
+                            {{ $errors->first('category_id') }}
+                        </p>
+                    @endif
+                </div>
             </div>
-        </div>
 
-        <div class="flex flex-wrap -mx-3 mb-2">
-            <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-city">
-                    City 
-                    <span class="text-red-500 text-xs italic">*</span>
-                </label>
-                
-                <input class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-city" type="text" name="city" value="{{ $location->city }}">
+            <div class="column is-full">
+                <div class="field">
+                    <label class="label">
+                        Address 
+                        <span class="has-text-danger is-italic">*</span>
+                    </label>
+                    
+                    <div class="control">
+                        <input class="input is-medium" type="text" name="address" value="{{ old('address') ?? $location->address }}">
+                    </div>
 
-                @if ($errors->has('city'))
-                    <span class="text-red-500 text-sm" role="alert">
-                        {{ $errors->first('city') }}
-                    </span>
-                @endif
+                    @if ($errors->has('address'))
+                        <p class="help is-danger">
+                            {{ $errors->first('address') }}
+                        </p>
+                    @endif
+                </div>
+            </div>
+
+            <div class="column is-one-quarter">
+                <div class="field">
+                    <label class="label">
+                        City 
+                        <span class="has-text-danger is-italic">*</span>
+                    </label>
+                    
+                    <div class="control">
+                        <input class="input is-medium" type="text" name="city" value="{{ old('city') ?? $location->city }}">
+                    </div>
+
+                    @if ($errors->has('city'))
+                        <p class="help is-danger">
+                            {{ $errors->first('city') }}
+                        </p>
+                    @endif
+                </div>
             </div>
             
-            <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-state">
-                    State 
-                    <span class="text-red-500 text-xs italic">*</span>
-                </label>
-                
-                <div class="relative">
-                    <select class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-state" name="state">
-                        <option value="GA" selected>Georgia</option>
-                    </select>
-
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+            <div class="column is-one-quarter">
+                <div class="field">
+                    <label class="label">
+                        State 
+                        <span class="has-text-danger is-italic">*</span>
+                    </label>
+                    
+                    <div class="control">
+                        <div class="select is-medium is-fullwidth">
+                            <select name="state">
+                                <option value="GA">Georgia</option>
+                            </select>
+                        </div>
                     </div>
-                </div>
 
-                @if ($errors->has('state'))
-                    <span class="text-red-500 text-sm" role="alert">
-                        {{ $errors->first('state') }}
-                    </span>
-                @endif
+                    @if ($errors->has('state'))
+                        <p class="help is-danger">
+                            {{ $errors->first('state') }}
+                        </p>
+                    @endif
+                </div>
             </div>
             
-            <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-zip">
-                    Zip 
-                    <span class="text-red-500 text-xs italic">*</span>
-                </label>
-                
-                <input class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-zip" type="text" name="zip" value="{{ $location->zip }}">
+            <div class="column is-one-quarter">
+                <div class="field">
+                    <label class="label">
+                        Zip 
+                        <span class="has-text-danger is-italic">*</span>
+                    </label>
+                    
+                    <div class="control">
+                        <input class="input is-medium" type="text" name="zip" value="{{ old('zip') ?? $location->zip }}">
+                    </div>
 
-                @if ($errors->has('zip'))
-                    <span class="text-red-500 text-sm" role="alert">
-                        {{ $errors->first('zip') }}
-                    </span>
-                @endif
+                    @if ($errors->has('zip'))
+                        <p class="help is-danger">
+                            {{ $errors->first('zip') }}
+                        </p>
+                    @endif
+                </div>
             </div>
-        </div>
 
-        <div class="flex flex-wrap -mx-3 mb-2 pt-4">
-            <div class="w-full md:w-2/12 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-active">
-                    Active 
-                    <span class="text-red-500 text-xs italic">*</span>
-                </label>
+            <div class="column is-narrow">
+                <div class="field">
+                    <label class="label">
+                        Active
+                        <span class="has-text-danger is-italic">*</span>
+                    </label>
 
-                <div class="mb-2">                
-                    <div class="form-switch inline-block align-middle">
-                        <input
-                            type="checkbox"
-                            name="active"
-                            id="active"
-                            class="form-switch-checkbox"
-                            value="1"
-                            {{ $location->active ? 'checked' : '' }}
-                        >
-                        <label class="form-switch-label" for="active"></label>
+                    <div class="control">
+                        <label class="checkbox">
+                            <input
+                                type="checkbox"
+                                name="active"
+                                value="1"
+                                {{ (old('active') ?? $location->active) ? 'checked' : '' }}
+                            >
+                        </label>
                     </div>
                 </div>
             </div>
 
-            <div class="w-full md:w-2/12 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-is-family-friendly">
-                    Family Friendly 
-                </label>
+            <div class="column is-narrow">
+                <div class="field">
+                    <label class="label">
+                        Family Friendly
+                    </label>
 
-                <div class="mb-2">                
-                    <div class="form-switch inline-block align-middle">
-                        <input
-                            type="checkbox"
-                            name="is_family_friendly"
-                            id="is_family_friendly"
-                            class="form-switch-checkbox"
-                            value="1"
-                            {{ $location->is_family_friendly ? 'checked' : '' }}
-                        >
-                        <label class="form-switch-label" for="is_family_friendly"></label>
+                    <div class="control">
+                        <label class="checkbox">
+                            <input
+                                type="checkbox"
+                                name="is_family_friendly"
+                                value="1"
+                                {{ (old('is_family_friendly') ?? $location->is_family_friendly) ? 'checked' : '' }}
+                            >
+                        </label>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="flex flex-wrap -mx-3 mb-6">
-            <div class="w-full px-3">
-                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded">
+            <div class="column is-full has-text-right">
+                <button type="submit" class="button is-primary is-large">
                     Save
                 </button>
             </div>

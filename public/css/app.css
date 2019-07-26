@@ -12189,6 +12189,17 @@ label.panel-block:hover {
   text-decoration: none !important;
 }
 
+a.navbar-item:focus,
+a.navbar-item:focus-within,
+a.navbar-item:hover,
+a.navbar-item.is-active,
+.navbar-link:focus,
+.navbar-link:focus-within,
+.navbar-link:hover,
+.navbar-link.is-active {
+  background-color: indigo !important;
+}
+
 .mt-1 {
   margin-top: 1rem !important;
 }

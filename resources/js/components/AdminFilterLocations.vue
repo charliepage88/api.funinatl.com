@@ -1,6 +1,6 @@
 <template>
-  <div class="columns">
-    <div class="column">
+  <div class="columns is-multiline">
+    <div class="column is-full">
       <h1 class="title is-1">Locations</h1>
     </div>
 

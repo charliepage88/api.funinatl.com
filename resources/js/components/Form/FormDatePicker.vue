@@ -18,7 +18,7 @@
 import moment from 'moment'
 
 export default {
-  name: 'admin-form-date-picker',
+  name: 'form-date-picker',
 
   props: [
     'name',

@@ -1,83 +1,87 @@
 @extends('layouts.admin')
 
 @section('content')
-    <form class="w-full" method="POST" action="{{ route('admin.categories.create') }}">
+    <form class="form" method="POST" action="{{ route('admin.categories.create') }}">
         @csrf
 
-        <h1 class="bg-brand font-bold text-center text-3xl md:text-5xl px-3">
+        <h1 class="title is-1">
             Create Category
         </h1>
 
-        <div class="flex flex-wrap -mx-3 mb-6">
-            <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-name">
-                    Name 
-                    <span class="text-red-500 text-xs italic">*</span>
-                </label>
-                
-                <input class="appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight" name="name" id="grid-name" type="text">
+        <div class="columns is-multiline">
+            <div class="column is-half">
+                <div class="field">
+                    <label class="label">
+                        Name
+                        <span class="has-text-danger is-italic">*</span>
+                    </label>
 
-                @if ($errors->has('name'))
-                    <span class="text-red-500 text-sm" role="alert">
-                        {{ $errors->first('name') }}
-                    </span>
-                @endif
+                    <div class="control">
+                        <input class="input is-medium" name="name" type="text" value="{{ old('name') }}">
+                    </div>
+
+                    @if ($errors->has('name'))
+                        <p class="help is-danger">
+                            {{ $errors->first('name') }}
+                        </p>
+                    @endif
+                </div>
             </div>
 
-            <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-active">
-                    Active 
-                    <span class="text-red-500 text-xs italic">*</span>
-                </label>
+            <div class="column is-half">
+                <div class="field">
+                    <label class="label">
+                        Active
+                        <span class="has-text-danger is-italic">*</span>
+                    </label>
 
-                <div class="mb-2">                
-                    <div class="form-switch inline-block align-middle">
-                        <input
-                            type="checkbox"
-                            name="active"
-                            id="active"
-                            class="form-switch-checkbox"
-                            value="1"
-                            checked
-                        >
-                        <label class="form-switch-label" for="active"></label>
+                    <div class="control">
+                        <label class="checkbox">
+                            <input type="checkbox" name="active" value="1" {{ old('active') !== false ? 'checked' : '' }}>
+                        </label>
                     </div>
                 </div>
             </div>
 
-            <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-is-default">
-                    Is Default
-                </label>
+            <div class="column is-half">
+                <div class="field">
+                    <label class="label">
+                        Is Default
+                        <span class="has-text-danger is-italic">*</span>
+                    </label>
 
-                <div class="mb-2">                
-                    <div class="form-switch inline-block align-middle">
-                        <input
-                            type="checkbox"
-                            name="is_default"
-                            id="is_default"
-                            class="form-switch-checkbox"
-                            value="1"
-                        >
-                        <label class="form-switch-label" for="is_default"></label>
+                    <div class="control">
+                        <label class="checkbox">
+                            <input type="checkbox" name="is_default" value="1" {{ old('is_default') ? 'checked' : '' }}>
+                        </label>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="flex flex-wrap -mx-3 mb-6">
-            <div class="w-full md:w-1/3 px-3">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-photo">
-                    Photo
-                </label>
-                
-                <input class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:border-gray-500" name="photo" id="grid-photo" type="file">
+            <div class="column is-half">
+                <div class="field">
+                    <label class="label">
+                        Photo
+                    </label>
+
+                    <div class="file is-warning is-boxed">
+                        <label class="file-label">
+                            <input class="file-input" type="file" name="photo">
+                            <span class="file-cta">
+                                <span class="file-icon">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                </span>
+                                <span class="file-label">
+                                    Choose a photo
+                                </span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <div class="flex flex-wrap -mx-3 mb-6">
-            <div class="w-full px-3">
-                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded">
+            <div class="column is-full has-text-right">
+                <button type="submit" class="button is-primary is-large">
                     Save
                 </button>
             </div>

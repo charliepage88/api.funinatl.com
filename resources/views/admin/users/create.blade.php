@@ -1,65 +1,65 @@
 @extends('layouts.admin')
 
 @section('content')
-    <form class="w-full" method="POST" action="{{ route('admin.users.create') }}">
+    <form class="form" method="POST" action="{{ route('admin.users.create') }}">
         @csrf
 
-        <h1 class="bg-brand font-bold text-center text-3xl md:text-5xl px-3">
+        <h1 class="title is-1">
             Create User
         </h1>
 
-        <div class="flex flex-wrap -mx-3 mb-6">
+        <div class="columns is-multiline">
             <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-name">
+                <label class="label" for="grid-name">
                     Name 
-                    <span class="text-red-500 text-xs italic">*</span>
+                    <span class="has-text-danger is-italic">*</span>
                 </label>
                 
                 <input class="appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight" name="name" id="grid-name" type="text">
 
                 @if ($errors->has('name'))
-                    <span class="text-red-500 text-sm" role="alert">
+                    <p class="help is-danger">
                         {{ $errors->first('name') }}
-                    </span>
+                    </p>
                 @endif
             </div>
 
             <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-email">
+                <label class="label" for="grid-email">
                     Email Address 
-                    <span class="text-red-500 text-xs italic">*</span>
+                    <span class="has-text-danger is-italic">*</span>
                 </label>
                 
                 <input class="appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight" name="email" id="grid-email" type="email" value="" autocomplete="off">
 
                 @if ($errors->has('email'))
-                    <span class="text-red-500 text-sm" role="alert">
+                    <p class="help is-danger">
                         {{ $errors->first('email') }}
-                    </span>
+                    </p>
                 @endif
             </div>
         </div>
 
-        <div class="flex flex-wrap -mx-3 mb-6">
+        <div class="columns is-multiline">
             <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-password">
+                <label class="label" for="grid-password">
                     Password
-                    <span class="text-red-500 text-xs italic">*</span>
+                    <span class="has-text-danger is-italic">*</span>
                 </label>
                 
                 <input class="appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight" name="password" id="grid-password" type="password" autocomplete="off" value="">
 
                 @if ($errors->has('password'))
-                    <span class="text-red-500 text-sm" role="alert">
+                    <p class="help is-danger">
                         {{ $errors->first('password') }}
-                    </span>
+                    </p>
                 @endif
             </div>
 
             <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-role">
+                <label class="label" for="grid-role">
                     Role 
-                    <span class="text-red-500 text-xs italic">*</span>
+                    <span class="has-text-danger is-italic">*</span>
                 </label>
                 
                 <div class="relative">
@@ -81,14 +81,14 @@
                 </div>
 
                 @if ($errors->has('role'))
-                    <span class="text-red-500 text-sm" role="alert">
+                    <p class="help is-danger">
                         {{ $errors->first('role') }}
-                    </span>
+                    </p>
                 @endif
             </div>
         </div>
 
-        <div class="flex flex-wrap -mx-3 mb-6">
+        <div class="columns is-multiline">
             <div class="w-full px-3">
                 <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded">
                     Save

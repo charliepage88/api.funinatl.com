@@ -5,7 +5,7 @@
         <div class="columns is-multiline">
             <div class="clearfix">
                 <div class="float-left">
-                    <h1 class="bg-brand font-bold text-center text-3xl md:text-5xl px-3">
+                    <h1 class="title is-1">
                         Tags
                     </h1>
                 </div>

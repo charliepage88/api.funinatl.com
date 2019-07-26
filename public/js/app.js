@@ -425,10 +425,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Form/AdminFormDatePicker.vue?vue&type=script&lang=js&":
-/*!***********************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Form/AdminFormDatePicker.vue?vue&type=script&lang=js& ***!
-  \***********************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Form/FormDatePicker.vue?vue&type=script&lang=js&":
+/*!******************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Form/FormDatePicker.vue?vue&type=script&lang=js& ***!
+  \******************************************************************************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -454,7 +454,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-  name: 'admin-form-date-picker',
+  name: 'form-date-picker',
   props: ['name', 'value'],
   watch: {
     value: function value(newVal, oldVal) {
@@ -492,10 +492,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Form/AdminFormTimePicker.vue?vue&type=script&lang=js&":
-/*!***********************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Form/AdminFormTimePicker.vue?vue&type=script&lang=js& ***!
-  \***********************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Form/FormTimePicker.vue?vue&type=script&lang=js&":
+/*!******************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Form/FormTimePicker.vue?vue&type=script&lang=js& ***!
+  \******************************************************************************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -517,9 +517,10 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-  name: 'admin-form-time-picker',
+  name: 'form-time-picker',
   props: ['name', 'value'],
   watch: {
     value: function value(newVal, oldVal) {
@@ -50121,7 +50122,7 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "columns" }, [
+  return _c("div", { staticClass: "columns is-multiline" }, [
     _vm._m(0),
     _vm._v(" "),
     _vm.categories.length
@@ -50301,7 +50302,7 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "column" }, [
+    return _c("div", { staticClass: "column is-full" }, [
       _c("h1", { staticClass: "title is-1" }, [_vm._v("Events")])
     ])
   },
@@ -50335,7 +50336,7 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "columns" }, [
+  return _c("div", { staticClass: "columns is-multiline" }, [
     _vm._m(0),
     _vm._v(" "),
     _vm.categories.length
@@ -50460,7 +50461,7 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "column" }, [
+    return _c("div", { staticClass: "column is-full" }, [
       _c("h1", { staticClass: "title is-1" }, [_vm._v("Locations")])
     ])
   },
@@ -50525,10 +50526,10 @@ render._withStripped = true
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Form/AdminFormDatePicker.vue?vue&type=template&id=d5cbcb22&":
-/*!***************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Form/AdminFormDatePicker.vue?vue&type=template&id=d5cbcb22& ***!
-  \***************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Form/FormDatePicker.vue?vue&type=template&id=62c56ef0&":
+/*!**********************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Form/FormDatePicker.vue?vue&type=template&id=62c56ef0& ***!
+  \**********************************************************************************************************************************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -50593,10 +50594,10 @@ render._withStripped = true
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Form/AdminFormTimePicker.vue?vue&type=template&id=1d993a64&":
-/*!***************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Form/AdminFormTimePicker.vue?vue&type=template&id=1d993a64& ***!
-  \***************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Form/FormTimePicker.vue?vue&type=template&id=82429162&":
+/*!**********************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Form/FormTimePicker.vue?vue&type=template&id=82429162& ***!
+  \**********************************************************************************************************************************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -50617,7 +50618,8 @@ var render = function() {
           "hour-format": "12",
           size: "is-medium",
           icon: "clock",
-          "icon-pack": "fas"
+          "icon-pack": "fas",
+          "mobile-native": false
         },
         model: {
           value: _vm.time,
@@ -62831,8 +62833,8 @@ Vue.use(buefy__WEBPACK_IMPORTED_MODULE_0___default.a);
 
 Vue.component('admin-filter-events', __webpack_require__(/*! ./components/AdminFilterEvents.vue */ "./resources/js/components/AdminFilterEvents.vue")["default"]);
 Vue.component('admin-filter-locations', __webpack_require__(/*! ./components/AdminFilterLocations.vue */ "./resources/js/components/AdminFilterLocations.vue")["default"]);
-Vue.component('admin-form-time-picker', __webpack_require__(/*! ./components/Form/AdminFormTimePicker.vue */ "./resources/js/components/Form/AdminFormTimePicker.vue")["default"]);
-Vue.component('admin-form-date-picker', __webpack_require__(/*! ./components/Form/AdminFormDatePicker.vue */ "./resources/js/components/Form/AdminFormDatePicker.vue")["default"]);
+Vue.component('form-time-picker', __webpack_require__(/*! ./components/Form/FormTimePicker.vue */ "./resources/js/components/Form/FormTimePicker.vue")["default"]);
+Vue.component('form-date-picker', __webpack_require__(/*! ./components/Form/FormDatePicker.vue */ "./resources/js/components/Form/FormDatePicker.vue")["default"]);
 Vue.component('admin-delete-button', __webpack_require__(/*! ./components/Common/AdminDeleteButton.vue */ "./resources/js/components/Common/AdminDeleteButton.vue")["default"]); // chart components
 
 Vue.component('chart-events-timeline', __webpack_require__(/*! ./components/Charts/ChartEventsTimeline.vue */ "./resources/js/components/Charts/ChartEventsTimeline.vue")["default"]);
@@ -63126,17 +63128,17 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/components/Form/AdminFormDatePicker.vue":
-/*!**************************************************************!*\
-  !*** ./resources/js/components/Form/AdminFormDatePicker.vue ***!
-  \**************************************************************/
+/***/ "./resources/js/components/Form/FormDatePicker.vue":
+/*!*********************************************************!*\
+  !*** ./resources/js/components/Form/FormDatePicker.vue ***!
+  \*********************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _AdminFormDatePicker_vue_vue_type_template_id_d5cbcb22___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./AdminFormDatePicker.vue?vue&type=template&id=d5cbcb22& */ "./resources/js/components/Form/AdminFormDatePicker.vue?vue&type=template&id=d5cbcb22&");
-/* harmony import */ var _AdminFormDatePicker_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./AdminFormDatePicker.vue?vue&type=script&lang=js& */ "./resources/js/components/Form/AdminFormDatePicker.vue?vue&type=script&lang=js&");
+/* harmony import */ var _FormDatePicker_vue_vue_type_template_id_62c56ef0___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./FormDatePicker.vue?vue&type=template&id=62c56ef0& */ "./resources/js/components/Form/FormDatePicker.vue?vue&type=template&id=62c56ef0&");
+/* harmony import */ var _FormDatePicker_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./FormDatePicker.vue?vue&type=script&lang=js& */ "./resources/js/components/Form/FormDatePicker.vue?vue&type=script&lang=js&");
 /* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
@@ -63146,9 +63148,9 @@ __webpack_require__.r(__webpack_exports__);
 /* normalize component */
 
 var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
-  _AdminFormDatePicker_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
-  _AdminFormDatePicker_vue_vue_type_template_id_d5cbcb22___WEBPACK_IMPORTED_MODULE_0__["render"],
-  _AdminFormDatePicker_vue_vue_type_template_id_d5cbcb22___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  _FormDatePicker_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _FormDatePicker_vue_vue_type_template_id_62c56ef0___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _FormDatePicker_vue_vue_type_template_id_62c56ef0___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
   false,
   null,
   null,
@@ -63158,54 +63160,54 @@ var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_
 
 /* hot reload */
 if (false) { var api; }
-component.options.__file = "resources/js/components/Form/AdminFormDatePicker.vue"
+component.options.__file = "resources/js/components/Form/FormDatePicker.vue"
 /* harmony default export */ __webpack_exports__["default"] = (component.exports);
 
 /***/ }),
 
-/***/ "./resources/js/components/Form/AdminFormDatePicker.vue?vue&type=script&lang=js&":
-/*!***************************************************************************************!*\
-  !*** ./resources/js/components/Form/AdminFormDatePicker.vue?vue&type=script&lang=js& ***!
-  \***************************************************************************************/
+/***/ "./resources/js/components/Form/FormDatePicker.vue?vue&type=script&lang=js&":
+/*!**********************************************************************************!*\
+  !*** ./resources/js/components/Form/FormDatePicker.vue?vue&type=script&lang=js& ***!
+  \**********************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_AdminFormDatePicker_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./AdminFormDatePicker.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Form/AdminFormDatePicker.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_AdminFormDatePicker_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_FormDatePicker_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./FormDatePicker.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Form/FormDatePicker.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_FormDatePicker_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
 
 /***/ }),
 
-/***/ "./resources/js/components/Form/AdminFormDatePicker.vue?vue&type=template&id=d5cbcb22&":
-/*!*********************************************************************************************!*\
-  !*** ./resources/js/components/Form/AdminFormDatePicker.vue?vue&type=template&id=d5cbcb22& ***!
-  \*********************************************************************************************/
+/***/ "./resources/js/components/Form/FormDatePicker.vue?vue&type=template&id=62c56ef0&":
+/*!****************************************************************************************!*\
+  !*** ./resources/js/components/Form/FormDatePicker.vue?vue&type=template&id=62c56ef0& ***!
+  \****************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_AdminFormDatePicker_vue_vue_type_template_id_d5cbcb22___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./AdminFormDatePicker.vue?vue&type=template&id=d5cbcb22& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Form/AdminFormDatePicker.vue?vue&type=template&id=d5cbcb22&");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_AdminFormDatePicker_vue_vue_type_template_id_d5cbcb22___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_FormDatePicker_vue_vue_type_template_id_62c56ef0___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./FormDatePicker.vue?vue&type=template&id=62c56ef0& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Form/FormDatePicker.vue?vue&type=template&id=62c56ef0&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_FormDatePicker_vue_vue_type_template_id_62c56ef0___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_AdminFormDatePicker_vue_vue_type_template_id_d5cbcb22___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_FormDatePicker_vue_vue_type_template_id_62c56ef0___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 
 /***/ }),
 
-/***/ "./resources/js/components/Form/AdminFormTimePicker.vue":
-/*!**************************************************************!*\
-  !*** ./resources/js/components/Form/AdminFormTimePicker.vue ***!
-  \**************************************************************/
+/***/ "./resources/js/components/Form/FormTimePicker.vue":
+/*!*********************************************************!*\
+  !*** ./resources/js/components/Form/FormTimePicker.vue ***!
+  \*********************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _AdminFormTimePicker_vue_vue_type_template_id_1d993a64___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./AdminFormTimePicker.vue?vue&type=template&id=1d993a64& */ "./resources/js/components/Form/AdminFormTimePicker.vue?vue&type=template&id=1d993a64&");
-/* harmony import */ var _AdminFormTimePicker_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./AdminFormTimePicker.vue?vue&type=script&lang=js& */ "./resources/js/components/Form/AdminFormTimePicker.vue?vue&type=script&lang=js&");
+/* harmony import */ var _FormTimePicker_vue_vue_type_template_id_82429162___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./FormTimePicker.vue?vue&type=template&id=82429162& */ "./resources/js/components/Form/FormTimePicker.vue?vue&type=template&id=82429162&");
+/* harmony import */ var _FormTimePicker_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./FormTimePicker.vue?vue&type=script&lang=js& */ "./resources/js/components/Form/FormTimePicker.vue?vue&type=script&lang=js&");
 /* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
@@ -63215,9 +63217,9 @@ __webpack_require__.r(__webpack_exports__);
 /* normalize component */
 
 var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
-  _AdminFormTimePicker_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
-  _AdminFormTimePicker_vue_vue_type_template_id_1d993a64___WEBPACK_IMPORTED_MODULE_0__["render"],
-  _AdminFormTimePicker_vue_vue_type_template_id_1d993a64___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  _FormTimePicker_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _FormTimePicker_vue_vue_type_template_id_82429162___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _FormTimePicker_vue_vue_type_template_id_82429162___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
   false,
   null,
   null,
@@ -63227,38 +63229,38 @@ var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_
 
 /* hot reload */
 if (false) { var api; }
-component.options.__file = "resources/js/components/Form/AdminFormTimePicker.vue"
+component.options.__file = "resources/js/components/Form/FormTimePicker.vue"
 /* harmony default export */ __webpack_exports__["default"] = (component.exports);
 
 /***/ }),
 
-/***/ "./resources/js/components/Form/AdminFormTimePicker.vue?vue&type=script&lang=js&":
-/*!***************************************************************************************!*\
-  !*** ./resources/js/components/Form/AdminFormTimePicker.vue?vue&type=script&lang=js& ***!
-  \***************************************************************************************/
+/***/ "./resources/js/components/Form/FormTimePicker.vue?vue&type=script&lang=js&":
+/*!**********************************************************************************!*\
+  !*** ./resources/js/components/Form/FormTimePicker.vue?vue&type=script&lang=js& ***!
+  \**********************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_AdminFormTimePicker_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./AdminFormTimePicker.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Form/AdminFormTimePicker.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_AdminFormTimePicker_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_FormTimePicker_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./FormTimePicker.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Form/FormTimePicker.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_FormTimePicker_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
 
 /***/ }),
 
-/***/ "./resources/js/components/Form/AdminFormTimePicker.vue?vue&type=template&id=1d993a64&":
-/*!*********************************************************************************************!*\
-  !*** ./resources/js/components/Form/AdminFormTimePicker.vue?vue&type=template&id=1d993a64& ***!
-  \*********************************************************************************************/
+/***/ "./resources/js/components/Form/FormTimePicker.vue?vue&type=template&id=82429162&":
+/*!****************************************************************************************!*\
+  !*** ./resources/js/components/Form/FormTimePicker.vue?vue&type=template&id=82429162& ***!
+  \****************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_AdminFormTimePicker_vue_vue_type_template_id_1d993a64___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./AdminFormTimePicker.vue?vue&type=template&id=1d993a64& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Form/AdminFormTimePicker.vue?vue&type=template&id=1d993a64&");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_AdminFormTimePicker_vue_vue_type_template_id_1d993a64___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_FormTimePicker_vue_vue_type_template_id_82429162___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./FormTimePicker.vue?vue&type=template&id=82429162& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Form/FormTimePicker.vue?vue&type=template&id=82429162&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_FormTimePicker_vue_vue_type_template_id_82429162___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_AdminFormTimePicker_vue_vue_type_template_id_1d993a64___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_FormTimePicker_vue_vue_type_template_id_82429162___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 
@@ -63282,8 +63284,8 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! /var/www/vhosts/api.funinatl.com/resources/js/app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! /var/www/vhosts/api.funinatl.com/resources/sass/app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! /private/var/www/vhosts/api.funinatl.com/resources/js/app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! /private/var/www/vhosts/api.funinatl.com/resources/sass/app.scss */"./resources/sass/app.scss");
 
 
 /***/ })

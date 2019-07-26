@@ -97,7 +97,7 @@
                         <span class="has-text-danger is-italic">*</span>
                     </label>
 
-                    <admin-form-date-picker
+                    <form-date-picker
                         name="start_date"
                         value="{{ old('start_date') }}"
                     />
@@ -116,7 +116,7 @@
                         End Date
                     </label>
 
-                    <admin-form-date-picker
+                    <form-date-picker
                         name="end_date"
                         value="{{ old('end_date') }}"
                     />
@@ -136,7 +136,7 @@
                         <span class="has-text-danger is-italic">*</span>
                     </label>
 
-                    <admin-form-time-picker
+                    <form-time-picker
                         name="start_time"
                         value="{{ old('start_time') }}"
                     />
@@ -155,7 +155,7 @@
                         End Time
                     </label>
 
-                    <admin-form-time-picker
+                    <form-time-picker
                         name="end_time"
                         value="{{ old('end_time') }}"
                     />

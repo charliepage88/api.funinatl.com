@@ -1,33 +1,33 @@
 @extends('layouts.admin')
 
 @section('content')
-    <form class="w-full" method="POST" action="{{ route('admin.categories.edit', [ 'category' => $category->id ]) }}">
+    <form class="form" method="POST" action="{{ route('admin.categories.edit', [ 'category' => $category->id ]) }}">
         @csrf
 
-        <h1 class="bg-brand font-bold text-center text-3xl md:text-5xl px-3">
+        <h1 class="title is-1">
             Edit Category
         </h1>
 
-        <div class="flex flex-wrap -mx-3 mb-6">
+        <div class="columns is-multiline">
             <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-name">
+                <label class="label" for="grid-name">
                     Name 
-                    <span class="text-red-500 text-xs italic">*</span>
+                    <span class="has-text-danger is-italic">*</span>
                 </label>
                 
                 <input class="appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight" name="name" id="grid-name" type="text" value="{{ $category->name }}">
 
                 @if ($errors->has('name'))
-                    <span class="text-red-500 text-sm" role="alert">
+                    <p class="help is-danger">
                         {{ $errors->first('name') }}
-                    </span>
+                    </p>
                 @endif
             </div>
 
             <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-active">
+                <label class="label" for="grid-active">
                     Active 
-                    <span class="text-red-500 text-xs italic">*</span>
+                    <span class="has-text-danger is-italic">*</span>
                 </label>
 
                 <div class="mb-2">                
@@ -46,7 +46,7 @@
             </div>
 
             <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-is-default">
+                <label class="label" for="grid-is-default">
                     Is Default
                 </label>
 
@@ -66,9 +66,9 @@
             </div>
         </div>
 
-        <div class="flex flex-wrap -mx-3 mb-6">
+        <div class="columns is-multiline">
             <div class="w-full md:w-1/3 px-3">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-photo">
+                <label class="label" for="grid-photo">
                     Photo
                 </label>
 
@@ -80,7 +80,7 @@
             </div>
         </div>
 
-        <div class="flex flex-wrap -mx-3 mb-6">
+        <div class="columns is-multiline">
             <div class="w-full px-3">
                 <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded">
                     Save

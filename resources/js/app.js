@@ -27,8 +27,8 @@ Vue.use(Buefy)
 // admin components
 Vue.component('admin-filter-events', require('./components/AdminFilterEvents.vue').default);
 Vue.component('admin-filter-locations', require('./components/AdminFilterLocations.vue').default);
-Vue.component('admin-form-time-picker', require('./components/Form/AdminFormTimePicker.vue').default);
-Vue.component('admin-form-date-picker', require('./components/Form/AdminFormDatePicker.vue').default);
+Vue.component('form-time-picker', require('./components/Form/FormTimePicker.vue').default);
+Vue.component('form-date-picker', require('./components/Form/FormDatePicker.vue').default);
 Vue.component('admin-delete-button', require('./components/Common/AdminDeleteButton.vue').default);
 
 // chart components
