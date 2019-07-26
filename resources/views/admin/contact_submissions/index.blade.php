@@ -2,74 +2,66 @@
 
 @section('content')
     <div class="box">
-        <div class="clearfix">
-            <div class="float-left">
-                <h1 class="bg-brand font-bold text-center text-3xl md:text-5xl px-3">
-                    Contact Submissions
-                </h1>
-            </div>
-        </div>
+        <h1 class="title is-1">
+            Contact Submissions
+        </h1>
 
         @if (!$items->count())
-            <span>No contact submissions found.</span>
+            <p>No contact submissions found.</p>
         @else
-            <div class="w-full mx-auto">
-                <div class="bg-white shadow-md rounded my-6">
-                    <table class="text-left w-full border-collapse">
-                        <thead>
-                            <th class="py-4 px-6 bg-gray-200 font-bold uppercase text-sm text-gray-700 border-b border-gray-100">
-                                Name
-                            </th>
-                            <th class="py-4 px-6 bg-gray-200 font-bold uppercase text-sm text-gray-700 border-b border-gray-100">
-                                Email
-                            </th>
-                            <th class="py-4 px-6 bg-gray-200 font-bold uppercase text-sm text-gray-700 border-b border-gray-100">
-                                Reviewed
-                            </th>
-                            <th class="py-4 px-6 bg-gray-200 font-bold uppercase text-sm text-gray-700 border-b border-gray-100">
-                                Created
-                            </th>
-                            <th class="py-4 px-6 bg-gray-200 font-bold uppercase text-sm text-gray-700 border-b border-gray-100">
-                                Actions
-                            </th>
-                        </thead>
-                        <tbody>
-                            @foreach($items as $item)
-                                <tr class="hover:bg-gray-100">
-                                    <td class="py-4 px-6 border-b border-gray-100">
-                                        {{ $item->name }}
-                                    </td>
-                                    <td class="py-4 px-6 border-b border-gray-100">
+            <div class="responsive-table-container mb-1">
+                <table class="table is-bordered is-fullwidth">
+                    <thead>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Reviewed?</th>
+                        <th>Submitted</th>
+                        <th></th>
+                    </thead>
+                    <tbody>
+                        @foreach($items as $item)
+                            <tr>
+                                <td>
+                                    {{ $item->name }}
+                                </td>
+                                <td>
+                                    <a href="mailto:{{ $item->email }}" target="_blank">
                                         {{ $item->email }}
-                                    </td>
-                                    <td class="py-4 px-6 border-b border-gray-100">
-                                        {{ $item->reviewed ? 'Yes' : 'No' }}
-                                    </td>
-                                    <td class="py-4 px-6 border-b border-gray-100">
-                                        {{ $item->created_at->format('F j, Y') }}
-                                    </td>
-                                    <td class="py-4 px-6 border-b border-gray-100">
+                                    </a>
+                                </td>
+                                <td>
+                                    {{ $item->reviewed ? 'Yes' : 'No' }}
+                                </td>
+                                <td>
+                                    {{ $item->created_at->format('F j, Y') }}
+                                </td>
+                                <td>
+                                    <div class="buttons">
                                         @if(!$item->reviewed)
-                                            <a href="{{ route('admin.contact_submissions.review', [ 'submission' => $item->id ]) }}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 border border-green-700 rounded mr-2">
-                                                <i class="far fa-check-square mr-1"></i>
-                                                <span>Review</span>
+                                            <a href="{{ route('admin.contact_submissions.review', [ 'submission' => $item->id ]) }}" class="button is-warning">
+                                                <span class="icon">
+                                                    <i class="fas fa-check-square"></i>
+                                                </span>
+                                                <span>Pending Review</span>
+                                            </a>
+                                        @else
+                                            <a href="{{ route('admin.contact_submissions.review', [ 'submission' => $item->id ]) }}" class="button is-info">
+                                                <span class="icon">
+                                                    <i class="fas fa-eye"></i>
+                                                </span>
+                                                <span>View</span>
                                             </a>
                                         @endif
 
-                                        <a
-                                            href="{{ route('admin.contact_submissions.delete', [ 'submission' => $item->id ]) }}"
-                                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded"
-                                            onclick="return confirm('Are you sure you want to delete this submission?');"
-                                        >
-                                            <i class="fa fa-trash mr-1"></i>
-                                            <span>Delete</span>
-                                        </a>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                                        <admin-delete-button
+                                            url="{{ route('admin.contact_submissions.delete', [ 'submission' => $item->id ]) }}"
+                                        />
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
 
             {{ $items->links('pagination::bulma') }}

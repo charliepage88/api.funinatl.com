@@ -701,4 +701,49 @@ class Event extends Model implements HasMedia
 
         return $band;
     }
+
+    /**
+    * Get Start Time Formatted Attribute
+    *
+    * @return string
+    */
+    public function getStartTimeFormattedAttribute()
+    {
+        $value = null;
+
+        if (!empty($this->start_time) && !empty($this->start_date)) {
+            $date = $this->start_date->format('Y-m-d');
+
+            $value = Carbon::parse($date . ' ' . $this->start_time);
+            $value = $value->format('Y-m-d H:i:s');
+        }
+
+        return $value;
+    }
+
+    /**
+    * Get End Time Formatted Attribute
+    *
+    * @return string
+    */
+    public function getEndTimeFormattedAttribute()
+    {
+        $value = null;
+        $date = null;
+
+        if (!empty($this->end_time)) {
+            if (!empty($this->end_date)) {
+                $date = $this->end_date->format('Y-m-d');
+            } elseif (!empty($this->start_date)) {
+                $date = $this->start_date->format('Y-m-d');
+            }
+
+            if (!empty($date)) {
+                $value = Carbon::parse($date . ' ' . $this->end_time);
+                $value = $value->format('Y-m-d H:i:s');
+            }
+        }
+
+        return $value;
+    }
 }

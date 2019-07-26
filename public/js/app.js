@@ -306,12 +306,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: 'admin-filter-locations',
   props: ['categoriesJson', 'createLocationUrl'],
@@ -390,6 +384,167 @@ __webpack_require__.r(__webpack_exports__);
   },
   mounted: function mounted() {
     this.renderChart(this.chartData, this.chartOptions);
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Common/AdminDeleteButton.vue?vue&type=script&lang=js&":
+/*!***********************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Common/AdminDeleteButton.vue?vue&type=script&lang=js& ***!
+  \***********************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  name: 'admin-delete-button',
+  props: ['url'],
+  methods: {
+    clickOnButton: function clickOnButton() {
+      var message = 'Are you sure you want to delete this item?';
+
+      if (confirm(message)) {
+        window.location = this.url;
+      } else {
+        return false;
+      }
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Form/AdminFormDatePicker.vue?vue&type=script&lang=js&":
+/*!***********************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Form/AdminFormDatePicker.vue?vue&type=script&lang=js& ***!
+  \***********************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_0__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  name: 'admin-form-date-picker',
+  props: ['name', 'value'],
+  watch: {
+    value: function value(newVal, oldVal) {
+      if (newVal && newVal !== oldVal) {
+        this.date = moment__WEBPACK_IMPORTED_MODULE_0___default()(newVal).toDate();
+      }
+    },
+    date: function date(newVal, oldVal) {
+      if (newVal) {
+        this.dateHidden = moment__WEBPACK_IMPORTED_MODULE_0___default()(newVal).format('YYYY-MM-DD');
+      } else {
+        this.dateHidden = null;
+      }
+    }
+  },
+  data: function data() {
+    return {
+      date: null,
+      dateHidden: null,
+      minDate: moment__WEBPACK_IMPORTED_MODULE_0___default()().subtract(1, 'day').toDate(),
+      maxDate: moment__WEBPACK_IMPORTED_MODULE_0___default()().add(4, 'month').toDate()
+    };
+  },
+  methods: {
+    formatDate: function formatDate(date) {
+      return moment__WEBPACK_IMPORTED_MODULE_0___default()(date).format('YYYY-MM-DD');
+    }
+  },
+  mounted: function mounted() {
+    if (this.value && this.value !== this.date) {
+      this.date = moment__WEBPACK_IMPORTED_MODULE_0___default()(this.value).toDate();
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Form/AdminFormTimePicker.vue?vue&type=script&lang=js&":
+/*!***********************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Form/AdminFormTimePicker.vue?vue&type=script&lang=js& ***!
+  \***********************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_0__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  name: 'admin-form-time-picker',
+  props: ['name', 'value'],
+  watch: {
+    value: function value(newVal, oldVal) {
+      if (newVal && newVal !== oldVal) {
+        this.time = moment__WEBPACK_IMPORTED_MODULE_0___default()(newVal).toDate();
+      }
+    },
+    time: function time(newVal, oldVal) {
+      if (newVal) {
+        this.timeHidden = moment__WEBPACK_IMPORTED_MODULE_0___default()(newVal).format('h:mm A');
+      } else {
+        this.timeHidden = null;
+      }
+    }
+  },
+  data: function data() {
+    return {
+      time: null,
+      timeHidden: null
+    };
+  },
+  mounted: function mounted() {
+    if (this.value && this.value !== this.time) {
+      this.time = moment__WEBPACK_IMPORTED_MODULE_0___default()(this.value).toDate();
+    }
   }
 });
 
@@ -50155,7 +50310,7 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("span", { staticClass: "icon" }, [
-      _c("i", { staticClass: "fa fa-plus" })
+      _c("i", { staticClass: "fas fa-plus" })
     ])
   }
 ]
@@ -50180,186 +50335,121 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "flex flex-wrap" }, [
+  return _c("div", { staticClass: "columns" }, [
     _vm._m(0),
     _vm._v(" "),
     _vm.categories.length
-      ? _c("div", { staticClass: "w-1/5 mr-4 mt-4" }, [
-          _c("div", { staticClass: "relative" }, [
+      ? _c(
+          "div",
+          { staticClass: "column" },
+          [
             _c(
-              "select",
-              {
-                directives: [
+              "b-field",
+              [
+                _c(
+                  "b-select",
                   {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.category_id,
-                    expression: "category_id"
-                  }
-                ],
-                staticClass:
-                  "block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500",
-                on: {
-                  change: [
-                    function($event) {
-                      var $$selectedVal = Array.prototype.filter
-                        .call($event.target.options, function(o) {
-                          return o.selected
-                        })
-                        .map(function(o) {
-                          var val = "_value" in o ? o._value : o.value
-                          return val
-                        })
-                      _vm.category_id = $event.target.multiple
-                        ? $$selectedVal
-                        : $$selectedVal[0]
+                    staticClass: "is-fullwidth",
+                    attrs: {
+                      icon: "tasks",
+                      "icon-pack": "fas",
+                      size: "is-large"
                     },
-                    function($event) {
-                      return _vm.filterUpdate("category_id")
+                    on: {
+                      input: function($event) {
+                        return _vm.filterUpdate("category_id")
+                      }
+                    },
+                    model: {
+                      value: _vm.category_id,
+                      callback: function($$v) {
+                        _vm.category_id = $$v
+                      },
+                      expression: "category_id"
                     }
-                  ]
+                  },
+                  [
+                    _c("option", { attrs: { value: "null" } }, [
+                      _vm._v("Choose Category")
+                    ]),
+                    _vm._v(" "),
+                    _vm._l(_vm.categories, function(category) {
+                      return _c(
+                        "option",
+                        { key: category.id, domProps: { value: category.id } },
+                        [
+                          _vm._v(
+                            "\n          " +
+                              _vm._s(category.name) +
+                              "\n        "
+                          )
+                        ]
+                      )
+                    })
+                  ],
+                  2
+                )
+              ],
+              1
+            )
+          ],
+          1
+        )
+      : _vm._e(),
+    _vm._v(" "),
+    _c(
+      "div",
+      { staticClass: "column" },
+      [
+        _c(
+          "b-field",
+          [
+            _c(
+              "b-select",
+              {
+                staticClass: "is-fullwidth",
+                attrs: { icon: "cogs", "icon-pack": "fas", size: "is-large" },
+                on: {
+                  input: function($event) {
+                    return _vm.filterUpdate("source")
+                  }
+                },
+                model: {
+                  value: _vm.source,
+                  callback: function($$v) {
+                    _vm.source = $$v
+                  },
+                  expression: "source"
                 }
               },
               [
                 _c("option", { attrs: { value: "null" } }, [
-                  _vm._v("Choose Category")
+                  _vm._v("Choose Source")
                 ]),
                 _vm._v(" "),
-                _vm._l(_vm.categories, function(category) {
-                  return _c(
-                    "option",
-                    { key: category.id, domProps: { value: category.id } },
-                    [_vm._v(_vm._s(category.name))]
-                  )
-                })
-              ],
-              2
-            ),
-            _vm._v(" "),
-            _c(
-              "div",
-              {
-                staticClass:
-                  "pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
-              },
-              [
-                _c(
-                  "svg",
-                  {
-                    staticClass: "fill-current h-4 w-4",
-                    attrs: {
-                      xmlns: "http://www.w3.org/2000/svg",
-                      viewBox: "0 0 20 20"
-                    }
-                  },
-                  [
-                    _c("path", {
-                      attrs: {
-                        d:
-                          "M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"
-                      }
-                    })
-                  ]
-                )
+                _c("option", { attrs: { value: "submission" } }, [
+                  _vm._v("Submission")
+                ]),
+                _vm._v(" "),
+                _c("option", { attrs: { value: "custom" } }, [_vm._v("Custom")])
               ]
             )
-          ])
-        ])
-      : _vm._e(),
-    _vm._v(" "),
-    _c("div", { staticClass: "w-auto mr-16 mt-4" }, [
-      _c("div", { staticClass: "relative" }, [
-        _c(
-          "select",
-          {
-            directives: [
-              {
-                name: "model",
-                rawName: "v-model",
-                value: _vm.source,
-                expression: "source"
-              }
-            ],
-            staticClass:
-              "block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500",
-            on: {
-              change: [
-                function($event) {
-                  var $$selectedVal = Array.prototype.filter
-                    .call($event.target.options, function(o) {
-                      return o.selected
-                    })
-                    .map(function(o) {
-                      var val = "_value" in o ? o._value : o.value
-                      return val
-                    })
-                  _vm.source = $event.target.multiple
-                    ? $$selectedVal
-                    : $$selectedVal[0]
-                },
-                function($event) {
-                  return _vm.filterUpdate("source")
-                }
-              ]
-            }
-          },
-          [
-            _c("option", { attrs: { value: "null" } }, [
-              _vm._v("Choose Source")
-            ]),
-            _vm._v(" "),
-            _c("option", { attrs: { value: "submission" } }, [
-              _vm._v("Submission")
-            ]),
-            _vm._v(" "),
-            _c("option", { attrs: { value: "custom" } }, [_vm._v("Custom")])
-          ]
-        ),
-        _vm._v(" "),
-        _c(
-          "div",
-          {
-            staticClass:
-              "pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
-          },
-          [
-            _c(
-              "svg",
-              {
-                staticClass: "fill-current h-4 w-4",
-                attrs: {
-                  xmlns: "http://www.w3.org/2000/svg",
-                  viewBox: "0 0 20 20"
-                }
-              },
-              [
-                _c("path", {
-                  attrs: {
-                    d:
-                      "M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"
-                  }
-                })
-              ]
-            )
-          ]
+          ],
+          1
         )
-      ])
-    ]),
+      ],
+      1
+    ),
     _vm._v(" "),
     _vm.createLocationUrl
-      ? _c("div", { staticClass: "w-auto mt-6" }, [
+      ? _c("div", { staticClass: "column is-narrow has-text-right" }, [
           _c(
             "a",
             {
-              staticClass:
-                "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded",
+              staticClass: "button is-success is-large is-fullwidth-mobile",
               attrs: { href: _vm.createLocationUrl }
             },
-            [
-              _c("i", { staticClass: "fa fa-plus mr-1" }),
-              _vm._v(" "),
-              _c("span", [_vm._v("Create Location")])
-            ]
+            [_vm._m(1), _vm._v(" "), _c("span", [_vm._v("Create Location")])]
           )
         ])
       : _vm._e()
@@ -50370,15 +50460,199 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "w-1/4 text-left mr-4" }, [
-      _c(
-        "h1",
-        { staticClass: "bg-brand font-bold text-3xl md:text-5xl px-3 mt-0" },
-        [_vm._v("Locations")]
-      )
+    return _c("div", { staticClass: "column" }, [
+      _c("h1", { staticClass: "title is-1" }, [_vm._v("Locations")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("span", { staticClass: "icon" }, [
+      _c("i", { staticClass: "fas fa-plus" })
     ])
   }
 ]
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Common/AdminDeleteButton.vue?vue&type=template&id=13b649d3&":
+/*!***************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Common/AdminDeleteButton.vue?vue&type=template&id=13b649d3& ***!
+  \***************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "a",
+    {
+      staticClass: "button is-danger",
+      attrs: { href: _vm.url },
+      on: {
+        click: function($event) {
+          $event.preventDefault()
+          return _vm.clickOnButton($event)
+        }
+      }
+    },
+    [_vm._m(0), _vm._v(" "), _c("span", [_vm._v("Delete")])]
+  )
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("span", { staticClass: "icon" }, [
+      _c("i", { staticClass: "fas fa-trash" })
+    ])
+  }
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Form/AdminFormDatePicker.vue?vue&type=template&id=d5cbcb22&":
+/*!***************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Form/AdminFormDatePicker.vue?vue&type=template&id=d5cbcb22& ***!
+  \***************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    { staticClass: "control" },
+    [
+      _c("b-datepicker", {
+        attrs: {
+          "min-date": _vm.minDate,
+          "max-date": _vm.maxDate,
+          "first-day-of-week": 1,
+          size: "is-medium",
+          "mobile-native": false,
+          "date-formatter": _vm.formatDate
+        },
+        model: {
+          value: _vm.date,
+          callback: function($$v) {
+            _vm.date = $$v
+          },
+          expression: "date"
+        }
+      }),
+      _vm._v(" "),
+      _c("input", {
+        directives: [
+          {
+            name: "model",
+            rawName: "v-model",
+            value: _vm.dateHidden,
+            expression: "dateHidden"
+          }
+        ],
+        attrs: { type: "hidden", name: _vm.name },
+        domProps: { value: _vm.dateHidden },
+        on: {
+          input: function($event) {
+            if ($event.target.composing) {
+              return
+            }
+            _vm.dateHidden = $event.target.value
+          }
+        }
+      })
+    ],
+    1
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Form/AdminFormTimePicker.vue?vue&type=template&id=1d993a64&":
+/*!***************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Form/AdminFormTimePicker.vue?vue&type=template&id=1d993a64& ***!
+  \***************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    { staticClass: "control" },
+    [
+      _c("b-timepicker", {
+        attrs: {
+          "hour-format": "12",
+          size: "is-medium",
+          icon: "clock",
+          "icon-pack": "fas"
+        },
+        model: {
+          value: _vm.time,
+          callback: function($$v) {
+            _vm.time = $$v
+          },
+          expression: "time"
+        }
+      }),
+      _vm._v(" "),
+      _c("input", {
+        directives: [
+          {
+            name: "model",
+            rawName: "v-model",
+            value: _vm.timeHidden,
+            expression: "timeHidden"
+          }
+        ],
+        attrs: { type: "hidden", name: _vm.name },
+        domProps: { value: _vm.timeHidden },
+        on: {
+          input: function($event) {
+            if ($event.target.composing) {
+              return
+            }
+            _vm.timeHidden = $event.target.value
+          }
+        }
+      })
+    ],
+    1
+  )
+}
+var staticRenderFns = []
 render._withStripped = true
 
 
@@ -62556,7 +62830,10 @@ Vue.use(buefy__WEBPACK_IMPORTED_MODULE_0___default.a);
 // admin components
 
 Vue.component('admin-filter-events', __webpack_require__(/*! ./components/AdminFilterEvents.vue */ "./resources/js/components/AdminFilterEvents.vue")["default"]);
-Vue.component('admin-filter-locations', __webpack_require__(/*! ./components/AdminFilterLocations.vue */ "./resources/js/components/AdminFilterLocations.vue")["default"]); // chart components
+Vue.component('admin-filter-locations', __webpack_require__(/*! ./components/AdminFilterLocations.vue */ "./resources/js/components/AdminFilterLocations.vue")["default"]);
+Vue.component('admin-form-time-picker', __webpack_require__(/*! ./components/Form/AdminFormTimePicker.vue */ "./resources/js/components/Form/AdminFormTimePicker.vue")["default"]);
+Vue.component('admin-form-date-picker', __webpack_require__(/*! ./components/Form/AdminFormDatePicker.vue */ "./resources/js/components/Form/AdminFormDatePicker.vue")["default"]);
+Vue.component('admin-delete-button', __webpack_require__(/*! ./components/Common/AdminDeleteButton.vue */ "./resources/js/components/Common/AdminDeleteButton.vue")["default"]); // chart components
 
 Vue.component('chart-events-timeline', __webpack_require__(/*! ./components/Charts/ChartEventsTimeline.vue */ "./resources/js/components/Charts/ChartEventsTimeline.vue")["default"]);
 /**
@@ -62777,6 +63054,213 @@ component.options.__file = "resources/js/components/Charts/ChartEventsTimeline.v
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_ChartEventsTimeline_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./ChartEventsTimeline.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Charts/ChartEventsTimeline.vue?vue&type=script&lang=js&");
 /* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_ChartEventsTimeline_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/Common/AdminDeleteButton.vue":
+/*!**************************************************************!*\
+  !*** ./resources/js/components/Common/AdminDeleteButton.vue ***!
+  \**************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _AdminDeleteButton_vue_vue_type_template_id_13b649d3___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./AdminDeleteButton.vue?vue&type=template&id=13b649d3& */ "./resources/js/components/Common/AdminDeleteButton.vue?vue&type=template&id=13b649d3&");
+/* harmony import */ var _AdminDeleteButton_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./AdminDeleteButton.vue?vue&type=script&lang=js& */ "./resources/js/components/Common/AdminDeleteButton.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _AdminDeleteButton_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _AdminDeleteButton_vue_vue_type_template_id_13b649d3___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _AdminDeleteButton_vue_vue_type_template_id_13b649d3___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/Common/AdminDeleteButton.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/Common/AdminDeleteButton.vue?vue&type=script&lang=js&":
+/*!***************************************************************************************!*\
+  !*** ./resources/js/components/Common/AdminDeleteButton.vue?vue&type=script&lang=js& ***!
+  \***************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_AdminDeleteButton_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./AdminDeleteButton.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Common/AdminDeleteButton.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_AdminDeleteButton_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/Common/AdminDeleteButton.vue?vue&type=template&id=13b649d3&":
+/*!*********************************************************************************************!*\
+  !*** ./resources/js/components/Common/AdminDeleteButton.vue?vue&type=template&id=13b649d3& ***!
+  \*********************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_AdminDeleteButton_vue_vue_type_template_id_13b649d3___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./AdminDeleteButton.vue?vue&type=template&id=13b649d3& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Common/AdminDeleteButton.vue?vue&type=template&id=13b649d3&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_AdminDeleteButton_vue_vue_type_template_id_13b649d3___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_AdminDeleteButton_vue_vue_type_template_id_13b649d3___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./resources/js/components/Form/AdminFormDatePicker.vue":
+/*!**************************************************************!*\
+  !*** ./resources/js/components/Form/AdminFormDatePicker.vue ***!
+  \**************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _AdminFormDatePicker_vue_vue_type_template_id_d5cbcb22___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./AdminFormDatePicker.vue?vue&type=template&id=d5cbcb22& */ "./resources/js/components/Form/AdminFormDatePicker.vue?vue&type=template&id=d5cbcb22&");
+/* harmony import */ var _AdminFormDatePicker_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./AdminFormDatePicker.vue?vue&type=script&lang=js& */ "./resources/js/components/Form/AdminFormDatePicker.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _AdminFormDatePicker_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _AdminFormDatePicker_vue_vue_type_template_id_d5cbcb22___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _AdminFormDatePicker_vue_vue_type_template_id_d5cbcb22___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/Form/AdminFormDatePicker.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/Form/AdminFormDatePicker.vue?vue&type=script&lang=js&":
+/*!***************************************************************************************!*\
+  !*** ./resources/js/components/Form/AdminFormDatePicker.vue?vue&type=script&lang=js& ***!
+  \***************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_AdminFormDatePicker_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./AdminFormDatePicker.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Form/AdminFormDatePicker.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_AdminFormDatePicker_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/Form/AdminFormDatePicker.vue?vue&type=template&id=d5cbcb22&":
+/*!*********************************************************************************************!*\
+  !*** ./resources/js/components/Form/AdminFormDatePicker.vue?vue&type=template&id=d5cbcb22& ***!
+  \*********************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_AdminFormDatePicker_vue_vue_type_template_id_d5cbcb22___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./AdminFormDatePicker.vue?vue&type=template&id=d5cbcb22& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Form/AdminFormDatePicker.vue?vue&type=template&id=d5cbcb22&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_AdminFormDatePicker_vue_vue_type_template_id_d5cbcb22___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_AdminFormDatePicker_vue_vue_type_template_id_d5cbcb22___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./resources/js/components/Form/AdminFormTimePicker.vue":
+/*!**************************************************************!*\
+  !*** ./resources/js/components/Form/AdminFormTimePicker.vue ***!
+  \**************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _AdminFormTimePicker_vue_vue_type_template_id_1d993a64___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./AdminFormTimePicker.vue?vue&type=template&id=1d993a64& */ "./resources/js/components/Form/AdminFormTimePicker.vue?vue&type=template&id=1d993a64&");
+/* harmony import */ var _AdminFormTimePicker_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./AdminFormTimePicker.vue?vue&type=script&lang=js& */ "./resources/js/components/Form/AdminFormTimePicker.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _AdminFormTimePicker_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _AdminFormTimePicker_vue_vue_type_template_id_1d993a64___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _AdminFormTimePicker_vue_vue_type_template_id_1d993a64___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/Form/AdminFormTimePicker.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/Form/AdminFormTimePicker.vue?vue&type=script&lang=js&":
+/*!***************************************************************************************!*\
+  !*** ./resources/js/components/Form/AdminFormTimePicker.vue?vue&type=script&lang=js& ***!
+  \***************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_AdminFormTimePicker_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./AdminFormTimePicker.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Form/AdminFormTimePicker.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_AdminFormTimePicker_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/Form/AdminFormTimePicker.vue?vue&type=template&id=1d993a64&":
+/*!*********************************************************************************************!*\
+  !*** ./resources/js/components/Form/AdminFormTimePicker.vue?vue&type=template&id=1d993a64& ***!
+  \*********************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_AdminFormTimePicker_vue_vue_type_template_id_1d993a64___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./AdminFormTimePicker.vue?vue&type=template&id=1d993a64& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Form/AdminFormTimePicker.vue?vue&type=template&id=1d993a64&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_AdminFormTimePicker_vue_vue_type_template_id_1d993a64___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_AdminFormTimePicker_vue_vue_type_template_id_1d993a64___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
 
 /***/ }),
 

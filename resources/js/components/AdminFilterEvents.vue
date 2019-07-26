@@ -72,7 +72,7 @@
         class="button is-success is-large is-fullwidth-mobile"
       >
         <span class="icon">
-          <i class="fa fa-plus"></i>
+          <i class="fas fa-plus"></i>
         </span>
         <span>Create Event</span>
       </a>

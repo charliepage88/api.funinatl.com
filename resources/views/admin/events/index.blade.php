@@ -14,21 +14,11 @@
             <div class="responsive-table-container mb-1">
                 <table class="table is-bordered is-fullwidth">
                     <thead>
-                        <th>
-                            Event
-                        </th>
-                        <th>
-                            Start Date
-                        </th>
-                        <th>
-                            Location
-                        </th>
-                        <th>
-                            Category
-                        </th>
-                        <th>
-                            Actions
-                        </th>
+                        <th>Event</th>
+                        <th>Start Date</th>
+                        <th>Location</th>
+                        <th>Category</th>
+                        <th></th>
                     </thead>
                     <tbody>
                         @foreach($events as $event)
@@ -56,19 +46,21 @@
                                     {{ $event->category->name }}
                                 </td>
                                 <td>
-                                    <a href="{{ route('admin.events.edit', [ 'event' => $event->id ]) }}" class="button is-primary">
-                                        @if($event->source === 'submission')
+                                    @if($event->source === 'submission')
+                                        <a href="{{ route('admin.events.edit', [ 'event' => $event->id ]) }}" class="button is-warning">
                                             <span class="icon">
                                                 <i class="fa fa-check-circle"></i>
                                             </span>
                                             <span>Review</span>
-                                        @else
+                                        </a>
+                                    @else
+                                        <a href="{{ route('admin.events.edit', [ 'event' => $event->id ]) }}" class="button is-primary">
                                             <span class="icon">
                                                 <i class="fa fa-pencil-alt"></i>
                                             </span>
                                             <span>Edit</span>
-                                        @endif
-                                    </a>
+                                        </a>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach

@@ -90,6 +90,10 @@ class EventsController extends Controller
             $event->event_type_id = 1;
             $event->source = 'custom';
 
+            if (!$request->has('active')) {
+                $event->active = false;
+            }
+
             $event->save();
 
             if ($request->has('photo')) {
@@ -131,6 +135,18 @@ class EventsController extends Controller
             ]);
 
             $event->fill($request->except('photo', 'tags'));
+
+            if (!$request->has('featured')) {
+                $event->featured = false;
+            }
+
+            if (!$request->has('is_family_friendly')) {
+                $event->is_family_friendly = false;
+            }
+
+            if (!$request->has('active')) {
+                $event->active = false;
+            }
 
             $event->save();
 
