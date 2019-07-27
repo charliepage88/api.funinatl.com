@@ -12,10 +12,16 @@
                     </div>
                     <div class="card-content">
                         <div class="columns">
-                            <div class="column is-narrow">
-                                <div class="rounded p-px-10 has-background-info">
+                            <div class="column is-narrow pl-0">
+                                <div class="rounded p-px-10 has-background-info is-hidden-desktop">
                                     <span class="icon is-6x is-centered">
                                         <i class="fas fa-calendar-alt fa-5x fa-inverse"></i>
+                                    </span>
+                                </div>
+
+                                <div class="rounded p-px-5 has-background-info is-hidden-touch">
+                                    <span class="icon is-3x">
+                                        <i class="fas fa-calendar-alt fa-2x fa-inverse"></i>
                                     </span>
                                 </div>
                             </div>
@@ -50,10 +56,16 @@
                     </div>
                     <div class="card-content">
                         <div class="columns">
-                            <div class="column is-narrow">
-                                <div class="rounded p-px-10 has-background-info">
+                            <div class="column is-narrow pl-0">
+                                <div class="rounded p-px-10 has-background-info is-hidden-desktop">
                                     <span class="icon is-6x is-centered">
                                         <i class="fas fa-users fa-5x fa-inverse"></i>
+                                    </span>
+                                </div>
+
+                                <div class="rounded p-px-5 has-background-info is-hidden-touch">
+                                    <span class="icon is-3x">
+                                        <i class="fas fa-users fa-2x fa-inverse"></i>
                                     </span>
                                 </div>
                             </div>
@@ -79,10 +91,16 @@
                     </div>
                     <div class="card-content">
                         <div class="columns">
-                            <div class="column is-narrow">
-                                <div class="rounded p-px-10 has-background-info">
+                            <div class="column is-narrow pl-0">
+                                <div class="rounded p-px-10 has-background-info is-hidden-desktop">
                                     <span class="icon is-6x is-centered">
                                         <i class="fas fa-user-plus fa-5x fa-inverse"></i>
+                                    </span>
+                                </div>
+
+                                <div class="rounded p-px-5 has-background-info is-hidden-touch">
+                                    <span class="icon is-3x">
+                                        <i class="fas fa-user-plus fa-2x fa-inverse"></i>
                                     </span>
                                 </div>
                             </div>
@@ -117,10 +135,16 @@
                     </div>
                     <div class="card-content">
                         <div class="columns">
-                            <div class="column is-narrow">
-                                <div class="rounded p-px-10 has-background-info">
+                            <div class="column is-narrow pl-0">
+                                <div class="rounded p-px-10 has-background-info is-hidden-desktop">
                                     <span class="icon is-6x is-centered">
                                         <i class="fas fa-calendar-week fa-5x fa-inverse"></i>
+                                    </span>
+                                </div>
+
+                                <div class="rounded p-px-5 has-background-info is-hidden-touch">
+                                    <span class="icon is-3x">
+                                        <i class="fas fa-calendar-week fa-2x fa-inverse"></i>
                                     </span>
                                 </div>
                             </div>
@@ -155,10 +179,16 @@
                     </div>
                     <div class="card-content">
                         <div class="columns">
-                            <div class="column is-narrow">
-                                <div class="rounded p-px-10 has-background-info">
+                            <div class="column is-narrow pl-0">
+                                <div class="rounded p-px-10 has-background-info is-hidden-desktop">
                                     <span class="icon is-6x is-centered">
                                         <i class="fas fa-map fa-5x fa-inverse"></i>
+                                    </span>
+                                </div>
+
+                                <div class="rounded p-px-5 has-background-info is-hidden-touch">
+                                    <span class="icon is-3x">
+                                        <i class="fas fa-map fa-2x fa-inverse"></i>
                                     </span>
                                 </div>
                             </div>
@@ -193,10 +223,16 @@
                     </div>
                     <div class="card-content">
                         <div class="columns">
-                            <div class="column is-narrow">
-                                <div class="rounded p-px-10 has-background-info">
+                            <div class="column is-narrow pl-0">
+                                <div class="rounded p-px-10 has-background-info is-hidden-desktop">
                                     <span class="icon is-6x is-centered">
                                         <i class="fas fa-envelope-open-text fa-5x fa-inverse"></i>
+                                    </span>
+                                </div>
+
+                                <div class="rounded p-px-5 has-background-info is-hidden-touch">
+                                    <span class="icon is-3x">
+                                        <i class="fas fa-envelope-open-text fa-2x fa-inverse"></i>
                                     </span>
                                 </div>
                             </div>

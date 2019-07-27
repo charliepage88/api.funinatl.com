@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
-    <form class="form" method="POST" action="{{ route('admin.categories.create') }}">
+    <form class="form" method="POST" action="{{ route('admin.categories.create') }}" enctype="multipart/form-data">
         @csrf
 
         <h1 class="title is-1">
@@ -47,7 +47,6 @@
                 <div class="field">
                     <label class="label">
                         Is Default
-                        <span class="has-text-danger is-italic">*</span>
                     </label>
 
                     <div class="control">
@@ -81,7 +80,7 @@
             </div>
 
             <div class="column is-full has-text-right">
-                <button type="submit" class="button is-primary is-large">
+                <button type="submit" class="button is-primary is-large is-fullwidth-mobile">
                     Save
                 </button>
             </div>

@@ -308,7 +308,7 @@
             </div>
 
             <div class="column is-full has-text-right">
-                <button type="submit" class="button is-primary is-large">
+                <button type="submit" class="button is-primary is-large is-fullwidth-mobile">
                     Save
                 </button>
             </div>

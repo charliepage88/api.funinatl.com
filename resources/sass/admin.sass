@@ -60,7 +60,11 @@ a.navbar-item.is-active,
 .navbar-link:focus-within,
 .navbar-link:hover,
 .navbar-link.is-active
-  background-color: indigo!important 
+  background-color: indigo!important
+
+article.message
+  .message-body
+    background-color: #eee!important
 
 // margin & padding helpers
 @for $i from 1 through 8
@@ -259,38 +263,22 @@ a.navbar-item.is-active,
   .responsive-table-container
     overflow-x: scroll
 
+  .navbar-brand
+    height: 70px!important
+
+    .navbar-item > img
+      height: 60px!important
+      min-height: 60px!important
+
 // Section -> ICONS
 
-// 5x
-span.icon.is-5x
-  width: 5em!important
-  height: 5em!important
-.fa-5x
-  height: 1em!important
+@for $i from 1 through 10
+  span.icon.is-#{$i}x
+    width: (1em * $i)!important
+    height: (1em * $i)!important
 
-// 6x
-span.icon.is-6x
-  width: 6em!important
-  height: 6em!important
-
-.fa-6x
-  height: 1em!important
-
-// 7x
-span.icon.is-7x
-  width: 7em!important
-  height: 7em!important
-
-.fa-7x
-  height: 1em!important
-
-// 9x
-span.icon.is-9x
-  width: 9em!important
-  height: 9em!important
-
-.fa-8x
-  height: 1em!important
+  .fa-#{$i}x
+    height: 1em!important
 
 // auto
 span.icon.is-auto

@@ -43,7 +43,7 @@
 
         <div id="appNavMenu" class="navbar-menu">
             <div class="navbar-start">
-                <a href="{{ env('PUBLIC_URL') }}" class="navbar-item">
+                <a href="{{ env('PUBLIC_URL') }}" class="navbar-item is-hidden-desktop">
                     <span class="icon mr-px-3">
                         <i class="fas fa-home fa-fw"></i>
                     </span>
@@ -94,7 +94,7 @@
             </div>
 
             <div class="navbar-end">
-                <div class="navbar-item">
+                <div class="navbar-item is-hidden-desktop">
                     <div class="field has-addons">
                         <div class="control">
                             <input class="input" type="text" placeholder="Search here">
@@ -107,8 +107,12 @@
                     </div>
                 </div>
 
-                <div class="navbar-item has-dropdown is-hoverable">
-                    <a class="navbar-link">
+                <a href="{{ route('admin.logout') }}" class="navbar-item is-hidden-touch">
+                    Logout
+                </a>
+
+                <div class="navbar-item has-dropdown is-hoverable is-hidden-desktop">
+                    <a class="navbar-link ">
                         Hi, {{ Auth::user()->name }}
                     </a>
 
