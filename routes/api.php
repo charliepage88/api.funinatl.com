@@ -23,4 +23,5 @@ Route::namespace('Api')->group(function () {
     Route::get('/events/search', 'EventsController@search');
     Route::post('/locations/submit', 'LocationsController@submit');
     Route::post('/contact/submit', 'ContactSubmissionsController@submit');
+    Route::get('/routes', 'MetaController@routes');
 });

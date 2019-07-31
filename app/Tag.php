@@ -21,6 +21,31 @@ class Tag extends ParentModel
     }
 
     /**
+     * To Searchable Array
+     *
+     * @return array
+     */
+    public function toSearchableArray()
+    {
+        // tag data
+        $fields = [
+            'id',
+            'name',
+            'slug'
+        ];
+
+        $tag = [];
+        foreach($fields as $field) {
+            $tag[$field] = $this->$field;
+        }
+
+        $tag['created_at'] = $this->created_at->toAtomString();
+        $tag['updated_at'] = $this->updated_at->toAtomString();
+
+        return $tag;
+    }
+
+    /**
      * Get Mongo Array
      *
      * @return array
