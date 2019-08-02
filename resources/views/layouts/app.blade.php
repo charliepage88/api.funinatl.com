@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,24 +10,25 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
 
+    <title>{{ config('app.name', 'Laravel') }}</title>
+
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
-
-    <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}" defer></script>
-
     <script defer src="//use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
 
+    <!-- Scripts -->
+    <script src="{{ \SiteHelper::cdn_asset('js/app.js') }}" defer></script>
+
     <!-- Styles -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link href="{{ \SiteHelper::cdn_asset('css/app.css') }}" rel="stylesheet">
 </head>
+
 <body class="has-navbar-fixed-top">
     <nav class="navbar is-fixed-top is-primary" role="navigation" aria-label="main navigation">
         <div class="navbar-brand">
-            <a class="navbar-item" href="{{ env('PUBLIC_URL') }}">
-              <img src="https://funinatl.nyc3.digitaloceanspaces.com/site/funinatl-logo.jpg" width="112" height="28">
+            <a href="{{ route('admin.dashboard') }}" class="navbar-item">
+                <img src="https://funinatl.nyc3.digitaloceanspaces.com/site/funinatl-logo.jpg" alt="FunInATL Admin" />
             </a>
 
             <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="appNavMenu">

@@ -106,4 +106,29 @@ class SiteHelper
 
         return $response;
     }
+
+    /**
+     * Cdn Asset
+     * Get the path to a versioned Mix file.
+     *
+     * @param  string  $path
+     * @param  string  $manifestDirectory
+     * @return \Illuminate\Support\HtmlString|string
+     *
+     * @throws \Exception
+     */
+    public static function cdn_asset($path, $manifestDirectory = '')
+    {
+        $mixPath = mix($path, $manifestDirectory);
+        $cdnUrl  = env('ASSETS_S3_URL');
+        $env     = config('app.env');
+
+        // Reference CDN assets only in production or staging environemnt.
+        // In other environments, we should reference locally built assets.
+        if ($cdnUrl && ($env === 'production' || $env === 'staging')) {
+            $mixPath = $cdnUrl . $mixPath;
+        }
+
+        return $mixPath;
+    }
 }
