@@ -1751,16 +1751,16 @@
         },
         {
             "name": "jenssegers/mongodb",
-            "version": "v3.5.1",
+            "version": "v3.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jenssegers/laravel-mongodb.git",
-                "reference": "bdb15c948cb1f3d703df0996753d7e5336950bee"
+                "reference": "e2a8fae1504d5126ca3aecf467e629e6d7307ec6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jenssegers/laravel-mongodb/zipball/bdb15c948cb1f3d703df0996753d7e5336950bee",
-                "reference": "bdb15c948cb1f3d703df0996753d7e5336950bee",
+                "url": "https://api.github.com/repos/jenssegers/laravel-mongodb/zipball/e2a8fae1504d5126ca3aecf467e629e6d7307ec6",
+                "reference": "e2a8fae1504d5126ca3aecf467e629e6d7307ec6",
                 "shasum": ""
             },
             "require": {
@@ -1768,7 +1768,7 @@
                 "illuminate/database": "^5.8",
                 "illuminate/events": "^5.8",
                 "illuminate/support": "^5.8",
-                "mongodb/mongodb": "^1.0.0"
+                "mongodb/mongodb": "^1.4"
             },
             "require-dev": {
                 "doctrine/dbal": "^2.5",
@@ -1816,7 +1816,7 @@
                 "mongo",
                 "mongodb"
             ],
-            "time": "2019-03-12T06:49:10+00:00"
+            "time": "2019-08-01T19:34:47+00:00"
         },
         {
             "name": "johngrogg/ics-parser",
@@ -7356,16 +7356,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "8.2.5",
+            "version": "8.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "c1b8534b3730f20f58600124129197bf1183dc92"
+                "reference": "21461ce5b162d0f1a0fa658e27f975517c5d4234"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/c1b8534b3730f20f58600124129197bf1183dc92",
-                "reference": "c1b8534b3730f20f58600124129197bf1183dc92",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/21461ce5b162d0f1a0fa658e27f975517c5d4234",
+                "reference": "21461ce5b162d0f1a0fa658e27f975517c5d4234",
                 "shasum": ""
             },
             "require": {
@@ -7381,7 +7381,7 @@
                 "phar-io/version": "^2.0.1",
                 "php": "^7.2",
                 "phpspec/prophecy": "^1.8.1",
-                "phpunit/php-code-coverage": "^7.0.5",
+                "phpunit/php-code-coverage": "^7.0.7",
                 "phpunit/php-file-iterator": "^2.0.2",
                 "phpunit/php-text-template": "^1.2.1",
                 "phpunit/php-timer": "^2.1.2",
@@ -7409,7 +7409,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "8.2-dev"
+                    "dev-master": "8.3-dev"
                 }
             },
             "autoload": {
@@ -7424,8 +7424,8 @@
             "authors": [
                 {
                     "name": "Sebastian Bergmann",
-                    "email": "sebastian@phpunit.de",
-                    "role": "lead"
+                    "role": "lead",
+                    "email": "sebastian@phpunit.de"
                 }
             ],
             "description": "The PHP Unit Testing framework.",
@@ -7435,7 +7435,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2019-07-15T06:26:24+00:00"
+            "time": "2019-08-02T07:54:25+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",

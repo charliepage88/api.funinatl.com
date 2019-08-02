@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
+use SpotifyWebAPI\SpotifyWebAPI;
 
 use App\Category;
 use App\Event;
@@ -12,6 +13,7 @@ use App\Location;
 use App\MusicBand;
 use App\Tag;
 
+use Cache;
 use DB;
 use Storage;
 
@@ -48,7 +50,10 @@ class DevCommand extends Command
      */
     public function handle()
     {
-        // $this->truncateMongo();
+        // $this->flushMongo();
+        // $this->flushJsonFiles();
+        // $this->syncSpotifyMusicBands();
+
         // $this->eventsWithoutPhoto();
         // $this->locationsWithoutPhoto();
         // $this->syncMusicBands();
@@ -60,15 +65,16 @@ class DevCommand extends Command
             $this->syncCategoriesToMongo();
             $this->syncLocationsToMongo();
             $this->syncEventsToMongo();
+            $this->syncDataToS3();
         }
     }
 
     /**
-     * Truncate Mongo
+     * Flush Mongo
      *
      * @return void
      */
-    public function truncateMongo()
+    public function flushMongo()
     {
         DB::connection('mongodb')->collection('tags')->delete();
         DB::connection('mongodb')->collection('music_bands')->delete();
@@ -381,5 +387,216 @@ class DevCommand extends Command
                 $this->info($event->name);
             }
         }
+    }
+
+    /**
+    * Sync Data To S3
+    *
+    * @return void
+    */
+    public function syncDataToS3()
+    {
+        $this->info('syncDataToS3');
+
+        $collections = [
+            'events' => [
+                'index',
+                'bySlug',
+                'byCategory',
+                'byLocation',
+                'byTag'
+            ],
+            'locations' => [
+                'index',
+                'bySlug'
+            ],
+            'categories' => [
+                'index',
+                'bySlug'
+            ],
+            'tags' => [
+                'bySlug'
+            ],
+            'music_bands' => [
+                'index'
+            ]
+        ];
+
+        $data = [
+            'events'      => DB::connection('mongodb')->collection('events')->get(),
+            'locations'   => DB::connection('mongodb')->collection('locations')->get(),
+            'categories'  => DB::connection('mongodb')->collection('categories')->get(),
+            'music_bands' => DB::connection('mongodb')->collection('music_bands')->get(),
+            'tags'        => DB::connection('mongodb')->collection('tags')->get()
+        ];
+
+        foreach($collections as $collection => $methods) {
+            $this->info('Generating JSON for collection `' . $collection . '`');
+
+            foreach($methods as $method) {
+                $this->info('Starting for method `' . $method . '`...');
+
+                $items = $data[$collection];
+
+                switch ($method) {
+                    case 'index':
+                        $json = json_encode($items->toArray());
+
+                        Storage::disk('s3')->put('json/' . $collection . '/index.json', $json);
+                    break;
+
+                    case 'bySlug':
+                        $grouped = $items->groupBy('slug');
+
+                        foreach($grouped as $slug => $rows) {
+                            $json = json_encode($rows[0]);
+
+                            Storage::disk('s3')->put('json/' . $collection . '/bySlug/' . $slug . '.json', $json);
+                        }
+                    break;
+
+                    case 'byCategory':
+                        $categories = $data['categories'];
+
+                        foreach($categories as $category) {
+                            $slug = $category['slug'];
+
+                            $events = DB::connection('mongodb')
+                                ->collection('events')
+                                ->where('category_slug', $slug)
+                                ->get();
+
+                            $json = json_encode($events->toArray());
+
+                            Storage::disk('s3')->put('json/' . $collection . '/byCategory/' . $slug . '.json', $json);
+                        }
+                    break;
+
+                    case 'byLocation':
+                        $locations = $data['locations'];
+
+                        foreach($locations as $location) {
+                            $slug = $location['slug'];
+
+                            $events = DB::connection('mongodb')
+                                ->collection('events')
+                                ->where('location_slug', $slug)
+                                ->get();
+
+                            $json = json_encode($events->toArray());
+
+                            Storage::disk('s3')->put('json/' . $collection . '/byLocation/' . $slug . '.json', $json);
+                        }
+                    break;
+
+                    case 'byTag':
+                        $tags = Tag::all();
+
+                        foreach($tags as $tag) {
+                            $slug = $tag->slug;
+
+                            $eventIds = $tag->findIdsByModelId(new Event);
+
+                            $events = DB::connection('mongodb')
+                                ->collection('events')
+                                ->whereIn('id', $eventIds)
+                                ->get();
+
+                            $json = json_encode($events->toArray());
+
+                            Storage::disk('s3')->put('json/' . $collection . '/byTag/' . $slug . '.json', $json);
+                        }
+                    break;
+                }
+
+                $this->info('Finished for method `' . $method . '`!');
+            }
+
+            $this->info('Finished collection `' . $collection . '`');
+        }
+    }
+
+    /**
+     * Flush Json Files
+     *
+     * @return void
+     */
+    public function flushJsonFiles()
+    {
+        $folders = Storage::disk('s3')->directories('json');
+
+        foreach($folders as $folder) {
+            Storage::disk('s3')->deleteDirectory($folder);
+        }
+    }
+
+    /**
+    * Sync Spotify Music Bands
+    *
+    * @return void
+    */
+    public function syncSpotifyMusicBands()
+    {
+        $spotify = $this->initSpotify();
+
+        $bands = MusicBand::whereNotNull('spotify_artist_id')
+            ->whereNull('spotify_json')
+            ->get();
+
+        foreach($bands as $key => $band) {
+            $info = $spotify->getArtist($band->spotify_artist_id);
+
+            if (!empty($info) && !empty($info->id)) {
+                $band->spotify_json = (array) $info;
+
+                $band->save();
+
+                $this->info('Band info saved for `' . $band->name . '`');
+            } else {
+                $this->error($info);
+            }
+
+            if ($key > 0 && ($key % 3 === 0)) {
+                $this->info('Sleeping for 2 seconds...');
+
+                sleep(2);
+            }
+        }
+    }
+
+    /**
+    * Init Spotify
+    *
+    * @return object
+    */
+    public function initSpotify()
+    {
+        // get new access token
+        if (!Cache::has('spotify_access_token')) {
+            $this->info('getting new access token for Spotify');
+
+            $session = new \SpotifyWebAPI\Session(
+                env('SPOTIFY_CLIENT_ID'),
+                env('SPOTIFY_CLIENT_SECRET')
+            );
+
+            $session->requestCredentialsToken();
+            $accessToken = $session->getAccessToken();
+
+            if (!empty($accessToken)) {
+                Cache::put('spotify_access_token', $accessToken, 60);
+            } else {
+                throw new \Exception('Cannot get access token from Spotify');
+            }
+        } else {
+            $accessToken = Cache::get('spotify_access_token');
+        }
+
+        // init spotify instance
+        $spotify = new SpotifyWebAPI;
+
+        $spotify->setAccessToken($accessToken);
+
+        return $spotify;
     }
 }

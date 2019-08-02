@@ -21,6 +21,23 @@ class Tag extends ParentModel
     }
 
     /**
+    * Find Ids By Model Id
+    *
+    * @param object $model
+    *
+    * @return array
+    */
+    public function findIdsByModelId($model)
+    {
+        $ids = DB::table('taggables')
+            ->where('tag_id', $this->id)
+            ->where('taggable_type', get_class($model))
+            ->pluck('taggable_id');
+
+        return $ids->toArray();
+    }
+
+    /**
      * To Searchable Array
      *
      * @return array
