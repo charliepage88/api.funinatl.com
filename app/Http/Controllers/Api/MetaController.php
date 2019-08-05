@@ -48,7 +48,7 @@ class MetaController extends Controller
         foreach($categories as $category) {
             $routes[] = [
                 'route' => '/category/' . $category->slug,
-                'payload' => []
+                'payload' => [],
                 'payload' => $category->toSearchableArray()
             ];
         }
@@ -59,7 +59,7 @@ class MetaController extends Controller
         foreach($events as $event) {
             $routes[] = [
                 'route' => '/event/' . $event->slug,
-                'payload' => []
+                'payload' => [],
                 'payload' => $event->toSearchableArray()
             ];
         }
@@ -70,7 +70,7 @@ class MetaController extends Controller
         foreach($locations as $location) {
             $routes[] = [
                 'route' => '/location/' . $location->slug,
-                'payload' => []
+                'payload' => [],
                 'payload' => $location->toSearchableArray()
             ];
         }
@@ -81,7 +81,7 @@ class MetaController extends Controller
         foreach($tags as $tag) {
             $routes[] = [
                 'route' => '/tag/' . $tag->slug,
-                'payload' => []
+                'payload' => [],
                 'payload' => $tag->toSearchableArray()
             ];
         }
