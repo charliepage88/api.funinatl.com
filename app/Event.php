@@ -15,6 +15,8 @@ use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Spatie\Tags\HasTags;
 
+use App\Collections\EventCollection;
+
 use DB;
 
 class Event extends Model implements HasMedia
@@ -745,5 +747,16 @@ class Event extends Model implements HasMedia
         }
 
         return $value;
+    }
+
+    /**
+     * Create a new Eloquent Collection instance.
+     *
+     * @param  array  $models
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function newCollection(array $models = [])
+    {
+        return new EventCollection($models);
     }
 }

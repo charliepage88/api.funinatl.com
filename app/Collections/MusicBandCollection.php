@@ -4,6 +4,8 @@ namespace App\Collections;
 
 use Illuminate\Database\Eloquent\Collection;
 
+use App\MusicBand;
+
 class MusicBandCollection extends Collection
 {
     /**
@@ -14,7 +16,7 @@ class MusicBandCollection extends Collection
     public function toSearchableArray()
     {
         // get array of band data
-        $mapped = $this->map(function ($band) {
+        $mapped = $this->map(function (MusicBand $band) {
             $musicBand = [];
 
             $musicBand['id'] = $band->id;
@@ -37,7 +39,7 @@ class MusicBandCollection extends Collection
     public function getMongoArray()
     {
         // get array of band data
-        $mapped = $this->map(function ($band) {
+        $mapped = $this->map(function (MusicBand $band) {
             $musicBand = [];
 
             $musicBand['id'] = $band->id;

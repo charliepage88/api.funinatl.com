@@ -25,9 +25,16 @@ class MetaController extends Controller
     {
         $routes = [];
 
+        // get events for home page & _slug pages
+        $events = Event::shouldShow()->get();
+
+        $routes[] = [
+            'route' => '/',
+            'payload' => $events
+        ];
+
         // static pages
         $pages = [
-            '/',
             '/about',
             '/contact',
             '/get-listed',
@@ -54,8 +61,6 @@ class MetaController extends Controller
         }
 
         // events
-        $events = Event::shouldShow()->get();
-
         foreach($events as $event) {
             $routes[] = [
                 'route' => '/event/' . $event->slug,
