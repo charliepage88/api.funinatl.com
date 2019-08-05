@@ -49,7 +49,7 @@ class MetaController extends Controller
             $routes[] = [
                 'route' => '/category/' . $category->slug,
                 'payload' => []
-                // 'payload' => $category->toSearchableArray()
+                'payload' => $category->toSearchableArray()
             ];
         }
 
@@ -60,7 +60,7 @@ class MetaController extends Controller
             $routes[] = [
                 'route' => '/event/' . $event->slug,
                 'payload' => []
-                // 'payload' => $event->toSearchableArray()
+                'payload' => $event->toSearchableArray()
             ];
         }
 
@@ -71,7 +71,7 @@ class MetaController extends Controller
             $routes[] = [
                 'route' => '/location/' . $location->slug,
                 'payload' => []
-                // 'payload' => $location->toSearchableArray()
+                'payload' => $location->toSearchableArray()
             ];
         }
 
@@ -82,7 +82,7 @@ class MetaController extends Controller
             $routes[] = [
                 'route' => '/tag/' . $tag->slug,
                 'payload' => []
-                // 'payload' => $tag->toSearchableArray()
+                'payload' => $tag->toSearchableArray()
             ];
         }
 

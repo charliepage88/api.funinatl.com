@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "ef645a98e32fdccb3989f4647435ca74",
+    "content-hash": "ae6733efddcc1e64a96eac35e763808e",
     "packages": [
         {
             "name": "appstract/laravel-meta",
@@ -113,16 +113,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.108.2",
+            "version": "3.108.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "1bb860e0ef548355bd97e22549b378c62c7af6ad"
+                "reference": "5b2fda38f057bfab7ce74cc32d8c7d87b3e41437"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/1bb860e0ef548355bd97e22549b378c62c7af6ad",
-                "reference": "1bb860e0ef548355bd97e22549b378c62c7af6ad",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/5b2fda38f057bfab7ce74cc32d8c7d87b3e41437",
+                "reference": "5b2fda38f057bfab7ce74cc32d8c7d87b3e41437",
                 "shasum": ""
             },
             "require": {
@@ -192,7 +192,7 @@
                 "s3",
                 "sdk"
             ],
-            "time": "2019-07-30T19:02:39+00:00"
+            "time": "2019-08-02T18:51:44+00:00"
         },
         {
             "name": "babenkoivan/scout-elasticsearch-driver",
@@ -1938,16 +1938,16 @@
         },
         {
             "name": "jwilsson/spotify-web-api-php",
-            "version": "2.8.0",
+            "version": "2.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jwilsson/spotify-web-api-php.git",
-                "reference": "ad6bf5c28d57b105b9050d7e8899c613fd60c1bc"
+                "reference": "d2d5e461476e060a28526a6e67600d16d1c58b6e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jwilsson/spotify-web-api-php/zipball/ad6bf5c28d57b105b9050d7e8899c613fd60c1bc",
-                "reference": "ad6bf5c28d57b105b9050d7e8899c613fd60c1bc",
+                "url": "https://api.github.com/repos/jwilsson/spotify-web-api-php/zipball/d2d5e461476e060a28526a6e67600d16d1c58b6e",
+                "reference": "d2d5e461476e060a28526a6e67600d16d1c58b6e",
                 "shasum": ""
             },
             "require": {
@@ -1980,7 +1980,7 @@
             "keywords": [
                 "spotify"
             ],
-            "time": "2019-06-29T09:02:34+00:00"
+            "time": "2019-08-03T13:33:17+00:00"
         },
         {
             "name": "laravel/framework",
@@ -3159,21 +3159,21 @@
         },
         {
             "name": "php-http/message",
-            "version": "1.7.2",
+            "version": "1.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-http/message.git",
-                "reference": "b159ffe570dffd335e22ef0b91a946eacb182fa1"
+                "reference": "ce8f43ac1e294b54aabf5808515c3554a19c1e1c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-http/message/zipball/b159ffe570dffd335e22ef0b91a946eacb182fa1",
-                "reference": "b159ffe570dffd335e22ef0b91a946eacb182fa1",
+                "url": "https://api.github.com/repos/php-http/message/zipball/ce8f43ac1e294b54aabf5808515c3554a19c1e1c",
+                "reference": "ce8f43ac1e294b54aabf5808515c3554a19c1e1c",
                 "shasum": ""
             },
             "require": {
                 "clue/stream-filter": "^1.4",
-                "php": "^5.4 || ^7.0",
+                "php": "^7.1",
                 "php-http/message-factory": "^1.0.2",
                 "psr/http-message": "^1.0"
             },
@@ -3199,7 +3199,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.6-dev"
+                    "dev-master": "1.8-dev"
                 }
             },
             "autoload": {
@@ -3227,7 +3227,7 @@
                 "message",
                 "psr-7"
             ],
-            "time": "2018-11-01T09:32:41+00:00"
+            "time": "2019-08-05T06:55:08+00:00"
         },
         {
             "name": "php-http/message-factory",
@@ -4125,16 +4125,16 @@
         },
         {
             "name": "spatie/image",
-            "version": "1.7.2",
+            "version": "1.7.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/image.git",
-                "reference": "61fa48fa4cb85eda4ef4f8f20b1c27edd9d38e85"
+                "reference": "8aac77a3ee18d7e0e5cb51cd67eb9558f1f491ef"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/image/zipball/61fa48fa4cb85eda4ef4f8f20b1c27edd9d38e85",
-                "reference": "61fa48fa4cb85eda4ef4f8f20b1c27edd9d38e85",
+                "url": "https://api.github.com/repos/spatie/image/zipball/8aac77a3ee18d7e0e5cb51cd67eb9558f1f491ef",
+                "reference": "8aac77a3ee18d7e0e5cb51cd67eb9558f1f491ef",
                 "shasum": ""
             },
             "require": {
@@ -4163,9 +4163,9 @@
             "authors": [
                 {
                     "name": "Freek Van der Herten",
+                    "role": "Developer",
                     "email": "freek@spatie.be",
-                    "homepage": "https://spatie.be",
-                    "role": "Developer"
+                    "homepage": "https://spatie.be"
                 }
             ],
             "description": "Manipulate images with an expressive API",
@@ -4174,7 +4174,7 @@
                 "image",
                 "spatie"
             ],
-            "time": "2019-05-13T11:38:22+00:00"
+            "time": "2019-08-02T23:57:44+00:00"
         },
         {
             "name": "spatie/image-optimizer",
@@ -7356,16 +7356,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "8.3.1",
+            "version": "8.3.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "21461ce5b162d0f1a0fa658e27f975517c5d4234"
+                "reference": "c319d08ebd31e137034c84ad7339054709491485"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/21461ce5b162d0f1a0fa658e27f975517c5d4234",
-                "reference": "21461ce5b162d0f1a0fa658e27f975517c5d4234",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/c319d08ebd31e137034c84ad7339054709491485",
+                "reference": "c319d08ebd31e137034c84ad7339054709491485",
                 "shasum": ""
             },
             "require": {
@@ -7435,7 +7435,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2019-08-02T07:54:25+00:00"
+            "time": "2019-08-03T15:41:47+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
