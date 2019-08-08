@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 use App\Event;
+use App\Report;
 use App\Http\Controllers\Controller;
 
 use Validator;
@@ -112,6 +113,22 @@ class EventsController extends Controller
         }
 
         // return response
+        return response()->json(compact('events'));
+    }
+
+    /**
+    * Index By Period
+    *
+    * @param Request $request
+    * @param string  $start_date
+    * @param string  $end_date
+    *
+    * @return Response
+    */
+    public function indexByPeriod(Request $request, string $start_date, string $end_date)
+    {
+        $events = Report::getEventsIndexByPeriod($start_date, $end_date);
+
         return response()->json(compact('events'));
     }
 }

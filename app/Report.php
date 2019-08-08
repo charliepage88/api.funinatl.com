@@ -237,4 +237,31 @@ class Report extends Model
 
         return $charts;
     }
+
+    /**
+    * Get Events Index By Period
+    *
+    * @param string $start_date
+    * @param string $end_date
+    *
+    * @return EventCollection
+    */
+    public static function getEventsIndexByPeriod(string $start_date, string $end_date)
+    {
+        $items = Event::shouldShow()
+            ->where('start_date', '>=', $start_date)
+            ->where('end_date', '<=', $end_date)
+            ->get();
+
+        $start_date = Carbon::parse($start_date);
+        $end_date = Carbon::parse($end_date);
+
+        $results = [];
+        for ($date = $start_date; $date->lte($end_date); $date->addWeek()) {
+            $formattedDate = $date->format('Y-m-d');
+
+        }
+
+        return $events;
+    }
 }

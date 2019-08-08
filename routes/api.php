@@ -18,6 +18,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::namespace('Api')->group(function () {
+   Route::get('/events/{start_date}/{end_date}', 'EventsController@indexByPeriod')->middleware('cacheResponse:eventsIndexByPeriod');
     Route::post('/newsletter/subscribe', 'NewsletterController@subscribe');
     Route::post('/events/submit', 'EventsController@submit');
     Route::get('/events/search', 'EventsController@search');
