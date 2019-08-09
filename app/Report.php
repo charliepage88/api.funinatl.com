@@ -248,20 +248,139 @@ class Report extends Model
     */
     public static function getEventsIndexByPeriod(string $start_date, string $end_date)
     {
-        $items = Event::shouldShow()
+        $events = Event::shouldShow()
             ->where('start_date', '>=', $start_date)
-            ->where('end_date', '<=', $end_date)
+            ->where('start_date', '<=', $end_date)
+            ->orderBy('start_date', 'asc')
             ->get();
+
+        // set weekend/weekdays
+        Carbon::macro('isWeekendDay', function () {
+            return $this->isFriday() || $this->isSaturday() || $this->isSunday();
+        });
 
         $start_date = Carbon::parse($start_date);
         $end_date = Carbon::parse($end_date);
+        $now = Carbon::now();
 
-        $results = [];
-        for ($date = $start_date; $date->lte($end_date); $date->addWeek()) {
+        // collect dates inbetween start & end date
+        // group by weekday vs weekend
+        $dates = [];
+        $existingDates = [];
+        for ($date = $start_date->copy(); $date->lte($end_date); $date->addWeek()) {
             $formattedDate = $date->format('Y-m-d');
+            $endOfWeek = $date->copy()->addWeek();
 
+            if ($endOfWeek->greaterThan($end_date)) {
+                $endOfWeek = $date->copy()->addDay();
+            }
+
+            for ($day = $date->copy(); $day->lte($endOfWeek); $day->addDay()) {
+                $dayFormatted = $day->format('Y-m-d');
+
+                if (!in_array($dayFormatted, $existingDates)) {
+                    $dates[] = $day->copy();
+                    $existingDates[] = $dayFormatted;
+                }
+            }
         }
 
-        return $events;
+        $results = [];
+        $lastIndex = 0;
+        foreach($dates as $key => $date) {
+            $formattedDate = $date->format('Y-m-d');
+
+            if ($key > 0) {
+                $lastDate = $dates[($key - 1)];
+
+                if ($lastDate->isWeekendDay() !== $date->isWeekendDay()) {
+                    $lastIndex++;
+                }
+            }
+
+            if (!isset($results[$lastIndex])) {
+                if ($now->format('Y-m-d') === $start_date->format('Y-m-d')) {
+                    $diff = $date->diffInDays($start_date->copy());
+
+                    if ($date->isWeekendDay()) {
+                        $label = 'Weekend of ' . $date->format('F jS');
+                        $label .= ' - ' . $date->copy()->addDays(2)->format('jS');
+
+                        if ($diff === 0) {
+                            $label = 'This Weekend';
+                        } elseif ($diff === 3) {
+                            $label = 'Next Weekend';
+                        }
+                    } else {
+                        $label = 'Week of ' . $date->format('F jS');
+                        $label .= ' - ' . $date->copy()->addDays(3)->format('jS');
+
+                        if ($diff === 0) {
+                            $label = 'This Week';
+                        } elseif ($diff == 3) {
+                            $label = 'Next Week';
+                        }
+                    }
+                } else {
+                    if ($date->isWeekendDay()) {
+                        $label = 'Weekend of ' . $date->format('F jS');
+                        $label .= ' - ' . $date->copy()->addDays(2)->format('jS');
+                    } else {
+                        $label = 'Week of ' . $date->format('F jS');
+                        $label .= ' - ' . $date->copy()->addDays(3)->format('jS');
+                    }
+                }
+
+                $results[$lastIndex] = [
+                    'label' => $label,
+                    'days' => []
+                ];
+            }
+
+            $daysEvents = $events->filter(function (Event $event) use ($formattedDate) {
+                return $event->start_date->format('Y-m-d') === $formattedDate;
+            });
+
+            $sorted = $daysEvents->sortBy(function (Event $event) {
+                // format date
+                $date = $event->start_date->format('Y-m-d');
+
+                // format time
+                $ex = explode(':', $event->start_time);
+                $time = (int) $ex[0];
+
+                if (strlen($time) === 1) {
+                    $time = '0' . $time;
+                }
+
+                if (strstr($ex[1], 'PM')) {
+                    $minutes = str_replace(' PM', '', $ex[1]);
+
+                    if ($time != 12) {
+                        $time += 12;
+                    }
+                } else {
+                    $minutes = str_replace(' AM', '', $ex[1]);
+                }
+
+                $time .= ':' . $minutes . ':00';
+
+                $start_time = Carbon::parse($date . ' ' . $time)->format('U');
+
+                return (int) $start_time;
+            });
+
+            $eventsForDay = [];
+            foreach($sorted->values()->all() as $event) {
+                $eventsForDay[] = $event->toSearchableArray();
+            }
+
+            $results[$lastIndex]['days'][] = [
+                'date' => $formattedDate,
+                'events' => $eventsForDay
+            ];
+        }
+
+        return $results;
     }
 }

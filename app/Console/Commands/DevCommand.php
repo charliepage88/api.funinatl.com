@@ -514,6 +514,9 @@ class DevCommand extends Command
 
             $this->info('Finished collection `' . $collection . '`');
         }
+
+        // flush cache
+        Cache::tags('eventsIndexByPeriod')->flush();
     }
 
     /**
