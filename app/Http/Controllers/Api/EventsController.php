@@ -127,8 +127,86 @@ class EventsController extends Controller
     */
     public function indexByPeriod(Request $request, string $start_date, string $end_date)
     {
-        $events = Report::getEventsIndexByPeriod($start_date, $end_date);
+        $events = Report::getEventsByPeriod($start_date, $end_date);
 
         return response()->json(compact('events'));
+    }
+
+    /**
+    * Get By Period And Category
+    *
+    * @param Request $request
+    * @param string  $slug
+    * @param string  $start_date
+    * @param string  $end_date
+    *
+    * @return Response
+    */
+    public function getByPeriodAndCategory(Request $request, string $slug, string $start_date, string $end_date)
+    {
+        $data = Report::getEventsByPeriod($start_date, $end_date, [
+            'category' => $slug
+        ]);
+
+        if (!empty($data['error'])) {
+            abort(404, $data['error']);
+        }
+
+        $events = $data['events'];
+        $category = $data['category'];
+
+        return response()->json(compact('events', 'category'));
+    }
+
+    /**
+    * Get By Period And Location
+    *
+    * @param Request $request
+    * @param string  $slug
+    * @param string  $start_date
+    * @param string  $end_date
+    *
+    * @return Response
+    */
+    public function getByPeriodAndLocation(Request $request, string $slug, string $start_date, string $end_date)
+    {
+        $data = Report::getEventsByPeriod($start_date, $end_date, [
+            'location' => $slug
+        ]);
+
+        if (!empty($data['error'])) {
+            abort(404, $data['error']);
+        }
+
+        $events = $data['events'];
+        $location = $data['location'];
+
+        return response()->json(compact('events', 'location'));
+    }
+
+    /**
+    * Get By Period And Tag
+    *
+    * @param Request $request
+    * @param string  $slug
+    * @param string  $start_date
+    * @param string  $end_date
+    *
+    * @return Response
+    */
+    public function getByPeriodAndTag(Request $request, string $slug, string $start_date, string $end_date)
+    {
+        $data = Report::getEventsByPeriod($start_date, $end_date, [
+            'tag' => $slug
+        ]);
+
+        if (!empty($data['error'])) {
+            abort(404, $data['error']);
+        }
+
+        $events = $data['events'];
+        $tag = $data['tag'];
+
+        return response()->json(compact('events', 'tag'));
     }
 }

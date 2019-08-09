@@ -9,11 +9,14 @@ use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
+use App\Traits\SlugExtend;
+
 class Category extends Model implements HasMedia
 {
     use HasMediaTrait,
         HasSlug,
-        Searchable;
+        Searchable,
+        SlugExtend;
 
     /**
     * @var string

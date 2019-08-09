@@ -239,20 +239,78 @@ class Report extends Model
     }
 
     /**
-    * Get Events Index By Period
+    * Get Events By Period
     *
     * @param string $start_date
     * @param string $end_date
+    * @param array  $params
     *
     * @return EventCollection
     */
-    public static function getEventsIndexByPeriod(string $start_date, string $end_date)
+    public static function getEventsByPeriod(string $start_date, string $end_date, $params = [])
     {
-        $events = Event::shouldShow()
+        // init var
+        $response = [];
+        $errorResponse = function ($key) {
+            $response = [
+                'events' => [],
+                'status' => false,
+                'error' => 'Cannot find ' . $key . '.'
+            ];
+
+            $response[$key] = [];
+
+            return $response;
+        };
+
+        // get events
+        $query = Event::shouldShow()
             ->where('start_date', '>=', $start_date)
             ->where('start_date', '<=', $end_date)
-            ->orderBy('start_date', 'asc')
-            ->get();
+            ->orderBy('start_date', 'asc');
+
+        // parse params
+        if (!empty($params)) {
+            // filter by category
+            if (!empty($params['category'])) {
+                $category = Category::bySlug($params['category']);
+
+                if (!empty($category->id)) {
+                    $query->where('category_id', '=', $category->id);
+
+                    $response['category'] = $category->toSearchableArray();
+                } else {
+                    return $errorResponse('category');
+                }
+            }
+
+            // filter by location
+            if (!empty($params['location'])) {
+                $location = Location::bySlug($params['location']);
+
+                if (!empty($location)) {
+                    $query->where('location_id', '=', $location->id);
+
+                    $response['location'] = $location->toSearchableArray();
+                }
+            }
+
+            // filter by tag
+            if (!empty($params['tag'])) {
+                $tag = Tag::bySlug($params['tag']);
+
+                if (!empty($tag)) {
+                    $eventIds = $tag->findIdsByModelId(new Event);
+
+                    $query->whereIn('id', $eventIds);
+
+                    $response['tag'] = $tag->toSearchableArray();
+                }
+            }
+        }
+
+        // get the events data
+        $events = $query->get();
 
         // set weekend/weekdays
         Carbon::macro('isWeekendDay', function () {
@@ -381,6 +439,12 @@ class Report extends Model
             ];
         }
 
-        return $results;
+        if (!empty($response)) {
+            $response['events'] = $results;
+        } else {
+            $response = $results;
+        }
+
+        return $response;
     }
 }

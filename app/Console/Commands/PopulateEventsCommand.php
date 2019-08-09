@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 use Goutte\Client as WebScraper;
-use GuzzleHttp\Client as Guzzle;
 use ICal\ICal;
 use SpotifyWebAPI\SpotifyWebAPI;
 use Symfony\Component\DomCrawler\Crawler;

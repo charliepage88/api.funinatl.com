@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Carbon\Carbon;
+use GuzzleHttp\Client as Guzzle;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 use SpotifyWebAPI\SpotifyWebAPI;
@@ -15,6 +16,7 @@ use App\Tag;
 
 use Cache;
 use DB;
+use SiteHelper;
 use Storage;
 
 class DevCommand extends Command
@@ -50,8 +52,9 @@ class DevCommand extends Command
      */
     public function handle()
     {
+        // $this->createCache();
+
         // $this->flushMongo();
-        // $this->flushJsonFiles();
         // $this->syncSpotifyMusicBands();
 
         // $this->eventsWithoutPhoto();
@@ -398,13 +401,16 @@ class DevCommand extends Command
     {
         $this->info('syncDataToS3');
 
+        // flush json files first
+        $this->flushJsonFiles();
+
         $collections = [
             'events' => [
-                'index',
+                // 'index',
                 'bySlug',
-                'byCategory',
-                'byLocation',
-                'byTag'
+                // 'byCategory',
+                // 'byLocation',
+                // 'byTag'
             ],
             'locations' => [
                 'index',
@@ -454,59 +460,6 @@ class DevCommand extends Command
                             Storage::disk('s3')->put('json/' . $collection . '/bySlug/' . $slug . '.json', $json);
                         }
                     break;
-
-                    case 'byCategory':
-                        $categories = $data['categories'];
-
-                        foreach($categories as $category) {
-                            $slug = $category['slug'];
-
-                            $events = DB::connection('mongodb')
-                                ->collection('events')
-                                ->where('category_slug', $slug)
-                                ->get();
-
-                            $json = json_encode($events->toArray());
-
-                            Storage::disk('s3')->put('json/' . $collection . '/byCategory/' . $slug . '.json', $json);
-                        }
-                    break;
-
-                    case 'byLocation':
-                        $locations = $data['locations'];
-
-                        foreach($locations as $location) {
-                            $slug = $location['slug'];
-
-                            $events = DB::connection('mongodb')
-                                ->collection('events')
-                                ->where('location_slug', $slug)
-                                ->get();
-
-                            $json = json_encode($events->toArray());
-
-                            Storage::disk('s3')->put('json/' . $collection . '/byLocation/' . $slug . '.json', $json);
-                        }
-                    break;
-
-                    case 'byTag':
-                        $tags = Tag::all();
-
-                        foreach($tags as $tag) {
-                            $slug = $tag->slug;
-
-                            $eventIds = $tag->findIdsByModelId(new Event);
-
-                            $events = DB::connection('mongodb')
-                                ->collection('events')
-                                ->whereIn('id', $eventIds)
-                                ->get();
-
-                            $json = json_encode($events->toArray());
-
-                            Storage::disk('s3')->put('json/' . $collection . '/byTag/' . $slug . '.json', $json);
-                        }
-                    break;
                 }
 
                 $this->info('Finished for method `' . $method . '`!');
@@ -516,7 +469,10 @@ class DevCommand extends Command
         }
 
         // flush cache
-        Cache::tags('eventsIndexByPeriod')->flush();
+        $this->flushCache();
+
+        // create cache
+        // $this->createCache();
     }
 
     /**
@@ -531,6 +487,93 @@ class DevCommand extends Command
         foreach($folders as $folder) {
             Storage::disk('s3')->deleteDirectory($folder);
         }
+    }
+
+    /**
+    * Flush Cache
+    *
+    * @return void
+    */
+    public function flushCache()
+    {
+        Cache::tags('eventsIndexByPeriod')->flush();
+        Cache::tags('eventsByPeriodAndCategory')->flush();
+        Cache::tags('eventsByPeriodAndLocation')->flush();
+        Cache::tags('eventsByPeriodAndTag')->flush();
+    }
+
+    /**
+    * Create Cache
+    *
+    * @return void
+    */
+    public function createCache()
+    {
+        // init vars
+        $client = new Guzzle;
+
+        // get first event
+        $firstEvent = Event::shouldShow()->orderBy('start_date', 'asc')->first();
+
+        $startDate = $firstEvent->start_date;
+
+        // get last event
+        $lastEvent = Event::shouldShow()->orderBy('start_date', 'desc')->first();
+
+        $endDate = $lastEvent->start_date;
+
+        // function to hit URI to generate cache
+        $hitUrl = function ($url) use ($client) {
+            $response = $client->request('GET', $url);
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode === 200) {
+                $this->info('Hit URL: `' . $url . '`');
+            } else {
+                $this->error('Error Hitting URL: `' . $url . '`. Status Code: ' . $statusCode);
+            }
+        };
+
+        // get data
+
+        // events
+        $events = Event::shouldShow()
+            ->orderBy('start_date', 'asc')
+            ->get();
+
+        // categories
+        $categories = Category::isActive()->get();
+
+        // location events
+        $locations = Location::isActive()->get();
+
+        // tags
+        $tags = Tag::all();
+
+        // collect all possible date values
+        $dates = [];
+        for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
+            $dates[] = $date->copy();
+        }
+
+        $apiUrl = config('app.url');
+        $urls = [];
+        foreach ($categories as $category) {
+            foreach($dates as $date) {
+                $firstDate = $date->copy();
+                $lastDate = $firstDate->copy()->addWeeks(2)->format('Y-m-d');
+
+                $url = $apiUrl . '/api/events/category/' . $category->slug;
+                $url .= '/' . $firstDate->format('Y-m-d') . '/' . $lastDate;
+
+                $urls[] = $url;
+            }
+        }
+
+        dd($urls);
+
+        dd($startDate->format('Y-m-d'), $endDate->format('Y-m-d'));
     }
 
     /**

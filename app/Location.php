@@ -14,13 +14,15 @@ use Spatie\Tags\HasTags;
 
 use App\Tag;
 use App\Facades\Geocoder;
+use App\Traits\SlugExtend;
 
 class Location extends Model implements HasMedia
 {
     use HasMediaTrait,
         HasSlug,
         HasTags,
-        Searchable;
+        Searchable,
+        SlugExtend;
 
     /**
     * @var string

@@ -131,4 +131,30 @@ class SiteHelper
 
         return $mixPath;
     }
+
+    /**
+    * Array Get All Combinations
+    *
+    * @source https://gist.github.com/cecilemuller/4688876
+    *
+    * @return array
+    */
+    public static function arrayGetAllCombinations($arrays)
+    {
+        $result = [ [] ];
+        foreach ($arrays as $property => $property_values) {
+            $tmp = [];
+            foreach ($result as $result_item) {
+                foreach ($property_values as $property_value) {
+                    $tmp[] = array_merge($result_item, [
+                        $property => $property_value
+                    ]);
+                }
+            }
+
+            $result = $tmp;
+        }
+
+        return $result;
+    }
 }
