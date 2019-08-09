@@ -400,6 +400,10 @@ class Report extends Model
             });
 
             $sorted = $daysEvents->sortBy(function (Event $event) {
+                if (empty($event->start_time)) {
+                    return -1;
+                }
+
                 // format date
                 $date = $event->start_date->format('Y-m-d');
 
