@@ -437,10 +437,19 @@ class Report extends Model
                 $eventsForDay[] = $event->toSearchableArray();
             }
 
-            $results[$lastIndex]['days'][] = [
-                'date' => $formattedDate,
-                'events' => $eventsForDay
-            ];
+            if (!empty($eventsForDay)) {
+                $results[$lastIndex]['days'][] = [
+                    'date' => $formattedDate,
+                    'events' => $eventsForDay
+                ];
+            }
+        }
+
+        // unset days with empty events
+        foreach($results as $key => $row) {
+            if (empty($row['days'])) {
+                unset($results[$key]);
+            }
         }
 
         if (!empty($response)) {
