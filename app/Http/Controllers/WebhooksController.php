@@ -21,6 +21,10 @@ class WebhooksController extends Controller
         $token = request()->header('Authorization');
         $body = $request->input('body');
 
+        \Log::info($body);
+        \Log::info($token);
+        die();
+
         if (!empty($token) && !empty($body)) {
             $token = str_replace('Bearer ', '', $token);
 
