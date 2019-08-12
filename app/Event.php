@@ -273,6 +273,14 @@ class Event extends Model implements HasMedia
                         'type' => 'text'
                     ],
 
+                    'thumb_small' => [
+                        'type' => 'text'
+                    ],
+
+                    'thumb_medium' => [
+                        'type' => 'text'
+                    ],
+
                     'created_at' => [
                         'type' => 'date'
                     ],
@@ -314,6 +322,10 @@ class Event extends Model implements HasMedia
                     ],
 
                     'photo' => [
+                        'type' => 'text'
+                    ],
+
+                    'spotify_url' => [
                         'type' => 'text'
                     ]
                 ]

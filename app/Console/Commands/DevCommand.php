@@ -52,8 +52,6 @@ class DevCommand extends Command
      */
     public function handle()
     {
-        // $this->createCache();
-
         // $this->flushMongo();
         // $this->syncSpotifyMusicBands();
 
@@ -383,7 +381,7 @@ class DevCommand extends Command
     {
         $this->info('syncMusicBands');
 
-        $events = Event::isActive()->get();
+        $events = Event::shouldShow()->get();
 
         foreach($events as $event) {
             if (!$event->bands()->count() && $event->category_id === 1) {
@@ -406,11 +404,7 @@ class DevCommand extends Command
 
         $collections = [
             'events' => [
-                // 'index',
-                'bySlug',
-                // 'byCategory',
-                // 'byLocation',
-                // 'byTag'
+                'bySlug'
             ],
             'locations' => [
                 'index',
@@ -472,7 +466,7 @@ class DevCommand extends Command
         $this->flushCache();
 
         // create cache
-        // $this->createCache();
+        $this->createCache();
     }
 
     /**
@@ -517,10 +511,9 @@ class DevCommand extends Command
 
         $startDate = $firstEvent->start_date;
 
-        // get last event
-        $lastEvent = Event::shouldShow()->orderBy('start_date', 'desc')->first();
-
-        $endDate = $lastEvent->start_date;
+        // get end date
+        $endDate = $startDate->copy()->addWeeks(2);
+        $eventsEndDate = $startDate->copy()->addWeeks(4);
 
         // function to hit URI to generate cache
         $hitUrl = function ($url) use ($client) {
@@ -557,8 +550,15 @@ class DevCommand extends Command
             $dates[] = $date->copy();
         }
 
+        $eventDates = [];
+        for ($date = $startDate->copy(); $date->lte($eventsEndDate); $date->addDay()) {
+            $eventDates[] = $date->copy();
+        }
+
         $apiUrl = config('app.url');
         $urls = [];
+
+        // category urls
         foreach ($categories as $category) {
             foreach($dates as $date) {
                 $firstDate = $date->copy();
@@ -571,9 +571,59 @@ class DevCommand extends Command
             }
         }
 
-        dd($urls);
+        // tag urls
+        foreach ($tags as $tag) {
+            foreach($dates as $date) {
+                $firstDate = $date->copy();
+                $lastDate = $firstDate->copy()->addWeeks(2)->format('Y-m-d');
 
-        dd($startDate->format('Y-m-d'), $endDate->format('Y-m-d'));
+                $url = $apiUrl . '/api/events/tag/' . $tag->slug;
+                $url .= '/' . $firstDate->format('Y-m-d') . '/' . $lastDate;
+
+                $urls[] = $url;
+            }
+        }
+
+        // location urls
+        foreach ($locations as $location) {
+            foreach($dates as $date) {
+                $firstDate = $date->copy();
+                $lastDate = $firstDate->copy()->addWeeks(2)->format('Y-m-d');
+
+                $url = $apiUrl . '/api/events/location/' . $location->slug;
+                $url .= '/' . $firstDate->format('Y-m-d') . '/' . $lastDate;
+
+                $urls[] = $url;
+            }
+        }
+
+        // event urls
+        foreach($eventDates as $date) {
+            $firstDate = $date->copy();
+            $lastDate = $firstDate->copy()->addWeeks(4)->format('Y-m-d');
+
+            $url = $apiUrl . '/api/events/index';
+            $url .= '/' . $firstDate->format('Y-m-d') . '/' . $lastDate;
+
+            $urls[] = $url;
+        }
+
+        // hit URLs to generate cache
+        foreach($urls as $key => $url) {
+            $this->info('Start: ' . $url);
+
+            $hitUrl($url);
+
+            $this->info('Done: ' . $url);
+
+            if ($key > 0 && ($key % 60 === 0)) {
+                $this->info('Sleeping for 60 seconds...');
+
+                sleep(60);
+            }
+        }
+
+        $this->info('Done Creating Cache for: ' . $startDate->format('Y-m-d') . '-' . $endDate->format('Y-m-d'));
     }
 
     /**

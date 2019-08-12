@@ -39,6 +39,11 @@ class PopulateEventsCommand extends Command
     protected $description = 'Scrape websites to populate events.';
 
     /**
+    * @var Carbon
+    */
+    public $today;
+
+    /**
      * Execute the console command.
      *
      * @return mixed
@@ -50,28 +55,88 @@ class PopulateEventsCommand extends Command
 
         // get active providers
         // that haven't run today
-        $today = Carbon::today()->startOfDay()->format('Y-m-d H:i:s');
+        $this->today = Carbon::today()->startOfDay();
 
         $providers = Provider::isActive()
-            ->where('last_scraped', '<=', $today)
+            ->where('last_scraped', '<=', $this->today->format('Y-m-d H:i:s'))
             // ->where('id', '=', 9)
             ->orWhereNull('last_scraped')
             ->get();
 
+        // see if checksums need to be regenerated
+        $key = 'provider_checksums';
+        $keyDate = 'provider_checksums_date';
+        $skipGenerateChecksum = false;
+        if (!Cache::get($key) || !Cache::get($keyDate)) {
+            $this->regenerateChecksums($providers);
+
+            $skipGenerateChecksum = true;
+        } else {
+            $cacheValue = Cache::get($key);
+            $cacheDate = Cache::get($keyDate);
+
+            if (empty($cacheValue) || empty($cacheDate)) {
+                $this->regenerateChecksums($providers);
+
+                $skipGenerateChecksum = true;
+            } else {
+                $today = $this->today->copy();
+                $date = Carbon::parse($cacheDate);
+
+                if ($today->diffInDays($date) >= 3) {
+                    $this->regenerateChecksums($providers);
+
+                    $skipGenerateChecksum = true;
+                }
+            }
+        }
+
+        // loop through providers
         $scraper = new WebScraper;
         foreach($providers as $provider) {
+            $name = $provider->name;
+
             $find = [
                 '"',
                 "'"
             ];
 
-            $providerName = str_replace($find, '', $provider->name);
+            $providerName = str_replace($find, '', $name);
             $methodName = Str::camel('provider' . $providerName);
 
             if (method_exists($this, $methodName)) {
-                $this->info('Starting scraper for `' . $provider->name . '`');
+                // checksum
 
-                $this->$methodName($provider, $scraper, $spotify);
+                $key = 'provider_' . $provider->slug;
+                $keyDate = 'provider_' . $provider->slug . '_date';
+
+                if (!$skipGenerateChecksum) {
+                    $this->info('Checksum for provider `' . $name . '`');
+
+                    if (Cache::has($key) && Cache::has($keyDate)) {
+                        $cacheDate = Cache::get($keyDate);
+
+                        $today = $this->today->copy();
+                        $date = Carbon::parse($cacheDate);
+
+                        if ($today->diffInDays($date) < 3) {
+                            $this->info('Checksum validated, skipping scraper for `' . $name . '`');
+
+                            continue;
+                        }
+                    }
+                }
+
+                // call method
+                $this->info('Starting scraper for `' . $name . '`');
+
+                $events = $this->$methodName($provider, $scraper, $spotify);
+
+                if (!Cache::has($key) || !Cache::has($keyDate)) {
+                    $this->createChecksum($provider, $events);
+                } else {
+                    $this->updateChecksum($provider, $events);
+                }
             } else {
                 $this->error('Cannot find method name `' . $methodName . '`');
             }
@@ -357,6 +422,8 @@ class PopulateEventsCommand extends Command
         $provider->last_scraped = Carbon::now();
 
         $provider->save();
+
+        return $events;
     }
 
     /**
@@ -610,6 +677,8 @@ class PopulateEventsCommand extends Command
         $provider->last_scraped = Carbon::now();
 
         $provider->save();
+
+        return $events;
     }
 
     /**
@@ -752,6 +821,8 @@ class PopulateEventsCommand extends Command
         $provider->last_scraped = Carbon::now();
 
         $provider->save();
+
+        return $events;
     }
 
     /**
@@ -1047,6 +1118,8 @@ class PopulateEventsCommand extends Command
         $provider->last_scraped = Carbon::now();
 
         $provider->save();
+
+        return $events;
     }
 
     /**
@@ -1158,6 +1231,8 @@ class PopulateEventsCommand extends Command
         $provider->last_scraped = Carbon::now();
 
         $provider->save();
+
+        return $urls;
     }
 
     /**
@@ -1239,6 +1314,8 @@ class PopulateEventsCommand extends Command
         $provider->last_scraped = Carbon::now();
 
         $provider->save();
+
+        return $urls;
     }
 
     /**
@@ -1380,6 +1457,8 @@ class PopulateEventsCommand extends Command
         $provider->last_scraped = Carbon::now();
 
         $provider->save();
+
+        return $events;
     }
 
     /**
@@ -1472,6 +1551,8 @@ class PopulateEventsCommand extends Command
         $provider->last_scraped = Carbon::now();
 
         $provider->save();
+
+        return $events;
     }
 
     /**
@@ -1691,5 +1772,56 @@ class PopulateEventsCommand extends Command
         $provider->last_scraped = Carbon::now();
 
         $provider->save();
+
+        return $events;
+    }
+
+    /**
+    * Create Checksum
+    *
+    * @param Provider $provider
+    * @param array    $data
+    *
+    * @return void
+    */
+    private function createChecksum(Provider $provider, array $data)
+    {
+
+    }
+
+    /**
+    * Update Checksum
+    *
+    * @param Provider $provider
+    * @param array    $data
+    *
+    * @return void
+    */
+    private function updateChecksum(Provider $provider, array $data)
+    {
+
+    }
+
+    /**
+    * Regenerate Checksums
+    *
+    * @param Collection $providers
+    *
+    * @return void
+    */
+    private function regenerateChecksums($providers)
+    {
+        $this->info('regenerateChecksums -> start');
+
+        foreach($providers as $provider) {
+            $events = [];
+            foreach($provider->location->events as $event) {
+                $events[] = $event->toSearchableArray();
+            }
+
+            $this->createChecksum($provider, $events);
+        }
+
+        $this->info('regenerateChecksums -> end');
     }
 }

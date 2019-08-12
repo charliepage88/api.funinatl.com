@@ -153,11 +153,14 @@ class CrawlVenkmansLink implements ShouldQueue
 
         // start time
         try {
-            $start_time = trim($crawler->filter('.tribe-event-date-start')->text());
-            $start_time = str_replace($startDate->format('F d') . ' @ ', '', $start_time);
+            $date = trim($crawler->filter('.tribe-event-date-start')->text());
 
-            $event['start_time'] = Carbon::parse($event['start_date'] . ' ' . $start_time);
-            $event['start_time'] = $event['start_time']->format('g:i A');
+            $ex = explode(' @ ', $date);
+
+            if (!empty($ex[1])) {
+                $event['start_time'] = Carbon::parse($event['start_date'] . ' ' . trim($ex[1]));
+                $event['start_time'] = $event['start_time']->format('g:i A');
+            }
         } catch (\Exception $e) {
 
         }
@@ -170,6 +173,19 @@ class CrawlVenkmansLink implements ShouldQueue
             $event['end_time'] = $event['end_time']->format('g:i A');
         } catch (\Exception $e) {
             
+        }
+
+        // set default start time if empty
+        if (empty($event['start_time'])) {
+            $event['start_time'] = Carbon::parse($event['start_date'] . ' 17:30:00');
+            $event['start_time'] = $event['start_time']->format('g:i A');
+        }
+
+        // set default end time if empty
+        if (empty($event['end_time'])) {
+            $start_time = Carbon::parse($event['start_date'] . ' ' . $event['start_time']);
+
+            $event['end_time'] = $start_time->addHours(3)->format('g:i A');
         }
 
         // figure out price

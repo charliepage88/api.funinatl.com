@@ -54,6 +54,7 @@ class MusicBand extends Model implements HasMedia
             'id' => [
                 'type' => 'integer'
             ],
+
             'name' => [
                 'type' => 'text',
                 'fields' => [
@@ -63,15 +64,23 @@ class MusicBand extends Model implements HasMedia
                 ],
                 'analyzer' => 'band_analyzer'
             ],
+
             'slug' => [
                 'type' => 'text'
             ],
+
             'photo' => [
                 'type' => 'text'
             ],
+
+            'spotify_url' => [
+                'type' => 'text'
+            ],
+
             'created_at' => [
                 'type' => 'date'
             ],
+
             'updated_at' => [
                 'type' => 'date'
             ]
@@ -120,6 +129,20 @@ class MusicBand extends Model implements HasMedia
     }
 
     /**
+    * Get Spotify Url Attribute
+    *
+    * @return string|null
+    */
+    public function getSpotifyUrlAttribute()
+    {
+        if (empty($this->spotify_json)) {
+            return null;
+        }
+
+        return \igorw\get_in($this->spotify_json, [ 'external_urls', 'spotify' ]);
+    }
+
+    /**
     * To Searchable Array
     *
     * @return array
@@ -138,6 +161,7 @@ class MusicBand extends Model implements HasMedia
         }
 
         $band['photo'] = $this->photo_url;
+        $band['spotify_url'] = $this->spotify_url;
         $band['created_at'] = $this->created_at->toAtomString();
         $band['updated_at'] = $this->updated_at->toAtomString();
 
@@ -163,6 +187,7 @@ class MusicBand extends Model implements HasMedia
         }
 
         $band['photo'] = $this->photo_url;
+        $band['spotify_url'] = $this->spotify_url;
         $band['created_at'] = $this->created_at->toAtomString();
         $band['updated_at'] = $this->updated_at->toAtomString();
 

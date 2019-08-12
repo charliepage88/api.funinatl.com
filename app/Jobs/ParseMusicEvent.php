@@ -49,7 +49,7 @@ class ParseMusicEvent implements ShouldQueue
     public function handle()
     {
         // parse event data
-        if (strstr($this->event['price'], ' Suggested ') {
+        if (strstr($this->event['price'], ' Suggested ')) {
             $this->event['price'] = str_replace(' Suggested ', '', $this->event['price']);
         }
 

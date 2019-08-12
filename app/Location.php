@@ -6,8 +6,10 @@ use Geocoder\Query\GeocodeQuery;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use ScoutElastic\Searchable;
+use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia\HasMedia;
 use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
+use Spatie\MediaLibrary\Models\Media;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Spatie\Tags\HasTags;
@@ -131,6 +133,14 @@ class Location extends Model implements HasMedia
             ],
 
             'photo' => [
+                'type' => 'text'
+            ],
+
+            'thumb_small' => [
+                'type' => 'text'
+            ],
+
+            'thumb_medium' => [
                 'type' => 'text'
             ],
 
@@ -278,6 +288,44 @@ class Location extends Model implements HasMedia
     }
 
     /**
+    * Get Thumb Small Url Attribute
+    *
+    * @return stirng|null
+    */
+    public function getThumbSmallUrlAttribute()
+    {
+        $photos = $this->getMedia('locations');
+
+        if ($photos->count()) {
+            $photo = $photos->first()->getUrl('thumb_small');
+            // $photo = env('DO_SPACES_URL') . '/' . $photos->first()->getPath();
+        } else {
+            $photo = null;
+        }
+
+        return $photo;
+    }
+
+    /**
+    * Get Thumb Medium Url Attribute
+    *
+    * @return stirng|null
+    */
+    public function getThumbMediumUrlAttribute()
+    {
+        $photos = $this->getMedia('locations');
+
+        if ($photos->count()) {
+            $photo = $photos->first()->getUrl('thumb_medium');
+            // $photo = env('DO_SPACES_URL') . '/' . $photos->first()->getPath();
+        } else {
+            $photo = null;
+        }
+
+        return $photo;
+    }
+
+    /**
     * Get Tag Class Name
     *
     * @return string
@@ -391,6 +439,8 @@ class Location extends Model implements HasMedia
             'lon' => $this->longitude
         ];
         $location['photo'] = $this->photo_url;
+        $location['thumb_small'] = $this->thumb_small_url;
+        $location['thumb_medium'] = $this->thumb_medium_url;
         $location['tags'] = $this->list_tags;
         $location['created_at'] = $this->created_at->toAtomString();
         $location['updated_at'] = $this->updated_at->toAtomString();
@@ -435,6 +485,8 @@ class Location extends Model implements HasMedia
         }
 
         $location['photo'] = $this->photo_url;
+        $location['thumb_small'] = $this->thumb_small_url;
+        $location['thumb_medium'] = $this->thumb_medium_url;
         $location['tags'] = $this->list_tags;
         $location['created_at'] = $this->created_at->toAtomString();
         $location['updated_at'] = $this->updated_at->toAtomString();
@@ -477,5 +529,23 @@ class Location extends Model implements HasMedia
     public function scopeIsActive($query)
     {
         return $query->where('active', '=', true);
+    }
+
+    /**
+    * Register Media Conversions
+    *
+    * @param Media|null $media
+    *
+    * @return void
+    */
+    public function registerMediaConversions(Media $media = null)
+    {
+        $this->addMediaConversion('thumb_small')
+              ->optimize()
+              ->fit(Manipulations::FIT_CROP, 96, 96);
+
+        $this->addMediaConversion('thumb_medium')
+              ->optimize()
+              ->fit(Manipulations::FIT_CROP, 128, 128);
     }
 }
