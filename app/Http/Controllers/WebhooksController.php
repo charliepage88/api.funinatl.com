@@ -23,7 +23,6 @@ class WebhooksController extends Controller
 
         \Log::info($body);
         \Log::info($token);
-        die();
 
         if (!empty($token) && !empty($body)) {
             $token = str_replace('Bearer ', '', $token);
