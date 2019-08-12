@@ -90,7 +90,9 @@ class RunCommand extends Command
             $records = DB::table($table)->get();
 
             foreach($records as $record) {
-                $body[$table][] = (array) $record;
+                $value = (array) $record;
+
+                $body[$table][] = $value;
             }
         }
 

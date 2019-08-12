@@ -21,9 +21,6 @@ class WebhooksController extends Controller
         $token = request()->header('Authorization');
         $body = $request->input('body');
 
-        \Log::info($body);
-        \Log::info($token);
-
         if (!empty($token) && !empty($body)) {
             $token = str_replace('Bearer ', '', $token);
 
@@ -36,6 +33,8 @@ class WebhooksController extends Controller
                     $records = collect($records);
 
                     foreach($records->chunk(25) as $rows) {
+                        $rows = $rows->values()->all();
+
                         DB::table($table)->insert($rows);
 
                         \Log::info('Table `' . $table . '` inserted ' . count($rows) . ' records.');
