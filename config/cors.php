@@ -18,8 +18,27 @@ return [
         // 'http://localhost'
         '*'
     ],
-    'allowedHeaders' => ['Accepts', 'Authorization', 'Content-Type', 'Content-Disposition', 'X-Filename', 'X-Timezone', 'X-User'],
-    'allowedMethods' => ['GET', 'POST', 'PUT', 'DELETE'],
-    'exposedHeaders' => ['Content-Type','Content-Disposition', 'X-Filename', 'X-Timezone', 'X-User'],
+    'allowedHeaders' => [
+        'Accepts',
+        'Authorization',
+        'Content-Type',
+        'Content-Disposition',
+        'X-Filename',
+        'X-Timezone',
+        'X-User'
+    ],
+    'allowedMethods' => [
+        'GET',
+        'POST',
+        'PUT',
+        'DELETE'
+    ],
+    'exposedHeaders' => [
+        'Content-Type',
+        'Content-Disposition',
+        'X-Filename',
+        'X-Timezone',
+        'X-User'
+    ],
     'maxAge' => 0,
 ];

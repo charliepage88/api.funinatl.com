@@ -81,3 +81,6 @@ Route::middleware('auth')->namespace('Admin')->prefix('admin')->group(function (
     Route::get('/contact-submissions/delete/{submission}', 'ContactSubmissionsController@destroy')
         ->name('admin.contact_submissions.delete');
 });
+
+// Webhooks
+Route::post('/webhook/sync', 'WebhooksController@sync');
