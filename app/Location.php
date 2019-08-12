@@ -297,8 +297,7 @@ class Location extends Model implements HasMedia
         $photos = $this->getMedia('locations');
 
         if ($photos->count()) {
-            $photo = $photos->first()->getUrl('thumb_small');
-            // $photo = env('DO_SPACES_URL') . '/' . $photos->first()->getPath();
+            $photo = env('DO_SPACES_URL') . '/' . $photos->first()->getPath('thumb_small');
         } else {
             $photo = null;
         }
@@ -316,8 +315,7 @@ class Location extends Model implements HasMedia
         $photos = $this->getMedia('locations');
 
         if ($photos->count()) {
-            $photo = $photos->first()->getUrl('thumb_medium');
-            // $photo = env('DO_SPACES_URL') . '/' . $photos->first()->getPath();
+            $photo = env('DO_SPACES_URL') . '/' . $photos->first()->getPath('thumb_small');
         } else {
             $photo = null;
         }
