@@ -17,14 +17,7 @@ class MusicBandCollection extends Collection
     {
         // get array of band data
         $mapped = $this->map(function (MusicBand $band) {
-            $musicBand = [];
-
-            $musicBand['id'] = $band->id;
-            $musicBand['name'] = $band->name;
-            $musicBand['slug'] = $band->slug;
-            $musicBand['photo'] = $band->photo_url;
-
-            return $musicBand;
+            return $band->toSearchableArray();
         });
 
         // format into array
@@ -34,20 +27,15 @@ class MusicBandCollection extends Collection
     /**
      * Get Mongo Array
      *
+     * @param bool $includeRelationships
+     *
      * @return array
      */
-    public function getMongoArray()
+    public function getMongoArray($includeRelationships = true)
     {
         // get array of band data
-        $mapped = $this->map(function (MusicBand $band) {
-            $musicBand = [];
-
-            $musicBand['id'] = $band->id;
-            $musicBand['name'] = $band->name;
-            $musicBand['slug'] = $band->slug;
-            $musicBand['photo'] = $band->photo_url;
-
-            return $musicBand;
+        $mapped = $this->map(function (MusicBand $band) use ($includeRelationships) {
+            return $band->getMongoArray($includeRelationships);
         });
 
         // format into array

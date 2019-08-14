@@ -490,7 +490,7 @@ class Location extends Model implements HasMedia
         $location['updated_at'] = $this->updated_at->toAtomString();
 
         // category
-        if ($includeRelationships && !empty($this->category)) {
+        if (!empty($this->category)) {
             $category = [];
 
             $category['id'] = $this->category->id;

@@ -38,7 +38,7 @@ class DevCommand extends Command
     /**
      * @var boolean
      */
-    public $enableSyncToSearch = true;
+    public $enableSyncToSearch = false;
 
     /**
      * @var boolean
@@ -53,7 +53,7 @@ class DevCommand extends Command
     public function handle()
     {
         // $this->flushMongo();
-        // $this->syncSpotifyMusicBands();
+        $this->syncSpotifyMusicBands();
 
         // $this->eventsWithoutPhoto();
         // $this->locationsWithoutPhoto();
@@ -61,12 +61,8 @@ class DevCommand extends Command
         // $this->regenerateEventSlugs();
 
         if ($this->enableSync) {
-            $this->syncTagsToMongo();
-            $this->syncMusicBandsToMongo();
-            $this->syncCategoriesToMongo();
-            $this->syncLocationsToMongo();
-            $this->syncEventsToMongo();
-            $this->syncDataToS3();
+            // $this->syncToMongo();
+            // $this->syncDataToS3();
         }
     }
 
@@ -139,224 +135,6 @@ class DevCommand extends Command
                 $this->info($location->id . ' :: ' . $location->name);
             }
         }
-    }
-
-    /**
-    * Sync Events To Mongo
-    *
-    * @return void
-    */
-    private function syncEventsToMongo()
-    {
-        $mysqlEvents = Event::shouldShow()->get();
-
-        foreach($mysqlEvents as $event) {
-            $find = DB::connection('mongodb')
-                ->collection('events')
-                ->where('id', $event->id)
-                ->first();
-
-            if (empty($find)) {
-                $value = $event->getMongoArray();
-
-                DB::connection('mongodb')
-                    ->collection('events')
-                    ->insert($value);
-
-                $this->info('Inserted event #' . $event->id . ' into MongoDB.');
-            } else {
-                $value = $event->getMongoArray();
-
-                DB::connection('mongodb')
-                    ->collection('events')
-                    ->where('id', $event->id)
-                    ->update($value);
-
-                $this->info('Updated event #' . $event->id . ' with MongoDB.');
-            }
-        }
-
-        // sync to search
-        if ($this->enableSyncToSearch) {
-            Event::isActive()->get()->searchable();
-
-            $this->info('Events synced to Mongo and Scout.');
-        } else {
-            $this->info('Events synced to Mongo');
-        }
-    }
-
-    /**
-    * Sync Locations To Mongo
-    *
-    * @return void
-    */
-    private function syncLocationsToMongo()
-    {
-        $locations = Location::isActive()->get();
-
-        foreach($locations as $location) {
-            $find = DB::connection('mongodb')
-                ->collection('locations')
-                ->where('id', $location->id)
-                ->first();
-
-            if (empty($find)) {
-                $payload = $location->getMongoArray();
-
-                DB::connection('mongodb')
-                    ->collection('locations')
-                    ->insert($payload);
-
-                $this->info('Inserted location #' . $location->id . ' into MongoDB.');
-            } else {
-                $payload = $location->getMongoArray();
-
-                DB::connection('mongodb')
-                    ->collection('locations')
-                    ->where('id', $location->id)
-                    ->update($payload);
-
-                $this->info('Updated location #' . $location->id . ' with MongoDB.');
-            }
-        }
-
-        // sync to search
-        if ($this->enableSyncToSearch) {
-            Location::isActive()->get()->searchable();
-
-            $this->info('Locations synced to Mongo and Scout.');
-        } else {
-            $this->info('Locations synced to Mongo.');
-        }
-    }
-
-    /**
-    * Sync Categories To Mongo
-    *
-    * @return void
-    */
-    private function syncCategoriesToMongo()
-    {
-        $items = Category::isActive()->get();
-
-        foreach($items as $item) {
-            $find = DB::connection('mongodb')
-                ->collection('categories')
-                ->where('id', $item->id)
-                ->first();
-
-            if (empty($find)) {
-                $value = $item->getMongoArray();
-
-                DB::connection('mongodb')
-                    ->collection('categories')
-                    ->insert($value);
-
-                $this->info('Inserted category #' . $item->id . ' into MongoDB.');
-            } else {
-                $value = $item->getMongoArray();
-
-                DB::connection('mongodb')
-                    ->collection('categories')
-                    ->where('id', $item->id)
-                    ->update($value);
-
-                $this->info('Updated category #' . $item->id . ' with MongoDB.');
-            }
-        }
-
-        // sync to search
-        if ($this->enableSyncToSearch) {
-            Category::isActive()->get()->searchable();
-
-            $this->info('Categories synced to Mongo and Scout.');
-        } else {
-            $this->info('Categories synced to Mongo.');
-        }
-    }
-
-    /**
-    * Sync Music Bands To Mongo
-    *
-    * @return void
-    */
-    private function syncMusicBandsToMongo()
-    {
-        $items = MusicBand::all();
-
-        foreach($items as $item) {
-            $find = DB::connection('mongodb')
-                ->collection('music_bands')
-                ->where('id', $item->id)
-                ->first();
-
-            if (empty($find)) {
-                $value = $item->getMongoArray();
-
-                DB::connection('mongodb')
-                    ->collection('music_bands')
-                    ->insert($value);
-
-                $this->info('Inserted music band #' . $item->id . ' into MongoDB.');
-            } else {
-                $value = $item->getMongoArray();
-
-                DB::connection('mongodb')
-                    ->collection('music_bands')
-                    ->where('id', $item->id)
-                    ->update($value);
-
-                $this->info('Updated music band #' . $item->id . ' with MongoDB.');
-            }
-        }
-
-        // sync to search
-        if ($this->enableSyncToSearch) {
-            MusicBand::query()->get()->searchable();
-
-            $this->info('Music bands synced to Mongo and Scout.');
-        } else {
-            $this->info('Music bands synced to Mongo.');
-        }
-    }
-
-    /**
-    * Sync Tags To Mongo
-    *
-    * @return void
-    */
-    private function syncTagsToMongo()
-    {
-        $items = Tag::all();
-
-        foreach($items as $item) {
-            $find = DB::connection('mongodb')
-                ->collection('tags')
-                ->where('id', $item->id)
-                ->first();
-
-            if (empty($find)) {
-                $value = $item->getMongoArray();
-
-                DB::connection('mongodb')
-                    ->collection('tags')
-                    ->insert($value);
-
-                $this->info('Inserted tag #' . $item->id . ' into MongoDB.');
-            } else {
-                $value = $item->getMongoArray();
-
-                DB::connection('mongodb')
-                    ->collection('tags')
-                    ->where('id', $item->id)
-                    ->update($value);
-
-                $this->info('Updated tag #' . $item->id . ' with MongoDB.');
-            }
-        }
-
-        $this->info('Tags synced to Mongo.');
     }
 
     /**
@@ -694,5 +472,137 @@ class DevCommand extends Command
         $spotify->setAccessToken($accessToken);
 
         return $spotify;
+    }
+
+    /**
+    * Sync To Mongo
+    *
+    * @return void
+    */
+    private function syncToMongo()
+    {
+        $models = [
+            [
+                'items' => Tag::all(),
+                'collection' => 'tags',
+                'name' => 'tag',
+                'search' => false
+            ],
+
+            [
+                'items' => MusicBand::all(),
+                'collection' => 'music_bands',
+                'name' => 'music band'
+            ],
+
+            [
+                'items' => Category::isActive()->get(),
+                'collection' => 'categories',
+                'name' => 'category'
+            ],
+
+            [
+                'items' => Location::isActive()->get(),
+                'collection' => 'locations',
+                'name' => 'location'
+            ],
+
+            [
+                'items' => Event::shouldShow()->get(),
+                'collection' => 'events',
+                'name' => 'event'
+            ]
+        ];
+
+        foreach($models as $model) {
+            // init vars
+            $items = $model['items'];
+            $collection = $model['collection'];
+            $name = $model['name'];
+            $fullName = Str::title(Str::plural($name));
+
+            if (isset($model['search']) && $model['search'] === false) {
+                $search = false;
+            } else {
+                $search = true;
+            }
+
+            // loop through model items and create/update
+            $changesCount = 0;
+            foreach($items as $item) {
+                $find = DB::connection('mongodb')
+                    ->collection($collection)
+                    ->where('id', $item->id)
+                    ->first();
+
+                if (empty($find)) {
+                    $changesCount++;
+
+                    $value = $item->getMongoArray();
+
+                    DB::connection('mongodb')
+                        ->collection($collection)
+                        ->insert($value);
+
+                    $this->info('Inserted ' . $name . ' #' . $item->id . ' into MongoDB.');
+                } else {
+                    // get value from local DB
+                    $value = $item->getMongoArray(false);
+
+                    // get mongo array to compare
+                    $mongoValue = (array) $find;
+
+                    unset($mongoValue['_id']);
+
+                    // compare keys to see if unset is needed
+                    $valueKeys = array_keys($value);
+                    $mongoKeys = array_keys($mongoValue);
+
+                    $keysDiff = array_diff($mongoKeys, $valueKeys);
+
+                    if (!empty($keysDiff)) {
+                        foreach(array_values($keysDiff) as $key) {
+                            DB::connection('mongodb')
+                                ->collection($collection)
+                                ->where('id', $item->id)
+                                ->unset($key);
+
+                            $this->info('Unset field `' . $key . '` for collection ' . $collection);
+                        }   
+                    }
+
+                    // compare values via json_encode
+                    $diff = array_diff(
+                        array_map('json_encode', $mongoValue),
+                        array_map('json_encode', $value)
+                    );
+
+                    // json decode diff result
+                    $diff = array_map('json_decode', $diff);
+
+                    if (!empty($diff)) {
+                        $changesCount++;
+
+                        DB::connection('mongodb')
+                            ->collection($collection)
+                            ->where('id', $item->id)
+                            ->update($value);
+
+                        $this->info('Updated ' . $name . ' #' . $item->id . ' with MongoDB.');
+                    } else {
+                        $this->info('Skipping update for ' . $name . ' #' . $item->id);
+                    }
+                }
+            }
+
+            // sync to search
+            if ($search && $changesCount && $this->enableSyncToSearch) {
+                $items->searchable();
+
+                $this->info($fullName . ' synced to Mongo and Scout. ' . $changesCount . ' total changes.');
+            } else {
+                $this->info($fullName . ' synced to Mongo. ' . $changesCount . ' total changes.');
+            }
+        }
     }
 }

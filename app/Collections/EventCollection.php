@@ -27,13 +27,15 @@ class EventCollection extends Collection
     /**
      * Get Mongo Array
      *
+     * @param bool $includeRelationships
+     *
      * @return array
      */
-    public function getMongoArray()
+    public function getMongoArray($includeRelationships = true)
     {
         // get array of band data
-        $mapped = $this->map(function (Event $event) {
-            return $event->getMongoArray();
+        $mapped = $this->map(function (Event $event) use ($includeRelationships) {
+            return $event->getMongoArray($includeRelationships);
         });
 
         // format into array

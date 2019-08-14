@@ -220,7 +220,7 @@ class Category extends Model implements HasMedia
     /**
      * Get Mongo Array
      *
-     * @param boolean $includeRelationships
+     * @param bool $includeRelationships
      *
      * @return array
      */
@@ -244,20 +244,24 @@ class Category extends Model implements HasMedia
         $category['updated_at'] = $this->updated_at->toAtomString();
 
         // events
-        $events = [];
-        foreach($this->activeEvents() as $event) {
-            $events[] = $event->getMongoArray(false);
-        }
+        if ($includeRelationships) {
+            $events = [];
+            foreach($this->activeEvents() as $event) {
+                $events[] = $event->getMongoArray(false);
+            }
 
-        $category['events'] = $events;
+            $category['events'] = $events;
+        }
 
         // locations
-        $locations = [];
-        foreach($this->activeLocations() as $location) {
-            $locations[] = $location->getMongoArray(false);
-        }
+        if ($includeRelationships) {
+            $locations = [];
+            foreach($this->activeLocations() as $location) {
+                $locations[] = $location->getMongoArray(false);
+            }
 
-        $category['locations'] = $locations;
+            $category['locations'] = $locations;
+        }
 
         return $category;
     }

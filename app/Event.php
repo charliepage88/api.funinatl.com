@@ -588,7 +588,7 @@ class Event extends Model implements HasMedia
     /**
      * Get Mongo Array
      *
-     * @param boolean $includeRelationships
+     * @param bool $includeRelationships
      *
      * @return array
      */
