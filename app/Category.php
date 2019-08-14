@@ -9,6 +9,7 @@ use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
+use App\Collections\CategoryCollection;
 use App\Traits\SlugExtend;
 
 class Category extends Model implements HasMedia
@@ -181,6 +182,18 @@ class Category extends Model implements HasMedia
     }
 
     /**
+    * Register Media Collections
+    *
+    * @return void
+    */
+    public function registerMediaCollections()
+    {
+        $this
+           ->addMediaCollection('categories')
+           ->useDisk('spaces');
+    }
+
+    /**
     * Should Be Searchable
     *
     * @return boolean
@@ -264,5 +277,16 @@ class Category extends Model implements HasMedia
         }
 
         return $category;
+    }
+
+    /**
+     * Create a new Eloquent Collection instance.
+     *
+     * @param  array  $models
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function newCollection(array $models = [])
+    {
+        return new CategoryCollection($models);
     }
 }

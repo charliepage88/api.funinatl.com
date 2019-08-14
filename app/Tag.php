@@ -4,6 +4,8 @@ namespace App;
 
 use Spatie\Tags\Tag as ParentModel;
 
+use App\Collections\TagCollection;
+
 use DB;
 
 class Tag extends ParentModel
@@ -100,5 +102,16 @@ class Tag extends ParentModel
     public function scopeBySlug($query, $slug)
     {
         return $query->where('slug->en', $slug)->first();
+    }
+
+    /**
+     * Create a new Eloquent Collection instance.
+     *
+     * @param  array  $models
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function newCollection(array $models = [])
+    {
+        return new TagCollection($models);
     }
 }

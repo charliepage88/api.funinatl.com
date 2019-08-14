@@ -14,7 +14,7 @@ use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Spatie\Tags\HasTags;
 
-use App\Tag;
+use App\Collections\LocationCollection;
 use App\Facades\Geocoder;
 use App\Traits\SlugExtend;
 
@@ -530,6 +530,18 @@ class Location extends Model implements HasMedia
     }
 
     /**
+    * Register Media Collections
+    *
+    * @return void
+    */
+    public function registerMediaCollections()
+    {
+        $this
+           ->addMediaCollection('locations')
+           ->useDisk('spaces');
+    }
+
+    /**
     * Register Media Conversions
     *
     * @param Media|null $media
@@ -539,11 +551,22 @@ class Location extends Model implements HasMedia
     public function registerMediaConversions(Media $media = null)
     {
         $this->addMediaConversion('thumb_small')
-              ->optimize()
-              ->fit(Manipulations::FIT_CROP, 96, 96);
+            ->optimize()
+            ->fit(Manipulations::FIT_CROP, 96, 96);
 
         $this->addMediaConversion('thumb_medium')
-              ->optimize()
-              ->fit(Manipulations::FIT_CROP, 128, 128);
+            ->optimize()
+            ->fit(Manipulations::FIT_CROP, 128, 128);
+    }
+
+    /**
+     * Create a new Eloquent Collection instance.
+     *
+     * @param  array  $models
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function newCollection(array $models = [])
+    {
+        return new LocationCollection($models);
     }
 }

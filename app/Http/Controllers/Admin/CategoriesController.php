@@ -46,7 +46,7 @@ class CategoriesController extends Controller
             $category->save();
 
             if ($request->has('photo')) {
-                $category->addMedia($request->file('photo'))->toMediaCollection('categories', 'spaces');
+                $category->addMedia($request->file('photo'))->toMediaCollection('categories');
             }
 
             if ($category->is_default) {
@@ -80,7 +80,7 @@ class CategoriesController extends Controller
             $category->save();
 
             if ($request->has('photo')) {
-                $category->addMedia($request->file('photo'))->toMediaCollection('categories', 'spaces');
+                $category->addMedia($request->file('photo'))->toMediaCollection('categories');
             }
 
             if ($category->is_default) {

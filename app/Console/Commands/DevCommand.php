@@ -38,7 +38,7 @@ class DevCommand extends Command
     /**
      * @var boolean
      */
-    public $enableSyncToSearch = false;
+    public $enableSyncToSearch = true;
 
     /**
      * @var boolean
@@ -53,7 +53,7 @@ class DevCommand extends Command
     public function handle()
     {
         // $this->flushMongo();
-        $this->syncSpotifyMusicBands();
+        // $this->syncSpotifyMusicBands();
 
         // $this->eventsWithoutPhoto();
         // $this->locationsWithoutPhoto();
@@ -61,8 +61,8 @@ class DevCommand extends Command
         // $this->regenerateEventSlugs();
 
         if ($this->enableSync) {
-            // $this->syncToMongo();
-            // $this->syncDataToS3();
+            $this->syncToMongo();
+            $this->syncDataToS3();
         }
     }
 
@@ -157,15 +157,77 @@ class DevCommand extends Command
     */
     public function syncMusicBands()
     {
-        $this->info('syncMusicBands');
+        $this->info('syncMusicBands -> start');
 
         $events = Event::shouldShow()->get();
+        $categories = Category::isActive()->get()->getList();
 
         foreach($events as $event) {
             if (!$event->bands()->count() && $event->category_id === 1) {
-                $this->info($event->name);
+                $message = $event->name . ' @ ';
+                $message .= $event->location->name . ' :: ' . $event->start_date->format('Y-m-d');
+
+                $this->info($message);
+
+                $bands = $this->ask('What are the band(s) for this event?');
+
+                switch ($bands) {
+                    case null:
+                        $this->info('Skipping event...');
+                    break;
+
+                    case 'category-other':
+                        $category = $categories['other'];
+
+                        $event->category_id = $category->id;
+
+                        $event->save();
+
+                        $this->info('Category saved to `' . $category->name . '`');
+                    break;
+
+                    case 'category-food-drinks':
+                        $category = $categories['food-drinks'];
+
+                        $event->category_id = $category->id;
+
+                        $event->save();
+
+                        $this->info('Category saved to `' . $category->name . '`');
+                    break;
+
+                    case 'category-comedy':
+                        $category = $categories['comedy'];
+
+                        $event->category_id = $category->id;
+
+                        $event->save();
+
+                        $this->info('Category saved to `' . $category->name . '`');
+                    break;
+
+                    case 'category-arts-theatre':
+                        $category = $categories['arts-theatre'];
+
+                        $event->category_id = $category->id;
+
+                        $event->save();
+
+                        $this->info('Category saved to `' . $category->name . '`');
+                    break;
+
+                    default:
+                        $ex = explode(',', $bands);
+
+                        $event->syncBands($ex);
+
+                        $this->info('Bands have been synced to event `' . $event->id . '`');
+                    break;
+                }
             }
         }
+
+        $this->info('syncMusicBands -> end');
     }
 
     /**

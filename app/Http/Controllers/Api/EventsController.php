@@ -66,7 +66,7 @@ class EventsController extends Controller
         $event->save();
 
         if ($request->has('photo')) {
-            $event->addMedia($request->file('photo'))->toMediaCollection('events', 'spaces');
+            $event->addMedia($request->file('photo'))->toMediaCollection('events');
         }
 
         if ($request->has('tags') && $request->input('tags') !== null) {

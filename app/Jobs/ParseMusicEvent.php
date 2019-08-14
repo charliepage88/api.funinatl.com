@@ -230,7 +230,7 @@ class ParseMusicEvent implements ShouldQueue
                             Storage::disk('local')->put($filename, $contents);
 
                             // then add the url
-                            $band->addMedia($tmpPath)->toMediaCollection('bands', 'spaces');
+                            $band->addMedia($tmpPath)->toMediaCollection('bands');
 
                             \Log::info('Uploaded image for band `' . $band->name . '`');
 
@@ -276,7 +276,7 @@ class ParseMusicEvent implements ShouldQueue
                 Storage::disk('local')->put($filename, $contents);
 
                 // then add the url
-                $event->addMedia($tmpPath)->toMediaCollection('events', 'spaces');
+                $event->addMedia($tmpPath)->toMediaCollection('events');
 
                 \Log::info('Uploaded image for event #' . $event->id);
 
@@ -314,7 +314,7 @@ class ParseMusicEvent implements ShouldQueue
         Storage::disk('local')->put($filename, $contents);
 
         // then attach file
-        $model->addMedia($tmpPath)->toMediaCollection($mediaCollection, 'spaces');
+        $model->addMedia($tmpPath)->toMediaCollection($mediaCollection);
 
         \Log::info('Uploaded image for #' . $model->id);
 

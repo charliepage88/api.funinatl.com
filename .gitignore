@@ -12,3 +12,4 @@ yarn-error.log
 /storage/search/*.index
 /public/css/*
 /public/js/*
+/storage/medialibrary/*

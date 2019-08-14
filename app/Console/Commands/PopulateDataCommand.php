@@ -46,7 +46,7 @@ class PopulateDataCommand extends Command
                 $path = storage_path('app/public') . '/' . $filename;
 
                 // then add the url
-                $category->addMedia($path)->toMediaCollection('categories', 'spaces');
+                $category->addMedia($path)->toMediaCollection('categories');
 
                 $this->info('Uploaded image for category `' . $category->name . '`');
             }

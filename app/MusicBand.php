@@ -129,6 +129,18 @@ class MusicBand extends Model implements HasMedia
     }
 
     /**
+    * Register Media Collections
+    *
+    * @return void
+    */
+    public function registerMediaCollections()
+    {
+        $this
+           ->addMediaCollection('bands')
+           ->useDisk('spaces');
+    }
+
+    /**
     * Get Spotify Url Attribute
     *
     * @return string|null

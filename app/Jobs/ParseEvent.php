@@ -156,7 +156,7 @@ class ParseEvent implements ShouldQueue
                 Storage::disk('local')->put($filename, $contents);
 
                 // then add the url
-                $event->addMedia($tmpPath)->toMediaCollection('events', 'spaces');
+                $event->addMedia($tmpPath)->toMediaCollection('events');
 
                 \Log::info('Uploaded image for event #' . $event->id);
 
@@ -176,7 +176,7 @@ class ParseEvent implements ShouldQueue
             Storage::disk('local')->put($filename, $contents);
 
             // then attach file
-            $event->addMedia($tmpPath)->toMediaCollection('events', 'spaces');
+            $event->addMedia($tmpPath)->toMediaCollection('events');
 
             \Log::info('Uploaded image for event #' . $event->id);
 

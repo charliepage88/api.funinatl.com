@@ -9,8 +9,10 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Str;
 use Jenssegers\Mongodb\Eloquent\HybridRelations;
 use ScoutElastic\Searchable;
+use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia\HasMedia;
 use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
+use Spatie\MediaLibrary\Models\Media;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Spatie\Tags\HasTags;
@@ -160,6 +162,15 @@ class Event extends Model implements HasMedia
                 'type' => 'boolean'
             ],
             'photo' => [
+                'type' => 'text'
+            ],
+            'thumb_mobile' => [
+                'type' => 'text'
+            ],
+            'thumb_tablet' => [
+                'type' => 'text'
+            ],
+            'thumb_desktop' => [
                 'type' => 'text'
             ],
             'created_at' => [
@@ -442,6 +453,60 @@ class Event extends Model implements HasMedia
     }
 
     /**
+    * Get Thumb Mobile Url Attribute
+    *
+    * @return stirng|null
+    */
+    public function getThumbMobileUrlAttribute()
+    {
+        $photos = $this->getMedia('events');
+
+        if ($photos->count()) {
+            $photo = env('DO_SPACES_URL') . '/' . $photos->first()->getPath('thumb_mobile');
+        } else {
+            $photo = null;
+        }
+
+        return $photo;
+    }
+
+    /**
+    * Get Thumb Tablet Url Attribute
+    *
+    * @return stirng|null
+    */
+    public function getThumbTabletUrlAttribute()
+    {
+        $photos = $this->getMedia('events');
+
+        if ($photos->count()) {
+            $photo = env('DO_SPACES_URL') . '/' . $photos->first()->getPath('thumb_tablet');
+        } else {
+            $photo = null;
+        }
+
+        return $photo;
+    }
+
+    /**
+    * Get Thumb Desktop Url Attribute
+    *
+    * @return stirng|null
+    */
+    public function getThumbDesktopUrlAttribute()
+    {
+        $photos = $this->getMedia('events');
+
+        if ($photos->count()) {
+            $photo = env('DO_SPACES_URL') . '/' . $photos->first()->getPath('thumb_desktop');
+        } else {
+            $photo = null;
+        }
+
+        return $photo;
+    }
+
+    /**
     * Get Tag Class Name
     *
     * @return string
@@ -565,6 +630,9 @@ class Event extends Model implements HasMedia
         }
 
         $event['photo'] = $this->photo_url;
+        $event['thumb_mobile_url'] = $this->thumb_mobile_url;
+        $event['thumb_tablet_url'] = $this->thumb_tablet_url;
+        $event['thumb_desktop_url'] = $this->thumb_desktop_url;
         $event['tags'] = $this->list_tags;
         $event['created_at'] = $this->created_at->toAtomString();
         $event['updated_at'] = $this->updated_at->toAtomString();
@@ -622,6 +690,9 @@ class Event extends Model implements HasMedia
         }
 
         $event['photo'] = $this->photo_url;
+        $event['thumb_mobile_url'] = $this->thumb_mobile_url;
+        $event['thumb_tablet_url'] = $this->thumb_tablet_url;
+        $event['thumb_desktop_url'] = $this->thumb_desktop_url;
         $event['tags'] = $this->list_tags;
         $event['created_at'] = $this->created_at->toAtomString();
         $event['updated_at'] = $this->updated_at->toAtomString();
@@ -759,6 +830,40 @@ class Event extends Model implements HasMedia
         }
 
         return $value;
+    }
+
+    /**
+    * Register Media Collections
+    *
+    * @return void
+    */
+    public function registerMediaCollections()
+    {
+        $this
+           ->addMediaCollection('events')
+           ->useDisk('spaces');
+    }
+
+    /**
+    * Register Media Conversions
+    *
+    * @param Media|null $media
+    *
+    * @return void
+    */
+    public function registerMediaConversions(Media $media = null)
+    {
+        $this->addMediaConversion('thumb_mobile')
+            ->optimize()
+            ->fit(Manipulations::FIT_CROP, 372, 250);
+
+        $this->addMediaConversion('thumb_tablet')
+            ->optimize()
+            ->fit(Manipulations::FIT_CROP, 726, 250);
+
+        $this->addMediaConversion('thumb_desktop')
+            ->optimize()
+            ->fit(Manipulations::FIT_CROP, 608, 250);
     }
 
     /**
