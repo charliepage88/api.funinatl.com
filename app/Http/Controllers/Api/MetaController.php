@@ -54,8 +54,6 @@ class MetaController extends Controller
         $pages = [
             '/about',
             '/contact',
-            '/get-listed',
-            '/submit-event',
             '/subscribe'
         ];
 
@@ -65,6 +63,23 @@ class MetaController extends Controller
                 'payload' => []
             ];
         }
+
+        // submit event page
+        $routes[] = [
+            'route' => '/submit-event',
+            'payload' => [
+                'locations' => $locations->getMongoArray(false),
+                'categories' => $categories->getMongoArray(false)
+            ]
+        ];
+
+        // get listed page
+        $routes[] = [
+            'route' => '/get-listed',
+            'payload' => [
+                'categories' => $categories->getMongoArray(false)
+            ]
+        ];
 
         // categories
         foreach($categories as $category) {
