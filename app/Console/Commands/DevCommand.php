@@ -53,6 +53,7 @@ class DevCommand extends Command
     public function handle()
     {
         // $this->flushMongo();
+        // $this->flushCache();
         // $this->syncSpotifyMusicBands();
 
         // $this->eventsWithoutPhoto();

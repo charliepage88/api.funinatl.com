@@ -41,12 +41,13 @@ class MetaController extends Controller
 
         $payload = Report::getEventsByPeriod($start_date, $end_date);
 
+        $locationsList = $payload['locations'];
+        $categoriesList = $payload['categories'];
+
         $routes[] = [
             'route' => '/',
             'payload' => [
-                'eventsByPeriod' => $payload,
-                'locations' => $locations->getMongoArray(false),
-                'categories' => $categories->getMongoArray(false)
+                'eventsByPeriod' => $payload
             ]
         ];
 
@@ -68,8 +69,8 @@ class MetaController extends Controller
         $routes[] = [
             'route' => '/submit-event',
             'payload' => [
-                'locations' => $locations->getMongoArray(false),
-                'categories' => $categories->getMongoArray(false)
+                'locations' => $locationsList,
+                'categories' => $categoriesList
             ]
         ];
 
@@ -77,7 +78,7 @@ class MetaController extends Controller
         $routes[] = [
             'route' => '/get-listed',
             'payload' => [
-                'categories' => $categories->getMongoArray(false)
+                'categories' => $categoriesList
             ]
         ];
 

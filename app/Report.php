@@ -278,7 +278,7 @@ class Report extends Model
                 if (!empty($category->id)) {
                     $query->where('category_id', '=', $category->id);
 
-                    $response['category'] = $category->toSearchableArray();
+                    $response['category'] = $category->getMongoArray(false);
                 } else {
                     return $errorResponse('category');
                 }
@@ -291,7 +291,7 @@ class Report extends Model
                 if (!empty($location)) {
                     $query->where('location_id', '=', $location->id);
 
-                    $response['location'] = $location->toSearchableArray();
+                    $response['location'] = $location->getMongoArray(false);
                 }
             }
 
@@ -304,9 +304,19 @@ class Report extends Model
 
                     $query->whereIn('id', $eventIds);
 
-                    $response['tag'] = $tag->toSearchableArray();
+                    $response['tag'] = $tag->getMongoArray(false);
                 }
             }
+        }
+
+        // if event index, append list of locations
+        // and categories
+        if (empty($response)) {
+            $categories = Category::isActive()->get();
+            $locations = Location::isActive()->get();
+
+            $response['categories'] = $categories->getMongoArray(false);
+            $response['locations'] = $locations->getMongoArray(false);
         }
 
         // get the events data
@@ -452,11 +462,7 @@ class Report extends Model
             }
         }
 
-        if (!empty($response)) {
-            $response['events'] = $results;
-        } else {
-            $response = $results;
-        }
+        $response['events'] = $results;
 
         return $response;
     }
