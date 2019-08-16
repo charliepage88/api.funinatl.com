@@ -630,9 +630,9 @@ class Event extends Model implements HasMedia
         }
 
         $event['photo'] = $this->photo_url;
-        $event['thumb_mobile_url'] = $this->thumb_mobile_url;
-        $event['thumb_tablet_url'] = $this->thumb_tablet_url;
-        $event['thumb_desktop_url'] = $this->thumb_desktop_url;
+        $event['thumb_mobile'] = $this->thumb_mobile_url;
+        $event['thumb_tablet'] = $this->thumb_tablet_url;
+        $event['thumb_desktop'] = $this->thumb_desktop_url;
         $event['tags'] = $this->list_tags;
         $event['created_at'] = $this->created_at->toAtomString();
         $event['updated_at'] = $this->updated_at->toAtomString();
@@ -690,9 +690,9 @@ class Event extends Model implements HasMedia
         }
 
         $event['photo'] = $this->photo_url;
-        $event['thumb_mobile_url'] = $this->thumb_mobile_url;
-        $event['thumb_tablet_url'] = $this->thumb_tablet_url;
-        $event['thumb_desktop_url'] = $this->thumb_desktop_url;
+        $event['thumb_mobile'] = $this->thumb_mobile_url;
+        $event['thumb_tablet'] = $this->thumb_tablet_url;
+        $event['thumb_desktop'] = $this->thumb_desktop_url;
         $event['tags'] = $this->list_tags;
         $event['created_at'] = $this->created_at->toAtomString();
         $event['updated_at'] = $this->updated_at->toAtomString();
