@@ -321,7 +321,7 @@ class PopulateEventsCommand extends Command
             if (strstr($html, '<br>')) {
                 $name = str_replace('<br>', ', ', $html);
 
-                $event['name'] = Str::title(trim($name));
+                $event['name'] = $name;
 
                 // collect band names
                 $ex = explode('<br>', $html);
@@ -336,9 +336,9 @@ class PopulateEventsCommand extends Command
                     }
                 }
             } else {
-                $event['name'] = Str::title(trim($info->text()));
+                $event['name'] = $info->text();
 
-                $event['bands'][] = $event['name'];
+                $event['bands'][] = Str::title(trim($event['name']));
             }
 
             // look for other info attached to event
@@ -346,7 +346,7 @@ class PopulateEventsCommand extends Command
                 $info = trim($node->filter('.schedule-show-event-title')->text());
 
                 if (!empty($info)) {
-                    $event['name'] .= ', ' . Str::title($info);
+                    $event['name'] .= ', ' . $info;
                 }
             } catch (\Exception $e) {
 
@@ -725,7 +725,11 @@ class PopulateEventsCommand extends Command
             }
 
             try {
-                $event['description'] = $node->filter('.middle-info > p')->text();
+                $info = trim($node->filter('.middle-info > p')->text());
+
+                if (!empty($info)) {
+                    $event['description'] = $info;
+                }
             } catch (\Exception $e) {
                 // do nothing
             }
@@ -989,7 +993,7 @@ class PopulateEventsCommand extends Command
                 // parse event name
                 if (strstr(strtolower($event['name']), 'festival')) {
                     $event['event_type_id'] = $eventTypes['festival']->id;
-                    $event['name'] = Str::title($event['name']);
+                    $event['name'] = $event['name'];
 
                     $addHeadliners = false;
                 }

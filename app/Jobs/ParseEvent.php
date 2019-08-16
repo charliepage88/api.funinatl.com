@@ -64,6 +64,11 @@ class ParseEvent implements ShouldQueue
 
             $event->fill($data);
 
+            // set filtered values
+            $event->name = $event->generateName();
+            $event->short_description = $event->generateShortDescription();
+            $event->description = $event->generateDescription();
+
             // if family friendly value not set, use location default
             if (!isset($data['is_family_friendly'])) {
                 $event->is_family_friendly = $event->location->is_family_friendly;
@@ -105,6 +110,11 @@ class ParseEvent implements ShouldQueue
 
             if (!empty($dataToSave)) {
                 $find->fill($dataToSave);
+
+                // set filtered values
+                $find->name = $find->generateName();
+                $find->short_description = $find->generateShortDescription();
+                $find->description = $find->generateDescription();
 
                 $find->save();
             }

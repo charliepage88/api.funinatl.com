@@ -26,7 +26,7 @@ class DevCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'dev';
+    protected $signature = 'dev {action?} {params?}';
 
     /**
      * The console command description.
@@ -52,19 +52,33 @@ class DevCommand extends Command
      */
     public function handle()
     {
-        // $this->flushMongo();
-        // $this->flushCache();
-        // $this->syncSpotifyMusicBands();
+        // can call methods directly
+        $action = $this->argument('action');
+        if (!empty($action)) {
+            $methodName = Str::camel($action);
 
-        // $this->eventsWithoutPhoto();
-        // $this->locationsWithoutPhoto();
-        // $this->syncMusicBands();
-        // $this->regenerateEventSlugs();
+            if (method_exists($this, $methodName)) {
+                $params = $this->argument('params');
 
-        if ($this->enableSync) {
-            $this->syncToMongo();
-            $this->syncDataToS3();
+                if (!empty($params)) {
+                    $ex = explode(',', $params);
+
+                    $this->$methodName(...$ex);
+                } else {
+                    $this->$methodName();
+                }
+
+                return true;
+            } else {
+                $this->error('Cannot find method name `' . $methodName . '`');
+
+                return false;
+            }
         }
+
+        // if no method called directly
+        // let's sync
+        $this->sync();
     }
 
     /**
@@ -340,9 +354,12 @@ class DevCommand extends Command
     /**
     * Create Cache
     *
+    * @param string|null $apiUrl
+    * @param string|null $start_at_url
+    *
     * @return void
     */
-    public function createCache()
+    public function createCache($apiUrl = null, $start_at_url = null)
     {
         // init vars
         $client = new Guzzle;
@@ -396,7 +413,10 @@ class DevCommand extends Command
             $eventDates[] = $date->copy();
         }
 
-        $apiUrl = config('app.url');
+        if (empty($apiUrl)) {
+            $apiUrl = config('app.url');
+        }
+
         $urls = [];
 
         // category urls
@@ -447,6 +467,27 @@ class DevCommand extends Command
             $url .= '/' . $firstDate->format('Y-m-d') . '/' . $lastDate;
 
             $urls[] = $url;
+        }
+
+        // if error occurred, let's
+        // not redo ALL of the url's
+        if (!empty($start_at_url)) {
+            $find = array_search($start_at_url, $urls);
+
+            if ($find === false) {
+                $this->error('Cannot find url `' . $start_at_url . '` to start caching at.');
+
+                return false;
+            } else {
+                $newUrls = [];
+                foreach($urls as $key => $url) {
+                    if ($key >= $find) {
+                        $newUrls[] = $url;
+                    }
+                }
+
+                $urls = $newUrls;
+            }
         }
 
         // hit URLs to generate cache
@@ -678,6 +719,217 @@ class DevCommand extends Command
             } else {
                 $this->info($fullName . ' synced to Mongo. ' . $changesCount . ' total changes.');
             }
+        }
+    }
+
+    /**
+    * Sync
+    *
+    * @return void
+    */
+    public function sync()
+    {
+        $this->info('sync');
+
+        if ($this->enableSync) {
+            $this->syncToMongo();
+            $this->syncDataToS3();
+        }
+    }
+
+    /**
+    * List
+    *
+    * @return void
+    */
+    public function list()
+    {
+        $this->info('list');
+
+        $findMethods = get_class_methods($this);
+        $methods = [];
+
+        foreach($findMethods as $methodName) {
+            if ($methodName === '__construct') {
+                break;
+            } else {
+                if ($methodName !== 'handle') {
+                    $methods[] = $methodName;
+                }
+            }
+        }
+
+        $headers = [
+            'Method'
+        ];
+        $body = [];
+        foreach($methods as $methodName) {
+            $row = [
+                $methodName
+            ];
+
+            $reflection = new \ReflectionMethod($this, $methodName);
+            $params = $reflection->getParameters();
+            $paramsList = [];
+            foreach ($params as $param) {
+                $paramsList[] = true;
+
+                $row[] = $param->getName();
+                $row[] = !$param->isOptional() ? 'Yes' : 'No';
+            }
+
+            if (!empty($paramsList)) {
+                foreach($paramsList as $key => $value) {
+                    $i = ($key + 1);
+
+                    $headers[] = 'Param Name (' . $i . ')';
+                    $headers[] = 'Param Required (' . $i . ')';
+                }
+            }
+
+            $body[] = $row;
+        }
+
+        $this->table($headers, $body);
+    }
+
+    /**
+    * Fix Event Info
+    *
+    * @return void
+    */
+    public function fixEventInfo()
+    {
+        $this->info('fixEventInfo');
+
+        // method to replace event url with default
+        $replacePhotoWithDefault = function ($event) {
+            // get url
+            $categoryPhotoUrl = $event->category->photo_url;
+
+            // get category image
+            $contents = file_get_contents($categoryPhotoUrl);
+
+            // store locally
+            $filename = $event->id . '-' . $event->slug . '.jpg';
+            $tmpPath = storage_path('app') . '/' . $filename;
+
+            Storage::disk('local')->put($filename, $contents);
+
+            // then attach file
+            $event->addMedia($tmpPath)->toMediaCollection('events');
+
+            return $event;
+        };
+
+        // get events
+        $events = Event::with('category')->shouldShow()->get();
+
+        $regenerateMediaIds = [];
+        foreach($events as $key => $event) {
+            $this->info('Processing event #' . $event->id);
+
+            // fix images that are too small
+            // try to fit instead of crop
+            try {
+                list($width, $height) = getimagesize($event->photo_url);
+
+                if ($width < 250 || $height < 150) {
+                    $this->info('Replace photo with category default....');
+
+                    $event = $replacePhotoWithDefault($event);
+
+                    $this->info('DONE Replacing photo with category default....');
+                } else {
+                    if ($width < 726 || $height < 250) {
+                        $regenerateMediaIds[] = $event->getMedia('events')->first()->id;
+
+                        $this->info('Should regenerate url `' . $event->photo_url . '` and conversions.');
+                    } else {
+                        $this->info('Skipping....' . $width . ' x ' . $height);
+                    }
+                }
+            } catch(\Exception $e) {
+                $this->error($e->getMessage());
+            }
+
+            // fix event descriptions so they are
+            // mostly consistent
+            $shouldSave = false;
+
+            // short description first
+            $infoShort = $event->short_description;
+            $regenerateInfoShort = false;
+
+            if (!empty($infoShort)) {
+                $infoShortLength = strlen($infoShort);
+
+                if ($infoShortLength < 100) {
+                    $regenerateInfoShort = true;
+                }
+            } else {
+                $regenerateInfoShort = true;
+            }
+
+            // then description
+            $infoLong = $event->description;
+            $regenerateInfoLong = false;
+
+            if (!empty($infoLong)) {
+                $infoLongLength = strlen($infoLong);
+
+                if ($infoLongLength < 100) {
+                    $regenerateInfoLong = true;
+                }
+            } else {
+                $regenerateInfoLong = true;
+            }
+
+            // regenerate name & slug
+            // if the generated value is different
+            $newName = $event->generateName();
+
+            if ($newName !== $event->name) {
+                $event->name = $newName;
+                $event->generateSlug();
+
+                $shouldSave = true;
+            }
+
+            // now figure out the short description
+            if ($regenerateInfoShort) {
+                $event->generateShortDescription();
+
+                $shouldSave = true;
+            }
+
+            // and figure out the long description
+            if ($regenerateInfoLong) {
+                $event->generateDescription();
+
+                $shouldSave = true;
+            }
+
+            if ($shouldSave) {
+                $event->save();
+            }
+
+            // sleep
+            if ($key > 0 && ($key % 15 === 0)) {
+                $this->info('Sleeping for 2 seconds...');
+
+                sleep(2);
+            }
+        }
+
+        if (!empty($regenerateMediaIds)) {
+            $this->info(count($regenerateMediaIds) . ' images set to be regenerated.');
+
+            $this->call('medialibrary:regenerate', [
+                '--ids' => implode(',', $regenerateMediaIds)
+            ]);
+        } else {
+            $this->info('No images needed to regenerate.');
         }
     }
 }

@@ -80,6 +80,16 @@ class Event extends Model implements HasMedia
     ];
 
     /**
+    * @var string
+    */
+    public $locationName;
+
+    /**
+    * @var string
+    */
+    public $categoryName;
+
+    /**
     * @var boolean
     */
     public $asYouType = true;
@@ -853,17 +863,45 @@ class Event extends Model implements HasMedia
     */
     public function registerMediaConversions(Media $media = null)
     {
-        $this->addMediaConversion('thumb_mobile')
-            ->optimize()
-            ->fit(Manipulations::FIT_CROP, 372, 250);
+        $useDefaults = true;
+        if (!empty($media)) {
+            $url = env('DO_SPACES_URL') . '/' . $media->getPath('thumb_mobile');
 
-        $this->addMediaConversion('thumb_tablet')
-            ->optimize()
-            ->fit(Manipulations::FIT_CROP, 726, 250);
+            list($width, $height) = getimagesize($event->photo_url);
 
-        $this->addMediaConversion('thumb_desktop')
-            ->optimize()
-            ->fit(Manipulations::FIT_CROP, 608, 250);
+            if ($width < 726 || $height < 250) {
+                $useDefaults = false;
+            }
+        }
+
+        if ($useDefaults) {
+            $this->addMediaConversion('thumb_mobile')
+                ->optimize()
+                ->fit(Manipulations::FIT_CROP, 372, 250);
+
+            $this->addMediaConversion('thumb_tablet')
+                ->optimize()
+                ->fit(Manipulations::FIT_CROP, 726, 250);
+
+            $this->addMediaConversion('thumb_desktop')
+                ->optimize()
+                ->fit(Manipulations::FIT_CROP, 608, 250);
+        } else {
+            $this->addMediaConversion('thumb_mobile')
+                ->optimize()
+                ->fit(Manipulations::FIT_FILL, 372, 250)
+                ->background('000000');
+
+            $this->addMediaConversion('thumb_tablet')
+                ->optimize()
+                ->fit(Manipulations::FIT_FILL, 726, 250)
+                ->background('000000');
+
+            $this->addMediaConversion('thumb_desktop')
+                ->optimize()
+                ->fit(Manipulations::FIT_FILL, 608, 250)
+                ->background('000000');
+        }
     }
 
     /**
@@ -875,5 +913,243 @@ class Event extends Model implements HasMedia
     public function newCollection(array $models = [])
     {
         return new EventCollection($models);
+    }
+
+    /**
+    * Get Similar Event Attribute
+    *
+    * @param string $attribute
+    *
+    * @return null|string
+    */
+    public function getSimilarEventAttribute($attribute)
+    {
+        // init var
+        $value = null;
+
+        // do the query
+        $query = Event::where('name', '=', $this->name)
+            ->where('start_date', '=', $this->start_date)
+            ->where('location_id', '=', $this->location_id)
+            ->where('category_id', '=', $this->category_id);
+
+        if (!empty($this->id)) {
+            $query->where('id', '!=', $this->id);
+        }
+
+        $lookup = $query->first();
+
+        if (!empty($lookup)) {
+            $value = $lookup->$attribute;
+        }
+
+        return $value;
+    }
+
+    /**
+    * Get Location Name
+    *
+    * @return string
+    */
+    public function getLocationName()
+    {
+        // see if location name set already
+        if (!empty($this->locationName)) {
+            return $this->locationName;
+        }
+
+        // lookup location name
+        if (empty($this->location)) {
+            $location = Location::find($this->location_id);
+        } else {
+            $location = $this->location;
+        }
+
+        $this->locationName = $location->name;
+
+        return $this->locationName;
+    }
+
+    /**
+    * Get Category Name
+    *
+    * @return string
+    */
+    public function getCategoryName()
+    {
+        // see if category name set already
+        if (!empty($this->categoryName)) {
+            return $this->categoryName;
+        }
+
+        // lookup category name
+        if (empty($this->category)) {
+            $category = Category::find($this->category_id);
+        } else {
+            $category = $this->category;
+        }
+
+        $this->categoryName = $category->name;
+
+        return $this->categoryName;
+    }
+
+    /**
+    * Generate Name
+    *
+    * @return string
+    */
+    public function generateName()
+    {
+        // init vars
+        $name = strtolower(trim($this->name));
+        $maxNameLength = 65;
+
+        // replace characters we don't want
+        // and other words
+        $find = [
+            '’'
+        ];
+
+        $name = str_replace($find, '', $name);
+
+        // check for "at Location" string
+        // and other similar checks
+        if (!empty($this->location_id)) {
+            $locationName = $this->getLocationName();
+
+            $replacements = [
+                $locationName . " presents ",
+                $locationName . "'s presents ",
+                " at " . $locationName,
+                " at " . $locationName . "'s",
+            ];
+
+            $name = str_replace($replacements, '', $name);
+        }
+
+        // max length for name
+        $newNameLength = strlen($name);
+        if ($newNameLength >= $maxNameLength) {
+            \Log::error('Event `' . $this->id . '` has generated name `' . $name . '` which is longer than the max. Length: ' . $newNameLength . ' :: Max Length: ' . $maxNameLength);
+        }
+
+        return Str::title($name);
+    }
+
+    /**
+    * Generate Short Description
+    *
+    * @param array $bands
+    *
+    * @return string
+    */
+    public function generateShortDescription($bands = [])
+    {
+        // init vars
+        $name = $this->name;
+        $description = trim($this->short_description);
+        $minLength = 100;
+        $maxLength = 150;
+
+        // method to generate description text
+        $event = $this;
+        $getDescription = function () use ($bands, $event) {
+            $time = $event->start_time;
+            $locationName = $event->getLocationName();
+            $date = $event->start_date->format('l, F jS');
+
+            if (!empty($bands)) {
+                $description = 'See live music at ' . $locationName . ' on ' . $date . ' at ' . $event->start_time . ' with bands including ' . implode(', ', $bands) . '.';
+            } else {
+                $categoryName = $event->getCategoryName();
+
+                if ($categoryName === 'Other') {
+                    $description = 'On ' . $date . ' at ' . $time . ', go check out this event at ' . $locationName . '!';
+                } else {
+                    $description = 'On ' . $date . ' at ' . $time . ', enjoy ' . $categoryName . ' with this event at ' . $locationName;
+                }
+            }
+
+            return $description;
+        };
+
+        // look for existing event with same name
+        // if there is one, use the description from that
+        $lookup = $this->getSimilarEventAttribute('short_description');
+
+        if (!empty($lookup)) {
+            $description = $lookup;
+        }
+
+        // does event have description, but not a short one?
+        if (empty($description) && !empty($this->description)) {
+            $description = Str::limit($this->description, 150);
+        }
+
+        // if no description, let's generate one
+        if (empty($description)) {
+            $description = $getDescription();
+        }
+
+        // check max/min length
+        $newDescriptionLength = strlen($description);
+
+        if ($newDescriptionLength < $minLength) {
+            $description = $getDescription();
+        }
+
+        if ($newDescriptionLength > $maxLength) {
+            $description = $getDescription();
+        }
+
+        // debugging for check length
+        if ($newDescriptionLength < $minLength) {
+            \Log::error('Event `' . $this->id . '` has generated short description `' . $description . '` which is less than the minimum. Length: ' . $newDescriptionLength . ' :: Min Length: ' . $minLength);
+        }
+
+        if ($newDescriptionLength > $maxLength) {
+            \Log::error('Event `' . $this->id . '` has generated short description `' . $description . '` which is longer than the max. Length: ' . $newDescriptionLength . ' :: Max Length: ' . $maxLength);
+        }
+
+        return $description;
+    }
+
+    /**
+    * Generate Description
+    *
+    * @param array $bands
+    *
+    * @return string
+    */
+    public function generateDescription($bands = [])
+    {
+        // init vars
+        $name = $this->name;
+        $description = trim($this->description);
+        $minLength = 100;
+        $maxLength = 250;
+
+        // look for existing event with same name
+        // if there is one, use the description from that
+        $lookup = $this->getSimilarEventAttribute('description');
+
+        if (!empty($lookup)) {
+            $description = $lookup;
+        }
+
+        // check max/min length
+        $newDescriptionLength = strlen($description);
+
+        // debugging for check length
+        if ($newDescriptionLength < $minLength) {
+            \Log::error('Event `' . $this->id . '` has generated description `' . $description . '` which is less than the minimum. Length: ' . $newDescriptionLength . ' :: Min Length: ' . $minLength);
+        }
+
+        if ($newDescriptionLength > $maxLength) {
+            \Log::error('Event `' . $this->id . '` has generated description `' . $description . '` which is longer than the max. Length: ' . $newDescriptionLength . ' :: Max Length: ' . $maxLength);
+        }
+
+        return $description;
     }
 }

@@ -86,6 +86,11 @@ class ParseMusicEvent implements ShouldQueue
 
             $event->fill($data);
 
+            // set filtered values
+            $event->name = $event->generateName();
+            $event->short_description = $event->generateShortDescription($bands);
+            $event->description = $event->generateDescription($bands);
+
             // if family friendly value not set, use location default
             if (!isset($data['is_family_friendly'])) {
                 $event->is_family_friendly = $event->location->is_family_friendly;
@@ -131,9 +136,21 @@ class ParseMusicEvent implements ShouldQueue
                 }
             }
 
+            // get bands
+            if (!empty($this->event['bands'])) {
+                $bands = $this->event['bands'];
+            } else {
+                $bands = [];
+            }
+
             // save event data
             if (!empty($dataToSave)) {
                 $find->fill($dataToSave);
+
+                // set filtered values
+                $find->name = $find->generateName();
+                $find->short_description = $find->generateShortDescription($bands);
+                $find->description = $find->generateDescription($bands);
 
                 $find->save();
             }
@@ -144,7 +161,7 @@ class ParseMusicEvent implements ShouldQueue
             }
 
             // sync bands
-            if (!empty($this->event['bands'])) {
+            if (!empty($bands)) {
                 $find->syncBands($this->event['bands']);
             }
 
