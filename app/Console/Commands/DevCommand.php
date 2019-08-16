@@ -609,6 +609,8 @@ class DevCommand extends Command
 
                     $this->info('Inserted ' . $name . ' #' . $item->id . ' into MongoDB.');
                 } else {
+                    $shouldUpdate = false;
+
                     // get value from local DB
                     $value = $item->getMongoArray(false);
 
@@ -634,16 +636,26 @@ class DevCommand extends Command
                         }   
                     }
 
-                    // compare values via json_encode
-                    $diff = array_diff(
-                        array_map('json_encode', $mongoValue),
-                        array_map('json_encode', $value)
-                    );
+                    // compare keys to see if model needs
+                    // to be updated
+                    $isMongoMissingKeys = array_diff($valueKeys, $mongoKeys);
 
-                    // json decode diff result
-                    $diff = array_map('json_decode', $diff);
+                    if (!empty($isMongoMissingKeys)) {
+                        $shouldUpdate = true;
+                    }
 
-                    if (!empty($diff)) {
+                    if (!$shouldUpdate) {
+                        // compare values via json_encode
+                        $diff = array_diff(
+                            array_map('json_encode', $mongoValue),
+                            array_map('json_encode', $value)
+                        );
+
+                        // json decode diff result
+                        $shouldUpdate = array_map('json_decode', $diff);
+                    }
+
+                    if ($shouldUpdate) {
                         $changesCount++;
 
                         DB::connection('mongodb')
