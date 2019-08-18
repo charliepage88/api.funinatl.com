@@ -58,24 +58,23 @@ class PopulateEventsCommand extends Command
         $this->today = Carbon::today()->startOfDay();
 
         $providers = Provider::isActive()
-            ->where('last_scraped', '<=', $this->today->format('Y-m-d H:i:s'))
-            // ->where('id', '=', 9)
-            ->orWhereNull('last_scraped')
+            // ->where('last_scraped', '<=', $this->today->format('Y-m-d H:i:s'))
+            ->where('id', '=', 2)
+            // ->orWhereNull('last_scraped')
             ->get();
 
+        /*
         // see if checksums need to be regenerated
-        $key = 'provider_checksums';
         $keyDate = 'provider_checksums_date';
         $skipGenerateChecksum = false;
-        if (!Cache::get($key) || !Cache::get($keyDate)) {
+        if (!Cache::has($keyDate)) {
             $this->regenerateChecksums($providers);
 
             $skipGenerateChecksum = true;
         } else {
-            $cacheValue = Cache::get($key);
             $cacheDate = Cache::get($keyDate);
 
-            if (empty($cacheValue) || empty($cacheDate)) {
+            if (empty($cacheDate)) {
                 $this->regenerateChecksums($providers);
 
                 $skipGenerateChecksum = true;
@@ -90,6 +89,7 @@ class PopulateEventsCommand extends Command
                 }
             }
         }
+        */
 
         // loop through providers
         $scraper = new WebScraper;
@@ -105,6 +105,7 @@ class PopulateEventsCommand extends Command
             $methodName = Str::camel('provider' . $providerName);
 
             if (method_exists($this, $methodName)) {
+                /*
                 // checksum
 
                 $key = 'provider_' . $provider->slug;
@@ -125,18 +126,14 @@ class PopulateEventsCommand extends Command
                             continue;
                         }
                     }
-                }
+                }*/
 
                 // call method
                 $this->info('Starting scraper for `' . $name . '`');
 
                 $events = $this->$methodName($provider, $scraper, $spotify);
 
-                if (!Cache::has($key) || !Cache::has($keyDate)) {
-                    $this->createChecksum($provider, $events);
-                } else {
-                    $this->updateChecksum($provider, $events);
-                }
+                // $this->createChecksum($provider, $events);
             } else {
                 $this->error('Cannot find method name `' . $methodName . '`');
             }
@@ -472,7 +469,7 @@ class PopulateEventsCommand extends Command
 
                 $isEarlyShows = (!empty($monthAndYear) && in_array($monthAndYear, $possibleValues));
             } catch (\Exception $e) {
-
+                // do nothing
             }
 
             if ($isEarlyShows) {
@@ -712,6 +709,25 @@ class PopulateEventsCommand extends Command
                 'bands' => []
             ];
 
+            // get website
+            $event['website'] = rtrim($node->filter('.right-buttons > a.more')->attr('href'), '/');
+
+            // check if event is cancelled
+            try {
+                $buttonText = trim($node->filter('.right-buttons > a.button')->text());
+                $buttonText = strtolower($buttonText);
+
+                if (!empty($buttonText) && $buttonText === 'cancelled') {
+                    $event['is_cancelled'] = true;
+                }
+            } catch (\Exception $e) {
+                // do nothing
+            }
+
+            if (isset($event['is_cancelled'])) {
+                return $event;
+            }
+
             // get band name & other bands
             $event['name'] = trim($node->filter('.middle-info > .headliner a')->text());
 
@@ -766,23 +782,41 @@ class PopulateEventsCommand extends Command
                 }
 
                 if (!empty($row['time'])) {
-                    $ex = explode('  ', $row['time']);
+                    $ex = explode(' ', $row['time']);
 
-                    $dateObj = Carbon::parse($event['start_date'] . ' ' . $ex[1]);
+                    $firstTime = null;
+                    foreach($ex as $part) {
+                        if (!empty($part) && (strstr($part, 'PM') || strstr($part, 'AM'))) {
+                            $firstTime = trim($part);
 
-                    $event['start_time'] = $dateObj->format('g:i A');
-                    $event['end_time'] = $dateObj->copy()->addHours(3)->format('g:i A');
+                            break;
+                        }
+                    }
+
+                    if (!empty($firstTime)) {
+                        $dateObj = Carbon::parse($event['start_date'] . ' ' . $firstTime);
+
+                        $event['start_time'] = $dateObj->format('g:i A');
+                        $event['end_time'] = $dateObj->copy()->addHours(3)->format('g:i A');
+                    } else {
+                        dd($details);
+                    }
                 }
             }
 
-            // get date & website
+            // get date
             $event['start_date'] = trim($node->filter('.right-buttons > .date')->text());
             $event['start_date'] = Carbon::parse($event['start_date'])->format('Y-m-d');
 
-            $event['website'] = rtrim($node->filter('.right-buttons > a.more')->attr('href'), '/');
-
             return $event;
         });
+
+        // filter out cancelled events
+        foreach($events as $key => $event) {
+            if (isset($event['is_cancelled'])) {
+                unset($events[$key]);
+            }
+        }
 
         $this->info(count($events) . ' events found for provider `' . $provider->name . '`');
 
@@ -916,19 +950,39 @@ class PopulateEventsCommand extends Command
 
                     $event['start_time'] = $dateObj->format('g:i A');
                     $event['end_time'] = $dateObj->copy()->addHours(3)->format('g:i A');
-                } elseif (strstr($value, 'Weekend Pass')) {
+                } elseif (strstr($valueLower, 'weekend pass')) {
                     $event['event_type_id'] = $eventTypes['festival']->id;
 
                     $prices = str_replace('Weekend Pass ', '', $value);
 
-                    $ex = explode('/', $prices);
+                    if (strstr($prices, '/')) {
+                        $ex = explode('/', $prices);
 
-                    $price = trim(str_replace($findToReplace, '', $ex[1]));
+                        $price = trim(str_replace($findToReplace, '', $ex[1]));
 
-                    if (!empty($event['price'])) {
-                        $event['price'] = $event['price'] . ' - ' . $price;
-                    } else {
-                        $event['price'] = $price;
+                        if (!empty($event['price'])) {
+                            $event['price'] = $event['price'] . ' - ' . $price;
+                        } else {
+                            $event['price'] = $price;
+                        }
+                    }
+
+                    if (strstr($prices, ' or ')) {
+                        $ex = explode(' or ', $prices);
+
+                        if (isset($ex[0])) {
+                            $event['price'] = trim(str_replace(' per day', '', $ex[0]));
+                        }
+
+                        if (isset($ex[1])) {
+                            $ex[1] = trim(str_replace('Weekend Pass', '', $ex[1]));
+
+                            if (!empty($event['price'])) {
+                                $event['price'] .= ' - ' . $ex[1];
+                            } else {
+                                $event['price'] = $ex[1];
+                            }
+                        }
                     }
 
                     $addHeadliners = false;
@@ -1790,20 +1844,15 @@ class PopulateEventsCommand extends Command
     */
     private function createChecksum(Provider $provider, array $data)
     {
+        // get hash
+        $hash = md5(array_map('json_decode', $data));
 
-    }
+        // store cache
+        $key = 'provider_' . $provider->slug;
+        $keyDate = 'provider_' . $provider->slug . '_date';
 
-    /**
-    * Update Checksum
-    *
-    * @param Provider $provider
-    * @param array    $data
-    *
-    * @return void
-    */
-    private function updateChecksum(Provider $provider, array $data)
-    {
-
+        Cache::put($key, $hash);
+        Cache::put($keyDate, Carbon::now()->format('Y-m-d H:i:s'));
     }
 
     /**
@@ -1817,6 +1866,7 @@ class PopulateEventsCommand extends Command
     {
         $this->info('regenerateChecksums -> start');
 
+        // regenerate checksums
         foreach($providers as $provider) {
             $events = [];
             foreach($provider->location->events as $event) {
@@ -1825,6 +1875,12 @@ class PopulateEventsCommand extends Command
 
             $this->createChecksum($provider, $events);
         }
+
+        // set cache
+        $keyDate = 'provider_checksums_date';
+        $date = Carbon::now()->format('Y-m-d H:i:s');
+
+        Cache::put($keyDate, $date);
 
         $this->info('regenerateChecksums -> end');
     }

@@ -13,6 +13,7 @@ use App\Event;
 use App\Location;
 use App\MusicBand;
 use App\Tag;
+use App\Jobs\Events\AssignCategoryPhoto;
 
 use Cache;
 use DB;
@@ -174,7 +175,7 @@ class DevCommand extends Command
     {
         $this->info('syncMusicBands -> start');
 
-        $events = Event::shouldShow()->get();
+        $events = Event::isActive()->get();
         $categories = Category::isActive()->get()->getList();
 
         foreach($events as $event) {
@@ -361,11 +362,27 @@ class DevCommand extends Command
     */
     public function createCache($apiUrl = null, $start_at_url = null)
     {
+        // get data
+
+        // events
+        $events = Event::isActive()
+            ->orderBy('start_date', 'asc')
+            ->get();
+
+        // categories
+        $categories = Category::isActive()->get();
+
+        // location events
+        $locations = Location::isActive()->get();
+
+        // tags
+        $tags = Tag::all();
+
         // init vars
         $client = new Guzzle;
 
         // get first event
-        $firstEvent = Event::shouldShow()->orderBy('start_date', 'asc')->first();
+        $firstEvent = $events->first();
 
         $startDate = $firstEvent->start_date;
 
@@ -385,22 +402,6 @@ class DevCommand extends Command
                 $this->error('Error Hitting URL: `' . $url . '`. Status Code: ' . $statusCode);
             }
         };
-
-        // get data
-
-        // events
-        $events = Event::shouldShow()
-            ->orderBy('start_date', 'asc')
-            ->get();
-
-        // categories
-        $categories = Category::isActive()->get();
-
-        // location events
-        $locations = Location::isActive()->get();
-
-        // tags
-        $tags = Tag::all();
 
         // collect all possible date values
         $dates = [];
@@ -612,7 +613,7 @@ class DevCommand extends Command
             ],
 
             [
-                'items' => Event::shouldShow()->get(),
+                'items' => Event::isActive()->get(),
                 'collection' => 'events',
                 'name' => 'event'
             ]
@@ -800,51 +801,38 @@ class DevCommand extends Command
     */
     public function fixEventInfo()
     {
-        $this->info('fixEventInfo');
-
-        // method to replace event url with default
-        $replacePhotoWithDefault = function ($event) {
-            // get url
-            $categoryPhotoUrl = $event->category->photo_url;
-
-            // get category image
-            $contents = file_get_contents($categoryPhotoUrl);
-
-            // store locally
-            $filename = $event->id . '-' . $event->slug . '.jpg';
-            $tmpPath = storage_path('app') . '/' . $filename;
-
-            Storage::disk('local')->put($filename, $contents);
-
-            // then attach file
-            $event->addMedia($tmpPath)->toMediaCollection('events');
-
-            return $event;
-        };
+        $this->info('fixEventInfo -> start');
 
         // get events
-        $events = Event::with('category')->shouldShow()->get();
+        $events = Event::with([ 'bands', 'category' ])
+            ->shouldShow()
+            ->get();
 
-        $regenerateMediaIds = [];
         foreach($events as $key => $event) {
+            // init debug info/vars
             $this->info('Processing event #' . $event->id);
+
+            $photoUrl = $event->photo_url;
+            $bands = $event->bands()->pluck('name')->toArray();
+
+            $this->info($photoUrl);
 
             // fix images that are too small
             // try to fit instead of crop
             try {
-                list($width, $height) = getimagesize($event->photo_url);
+                list($width, $height) = getimagesize($photoUrl);
+
+                $this->info($width . ' x ' . $height);
 
                 if ($width < 250 || $height < 150) {
                     $this->info('Replace photo with category default....');
 
-                    $event = $replacePhotoWithDefault($event);
+                    AssignCategoryPhoto::dispatch($event);
 
                     $this->info('DONE Replacing photo with category default....');
                 } else {
                     if ($width < 726 || $height < 250) {
-                        $regenerateMediaIds[] = $event->getMedia('events')->first()->id;
-
-                        $this->info('Should regenerate url `' . $event->photo_url . '` and conversions.');
+                        $this->info('Should regenerate url `' . $photoUrl . '` and conversions.');
                     } else {
                         $this->info('Skipping....' . $width . ' x ' . $height);
                     }
@@ -857,79 +845,91 @@ class DevCommand extends Command
             // mostly consistent
             $shouldSave = false;
 
-            // short description first
-            $infoShort = $event->short_description;
-            $regenerateInfoShort = false;
-
-            if (!empty($infoShort)) {
-                $infoShortLength = strlen($infoShort);
-
-                if ($infoShortLength < 100) {
-                    $regenerateInfoShort = true;
-                }
-            } else {
-                $regenerateInfoShort = true;
-            }
-
-            // then description
-            $infoLong = $event->description;
-            $regenerateInfoLong = false;
-
-            if (!empty($infoLong)) {
-                $infoLongLength = strlen($infoLong);
-
-                if ($infoLongLength < 100) {
-                    $regenerateInfoLong = true;
-                }
-            } else {
-                $regenerateInfoLong = true;
-            }
-
             // regenerate name & slug
             // if the generated value is different
             $newName = $event->generateName();
 
             if ($newName !== $event->name) {
+                $this->info('New Name & Slug...');
+                $this->info($event->name);
+                $this->info($event->slug);
+
                 $event->name = $newName;
                 $event->generateSlug();
+
+                $this->info($event->name);
+                $this->info($event->slug);
+                $this->info('---');
 
                 $shouldSave = true;
             }
 
             // now figure out the short description
-            if ($regenerateInfoShort) {
-                $event->generateShortDescription();
+            $newShortDescription = $event->generateShortDescription($bands);
+
+            if ($newShortDescription !== $event->short_description) {
+                $this->info('New Short Description...');
+                $this->info($event->short_description ?? 'empty...');
+
+                $event->short_description = $newShortDescription;
+
+                $this->info($event->short_description);
+                $this->info('---');
 
                 $shouldSave = true;
             }
 
             // and figure out the long description
-            if ($regenerateInfoLong) {
-                $event->generateDescription();
+            $newDescription = $event->generateDescription($bands);
+
+            if ($newDescription !== $event->description) {
+                $this->info('New Description...');
+                $this->info($event->description ?? 'empty...');
+
+                $event->description = $newDescription;
+
+                $this->info($event->description);
+                $this->info('---');
 
                 $shouldSave = true;
             }
 
+            // check if end time is set or not
+            // only set for music events
+            if (empty($event->end_time)) {
+                $startDate = $event->start_date->format('Y-m-d');
+                $time = Carbon::parse($startDate . ' ' . $event->start_time);
+
+                if ($event->category->slug === 'music') {
+                    $event->end_time = $time->copy()->addHours(3)->format('g:i A');
+                }
+            }
+
+            // if event start date = end date
+            // unset end date
+            if ($event->start_date === $event->end_date) {
+                $event->end_date = null;
+            }
+
+            // save event if data has changed
             if ($shouldSave) {
                 $event->save();
+
+                $this->info('Saved event `' . $event->id . '`');
             }
 
             // sleep
             if ($key > 0 && ($key % 15 === 0)) {
+                $this->info('Sleeping for 5 seconds...');
+
+                sleep(5);
+            } else {
                 $this->info('Sleeping for 2 seconds...');
 
                 sleep(2);
             }
         }
 
-        if (!empty($regenerateMediaIds)) {
-            $this->info(count($regenerateMediaIds) . ' images set to be regenerated.');
-
-            $this->call('medialibrary:regenerate', [
-                '--ids' => implode(',', $regenerateMediaIds)
-            ]);
-        } else {
-            $this->info('No images needed to regenerate.');
-        }
+        $this->info('fixEventInfo -> end');
     }
 }

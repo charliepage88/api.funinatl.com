@@ -80,16 +80,6 @@ class Event extends Model implements HasMedia
     ];
 
     /**
-    * @var string
-    */
-    public $locationName;
-
-    /**
-    * @var string
-    */
-    public $categoryName;
-
-    /**
     * @var boolean
     */
     public $asYouType = true;
@@ -355,6 +345,21 @@ class Event extends Model implements HasMedia
     ];
 
     /**
+    * @var string
+    */
+    public $locationName;
+
+    /**
+    * @var string
+    */
+    public $categoryName;
+
+    /**
+    * @var boolean
+    */
+    public $registerMediaConversionsUsingModelInstance = true;
+
+    /**
     * Location
     *
     * @return Location
@@ -442,6 +447,22 @@ class Event extends Model implements HasMedia
         return $query->where('active', '=', true)
             ->where('is_explicit', '=', false)
             ->where('start_date', '>=', $now);
+    }
+
+    /**
+    * Should Not Show
+    *
+    * @param object $query
+    *
+    * @return object
+    */
+    public function scopeShouldNotShow($query)
+    {
+        $now = Carbon::now()->format('Y-m-d');
+
+        return $query->where('active', '=', true)
+            // ->where('is_explicit', '=', false)
+            ->where('start_date', '<', $now);
     }
 
     /**
@@ -851,7 +872,8 @@ class Event extends Model implements HasMedia
     {
         $this
            ->addMediaCollection('events')
-           ->useDisk('spaces');
+           ->useDisk('spaces')
+           ->singleFile();
     }
 
     /**
@@ -863,11 +885,19 @@ class Event extends Model implements HasMedia
     */
     public function registerMediaConversions(Media $media = null)
     {
+        // init vars
         $useDefaults = true;
-        if (!empty($media)) {
-            $url = env('DO_SPACES_URL') . '/' . $media->getPath('thumb_mobile');
+        $photoUrl = $this->photo_url;
 
-            list($width, $height) = getimagesize($event->photo_url);
+        // if has photo, then check size
+        // if < min requirements, fit & fill
+        if (!empty($photoUrl)) {
+            // \Log::info('registerMediaConversions -> event `' . $this->id . '`');
+            // \Log::info($photoUrl);
+
+            list($width, $height) = getimagesize($photoUrl);
+
+            // \Log::info($width . ' x ' . $height);
 
             if ($width < 726 || $height < 250) {
                 $useDefaults = false;
@@ -875,6 +905,8 @@ class Event extends Model implements HasMedia
         }
 
         if ($useDefaults) {
+            // \Log::info('useDefaults -> event `' . $this->id . '` -> true');
+
             $this->addMediaConversion('thumb_mobile')
                 ->optimize()
                 ->fit(Manipulations::FIT_CROP, 372, 250);
@@ -887,6 +919,8 @@ class Event extends Model implements HasMedia
                 ->optimize()
                 ->fit(Manipulations::FIT_CROP, 608, 250);
         } else {
+            // \Log::info('useDefaults -> event `' . $this->id . '` -> false');
+
             $this->addMediaConversion('thumb_mobile')
                 ->optimize()
                 ->fit(Manipulations::FIT_FILL, 372, 250)
@@ -953,6 +987,14 @@ class Event extends Model implements HasMedia
     */
     public function getLocationName()
     {
+        // location ID check
+        if (empty($this->location_id)) {
+            \Log::error('Empty location ID for event...');
+            \Log::error(json_encode($this->toArray()));
+
+            return null;
+        }
+
         // see if location name set already
         if (!empty($this->locationName)) {
             return $this->locationName;
@@ -965,7 +1007,7 @@ class Event extends Model implements HasMedia
             $location = $this->location;
         }
 
-        $this->locationName = $location->name;
+        $this->locationName = optional($location)->name;
 
         return $this->locationName;
     }
@@ -977,6 +1019,14 @@ class Event extends Model implements HasMedia
     */
     public function getCategoryName()
     {
+        // category ID check
+        if (empty($this->category_id)) {
+            \Log::error('Empty category ID for event...');
+            \Log::error(json_encode($this->toArray()));
+
+            return null;
+        }
+
         // see if category name set already
         if (!empty($this->categoryName)) {
             return $this->categoryName;
@@ -989,7 +1039,7 @@ class Event extends Model implements HasMedia
             $category = $this->category;
         }
 
-        $this->categoryName = $category->name;
+        $this->categoryName = optional($category)->name;
 
         return $this->categoryName;
     }
@@ -1052,22 +1102,36 @@ class Event extends Model implements HasMedia
         $minLength = 100;
         $maxLength = 150;
 
+        // no bands? try to get them fresh
+        if (empty($bands)) {
+            $bands = $this->bands()->pluck('name')->toArray();
+        }
+
         // method to generate description text
-        $event = $this;
-        $getDescription = function () use ($bands, $event) {
-            $time = $event->start_time;
-            $locationName = $event->getLocationName();
-            $date = $event->start_date->format('l, F jS');
+        $category = $this->getCategoryName();
+        $location = $this->getLocationName();
+        $time = $this->start_time;
+        $date = $this->start_date->format('l, F jS');
 
-            if (!empty($bands)) {
-                $description = 'See live music at ' . $locationName . ' on ' . $date . ' at ' . $event->start_time . ' with bands including ' . implode(', ', $bands) . '.';
-            } else {
-                $categoryName = $event->getCategoryName();
+        $getDescription = function () use ($bands, $time, $date, $category, $location) {
+            // empty category/location check
+            if (empty($category) || empty($location)) {
+                \Log::error('cannot get description, empty location or category...');
 
-                if ($categoryName === 'Other') {
-                    $description = 'On ' . $date . ' at ' . $time . ', go check out this event at ' . $locationName . '!';
+                return null;
+            }
+
+            if ($category === 'Music') {
+                if (!empty($bands)) {
+                    $description = 'See live music at ' . $location . ' on ' . $date . '. Starting at ' . $time . ', with bands including ' . implode(', ', $bands) . '.';
                 } else {
-                    $description = 'On ' . $date . ' at ' . $time . ', enjoy ' . $categoryName . ' with this event at ' . $locationName;
+                    $description = 'See live music at ' . $location . ' on ' . $date . '. Starting at ' . $time . ' with plenty of great music.';
+                }
+            } else {
+                if ($category === 'Other') {
+                    $description = 'On ' . $date . ', starting at ' . $time . '. Go check out this event at ' . $location . '!';
+                } else {
+                    $description = 'On ' . $date . ', starting at ' . $time . '. Enjoy ' . $category . ' with this event at ' . $location;
                 }
             }
 
@@ -1129,6 +1193,11 @@ class Event extends Model implements HasMedia
         $description = trim($this->description);
         $minLength = 100;
         $maxLength = 250;
+
+        // no bands? try to get them fresh
+        if (empty($bands)) {
+            $bands = $this->bands()->pluck('name')->toArray();
+        }
 
         // look for existing event with same name
         // if there is one, use the description from that
