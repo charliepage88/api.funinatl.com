@@ -917,8 +917,10 @@ class DevCommand extends Command
 
             // if event start date = end date
             // unset end date
-            if ($event->start_date === $event->end_date) {
+            if ($event->start_date->format('Y-m-d') === $event->end_date->format('Y-m-d')) {
                 $event->end_date = null;
+
+                $this->info('Unset end date.');
             }
 
             // save event if data has changed

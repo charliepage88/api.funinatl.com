@@ -466,13 +466,14 @@ class Report extends Model
         }
 
         // unset days with empty events
-        foreach($results as $key => $row) {
-            if (empty($row['days'])) {
-                unset($results[$key]);
+        $newResults = [];
+        foreach($results as $row) {
+            if (!empty($row['days'])) {
+                $newResults[] = $row;
             }
         }
 
-        $response['events'] = $results;
+        $response['events'] = $newResults;
 
         return $response;
     }

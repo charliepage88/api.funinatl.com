@@ -798,15 +798,27 @@ class PopulateEventsCommand extends Command
 
                         $event['start_time'] = $dateObj->format('g:i A');
                         $event['end_time'] = $dateObj->copy()->addHours(3)->format('g:i A');
-                    } else {
-                        dd($details);
                     }
                 }
             }
 
             // get date
             $event['start_date'] = trim($node->filter('.right-buttons > .date')->text());
-            $event['start_date'] = Carbon::parse($event['start_date'])->format('Y-m-d');
+            $event['start_date'] = Carbon::parse($event['start_date']);
+
+            // see if date could be for next year
+            $today = $this->today->copy();
+            $isNextYear = $event['start_date']->isBefore($today);
+
+            if ($isNextYear) {
+                $isNextYear = ($event['start_date']->diffInMonths($today) > 4);
+            }
+
+            if ($isNextYear) {
+                $event['start_date'] = $event['start_date']->addYears(1)->format('Y-m-d');
+            } else {
+                $event['start_date'] = $event['start_date']->format('Y-m-d');
+            }
 
             return $event;
         });
@@ -1574,6 +1586,14 @@ class PopulateEventsCommand extends Command
 
                 $event['end_date'] = $endDate->copy()->format('Y-m-d');
                 $event['end_time'] = $endDate->copy()->format('g:i A');
+
+                if ($event['start_date'] === $event['end_date']) {
+                    $event['end_date'] = null;
+                }
+
+                if ($event['start_time'] === $event['end_time']) {
+                    $event['end_time'] = null;
+                }
             }
 
             // look for "Free", if it's present set the price
@@ -1789,8 +1809,23 @@ class PopulateEventsCommand extends Command
             // get start date
             $event['start_date'] = trim($node->filter('.right-buttons > .date')->text());
             $event['start_date'] = str_replace($doors_open, '', $event['start_date']);
-            $event['start_date'] = Carbon::parse($event['start_date'])->format('Y-m-d');
+            $event['start_date'] = Carbon::parse($event['start_date']);
 
+            // see if date could be for next year
+            $today = $this->today->copy();
+            $isNextYear = $event['start_date']->isBefore($today);
+
+            if ($isNextYear) {
+                $isNextYear = ($event['start_date']->diffInMonths($today) > 4);
+            }
+
+            if ($isNextYear) {
+                $event['start_date'] = $event['start_date']->addYears(1)->format('Y-m-d');
+            } else {
+                $event['start_date'] = $event['start_date']->format('Y-m-d');
+            }
+
+            // get start time
             $start_time = explode(' show', $ex[1]);
             $start_time = str_replace('PM', ' PM', $start_time[0]);
 
