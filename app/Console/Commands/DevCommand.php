@@ -12,6 +12,7 @@ use App\Category;
 use App\Event;
 use App\Location;
 use App\MusicBand;
+use App\Report;
 use App\Tag;
 use App\Jobs\Events\AssignCategoryPhoto;
 
@@ -350,6 +351,8 @@ class DevCommand extends Command
         Cache::tags('eventsByPeriodAndCategory')->flush();
         Cache::tags('eventsByPeriodAndLocation')->flush();
         Cache::tags('eventsByPeriodAndTag')->flush();
+        Cache::tags('dbcache')->flush();
+        Cache::tags('eventsCache')->flush();
     }
 
     /**
@@ -362,6 +365,13 @@ class DevCommand extends Command
     */
     public function createCache($apiUrl = null, $start_at_url = null)
     {
+        // create cache for queries
+        Report::getCachedCategories();
+        Report::getCachedLocations();
+        Report::getCachedBands();
+        Report::getCachedTags();
+        Report::getCachedEvents();
+
         // get data
 
         // events

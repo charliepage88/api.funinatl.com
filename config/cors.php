@@ -25,7 +25,8 @@ return [
         'Content-Disposition',
         'X-Filename',
         'X-Timezone',
-        'X-User'
+        'X-User',
+        'Content-Security-Policy'
     ],
     'allowedMethods' => [
         'GET',

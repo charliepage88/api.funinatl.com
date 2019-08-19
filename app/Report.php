@@ -5,6 +5,7 @@ namespace App;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
+use Cache;
 use DB;
 
 class Report extends Model
@@ -250,6 +251,8 @@ class Report extends Model
     public static function getEventsByPeriod(string $start_date, string $end_date, $params = [])
     {
         // init var
+        DB::connection()->disableQueryLog();
+
         $response = [];
         $errorResponse = function ($key) {
             $response = [
@@ -264,21 +267,24 @@ class Report extends Model
         };
 
         // get events
-        $query = Event::shouldShow()
+        $events = self::getCachedEvents();
+
+        $query = $events
             ->where('start_date', '>=', $start_date)
             ->where('start_date', '<=', $end_date)
-            ->orderBy('start_date', 'asc');
+            ->sortBy('start_date');
 
         // parse params
         if (!empty($params)) {
             // filter by category
             if (!empty($params['category'])) {
-                $category = Category::bySlug($params['category']);
+                $categories = self::getCachedCategories();
+                $category = $categories->firstWhere('slug', $params['category']);
 
-                if (!empty($category->id)) {
-                    $query->where('category_id', '=', $category->id);
+                if (!empty($category)) {
+                    $query->where('category_id', '=', $category['id']);
 
-                    $response['category'] = $category->getMongoArray(false);
+                    $response['category'] = $category;
                 } else {
                     return $errorResponse('category');
                 }
@@ -286,41 +292,48 @@ class Report extends Model
 
             // filter by location
             if (!empty($params['location'])) {
-                $location = Location::bySlug($params['location']);
+                $locations = self::getCachedLocations();
+                $location = $locations->firstWhere('slug', $params['location']);
 
                 if (!empty($location)) {
-                    $query->where('location_id', '=', $location->id);
+                    $query->where('location_id', '=', $location['id']);
 
-                    $response['location'] = $location->getMongoArray(false);
+                    $response['location'] = $location;
                 }
             }
 
             // filter by tag
             if (!empty($params['tag'])) {
-                $tag = Tag::bySlug($params['tag']);
+                $tags = self::getCachedTags();
+                $tag = $tags->firstWhere('slug', $params['tag']);
 
                 if (!empty($tag)) {
-                    $eventIds = $tag->findIdsByModelId(new Event);
+                    $query = $query->filter(function ($event) use ($params) {
+                        if (!empty($event['tags'])) {
+                            foreach($event['tags'] as $tag) {
+                                if ($tag['slug'] === $params['tag']) {
+                                    return true;
+                                }
+                            }
+                        }
 
-                    $query->whereIn('id', $eventIds);
+                        return false;
+                    });
 
-                    $response['tag'] = $tag->getMongoArray(false);
+                    $response['tag'] = $tag;
                 }
             }
         }
 
+        // get the events data
+        $events = $query;
+
         // if event index, append list of locations
         // and categories
         if (empty($response)) {
-            $categories = Category::isActive()->get();
-            $locations = Location::isActive()->get();
-
-            $response['categories'] = $categories->getMongoArray(false);
-            $response['locations'] = $locations->getMongoArray(false);
+            $response['categories'] = self::getCachedCategories();
+            $response['locations'] = self::getCachedLocations();
         }
-
-        // get the events data
-        $events = $query->get();
 
         // set weekend/weekdays
         Carbon::macro('isWeekendDay', function () {
@@ -405,20 +418,20 @@ class Report extends Model
                 ];
             }
 
-            $daysEvents = $events->filter(function (Event $event) use ($formattedDate) {
-                return $event->start_date->format('Y-m-d') === $formattedDate;
+            $daysEvents = $events->filter(function ($event) use ($formattedDate) {
+                return $event['start_date'] === $formattedDate;
             });
 
-            $sorted = $daysEvents->sortBy(function (Event $event) {
-                if (empty($event->start_time)) {
+            $sorted = $daysEvents->sortBy(function ($event) {
+                if (empty($event['start_time'])) {
                     return -1;
                 }
 
                 // format date
-                $date = $event->start_date->format('Y-m-d');
+                $date = Carbon::parse($event['start_date'])->format('Y-m-d');
 
                 // format time
-                $ex = explode(':', $event->start_time);
+                $ex = explode(':', $event['start_time']);
                 $time = (int) $ex[0];
 
                 if (strlen($time) === 1) {
@@ -442,10 +455,7 @@ class Report extends Model
                 return (int) $start_time;
             });
 
-            $eventsForDay = [];
-            foreach($sorted->values()->all() as $event) {
-                $eventsForDay[] = $event->toSearchableArray();
-            }
+            $eventsForDay = $sorted->values()->all();
 
             if (!empty($eventsForDay)) {
                 $results[$lastIndex]['days'][] = [
@@ -465,5 +475,146 @@ class Report extends Model
         $response['events'] = $results;
 
         return $response;
+    }
+
+    /**
+    * Get Cached Categories
+    *
+    * @return array
+    */
+    public static function getCachedCategories()
+    {
+        $items = Cache::tags([ 'dbcache' ])->rememberForever('categories', function () {
+            return DB::connection('mongodb')->collection('categories')->get();
+        });
+
+        $items = $items->map(function ($item) {
+            if (isset($item['_id'])) {
+                unset($item['_id']);
+            }
+
+            return $item;
+        });
+
+        return $items;
+    }
+
+    /**
+    * Get Cached Locations
+    *
+    * @return array
+    */
+    public static function getCachedLocations()
+    {
+        $items = Cache::tags([ 'dbcache' ])->rememberForever('locations', function () {
+            return DB::connection('mongodb')->collection('locations')->get();
+        });
+
+        $items = $items->map(function ($item) {
+            if (isset($item['_id'])) {
+                unset($item['_id']);
+            }
+
+            return $item;
+        });
+
+        return $items;
+    }
+
+    /**
+    * Get Cached Tags
+    *
+    * @return array
+    */
+    public static function getCachedTags()
+    {
+        $items = Cache::tags([ 'dbcache' ])->rememberForever('tags', function () {
+            return DB::connection('mongodb')->collection('tags')->get();
+        });
+
+        $items = $items->map(function ($item) {
+            if (isset($item['_id'])) {
+                unset($item['_id']);
+            }
+
+            return $item;
+        });
+
+        return $items;
+    }
+
+    /**
+    * Get Cached Bands
+    *
+    * @return array
+    */
+    public static function getCachedBands()
+    {
+        $items = Cache::tags([ 'dbcache' ])->rememberForever('music_bands', function () {
+            return DB::connection('mongodb')->collection('music_bands')->get();
+        });
+
+        $items = $items->map(function ($item) {
+            if (isset($item['_id'])) {
+                unset($item['_id']);
+            }
+
+            return $item;
+        });
+
+        return $items;
+    }
+
+    /**
+    * Get Cached Events
+    *
+    * @param array $params
+    *
+    * @return array
+    */
+    public static function getCachedEvents($params = [])
+    {
+        $cacheKey = 'events';
+
+        if (!empty($params)) {
+            $hash = md5(array_map('json_decode', $params));
+
+            $cacheKey = $cacheKey . '_' . $hash;
+        }
+
+        $tags = [ 'dbcache', 'eventsCache' ];
+
+        $items = Cache::tags($tags)->rememberForever($cacheKey, function () use ($params) {
+            $query = DB::connection('mongodb')->collection('events');
+
+            if (!empty($params)) {
+                foreach($params as $row) {
+                    $method = $row['method'];
+                    $key = isset($row['key']) ? $row['key'] : null;
+                    $value = isset($row['value']) ? $row['value'] : null;
+                    $operator = isset($row['operator']) ? $row['operator'] : false;
+
+                    if ($key !== null && $value !== null) {
+                        if ($operator) {
+                            $query->$method($key, $operator, $value);
+                        } else {
+                            $query->$method($key, $value);
+                        }
+                    }
+                }
+            }
+
+            return $query->get();
+        });
+
+        $items = $items->map(function ($item) {
+            if (isset($item['_id'])) {
+                unset($item['_id']);
+            }
+
+            return $item;
+        });
+
+        return $items;
     }
 }

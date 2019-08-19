@@ -357,7 +357,7 @@ class Event extends Model implements HasMedia
     /**
     * @var boolean
     */
-    public $registerMediaConversionsUsingModelInstance = true;
+    // public $registerMediaConversionsUsingModelInstance = true;
 
     /**
     * Location
@@ -887,6 +887,7 @@ class Event extends Model implements HasMedia
     {
         // init vars
         $useDefaults = true;
+        /*
         $photoUrl = $this->photo_url;
 
         // if has photo, then check size
@@ -903,6 +904,7 @@ class Event extends Model implements HasMedia
                 $useDefaults = false;
             }
         }
+        */
 
         if ($useDefaults) {
             // \Log::info('useDefaults -> event `' . $this->id . '` -> true');
