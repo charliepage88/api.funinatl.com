@@ -20,12 +20,13 @@ class WebhooksController extends Controller
         // get secret token and body data
         $token = request()->header('Authorization');
         $body = $request->input('body');
+        $validToken = config('services.webhooks.sync.token');
 
         if (!empty($token) && !empty($body)) {
             $token = str_replace('Bearer ', '', $token);
 
-            if ($token !== env('WEBHOOK_SYNC_TOKEN')) {
-                abort(403, 'Invalid token `' . env('WEBHOOK_SYNC_TOKEN') . '`');
+            if ($token !== $validToken) {
+                abort(403, 'Invalid token `' . $token . '`.');
             } else {
                 foreach($body as $table => $records) {
                     DB::table($table)->truncate();

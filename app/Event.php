@@ -475,7 +475,7 @@ class Event extends Model implements HasMedia
         $photos = $this->getMedia('events');
 
         if ($photos->count()) {
-            $photo = env('DO_SPACES_URL') . '/' . $photos->first()->getPath();
+            $photo = config('filesystems.disks.spaces.url') . '/' . $photos->first()->getPath();
         } else {
             $photo = null;
         }
@@ -493,7 +493,7 @@ class Event extends Model implements HasMedia
         $photos = $this->getMedia('events');
 
         if ($photos->count()) {
-            $photo = env('DO_SPACES_URL') . '/' . $photos->first()->getPath('thumb_mobile');
+            $photo = config('filesystems.disks.spaces.url') . '/' . $photos->first()->getPath('thumb_mobile');
         } else {
             $photo = null;
         }
@@ -511,7 +511,7 @@ class Event extends Model implements HasMedia
         $photos = $this->getMedia('events');
 
         if ($photos->count()) {
-            $photo = env('DO_SPACES_URL') . '/' . $photos->first()->getPath('thumb_tablet');
+            $photo = config('filesystems.disks.spaces.url') . '/' . $photos->first()->getPath('thumb_tablet');
         } else {
             $photo = null;
         }
@@ -529,7 +529,7 @@ class Event extends Model implements HasMedia
         $photos = $this->getMedia('events');
 
         if ($photos->count()) {
-            $photo = env('DO_SPACES_URL') . '/' . $photos->first()->getPath('thumb_desktop');
+            $photo = config('filesystems.disks.spaces.url') . '/' . $photos->first()->getPath('thumb_desktop');
         } else {
             $photo = null;
         }

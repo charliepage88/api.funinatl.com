@@ -64,8 +64,10 @@ class RunCommand extends Command
         $this->info('RunCommand -> sync');
 
         // init vars
+        $webhookToken = config('services.webhooks.sync.token');
+        $webhookUrl = config('services.webhooks.sync.url');
         $headers = [
-            'Authorization' => 'Bearer ' . env('WEBHOOK_SYNC_TOKEN'),
+            'Authorization' => 'Bearer ' . $webhookToken,
             'Accept' => 'application/json'
         ];
 
@@ -99,7 +101,7 @@ class RunCommand extends Command
         // send request to webhook
         $client = new Guzzle;
 
-        $response = $client->request('POST', env('WEBHOOK_SYNC_URL'), [
+        $response = $client->request('POST', $webhookUrl, [
             'headers' => $headers,
             'json' => [
                 'body' => $body

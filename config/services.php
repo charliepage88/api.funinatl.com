@@ -44,4 +44,31 @@ return [
         ],
     ],
 
+    's3' => [
+        'cdn_url' => env('ASSETS_S3_URL'),
+        'cdn_bucket' => env('ASSETS_S3_BUCKET')
+    ],
+
+    'circleci' => [
+        'token' => env('CIRCLE_CI_TOKEN')
+    ],
+
+    'algolia' => [
+        'places' => [
+            'key' => env('ALGOLIA_PLACES_KEY'),
+            'app_id' => env('ALGOLIA_PLACES_APP_ID')
+        ]
+    ],
+
+    'webhooks' => [
+        'sync' => [
+            'token' => env('WEBHOOK_SYNC_TOKEN'),
+            'url'   => env('WEBHOOK_SYNC_URL')
+        ]
+    ],
+
+    'spotify' => [
+        'client_id' => env('SPOTIFY_CLIENT_ID'),
+        'secret'    => env('SPOTIFY_CLIENT_SECRET')
+    ],
 ];

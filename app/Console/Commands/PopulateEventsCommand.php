@@ -152,8 +152,8 @@ class PopulateEventsCommand extends Command
             $this->info('getting new access token for Spotify');
 
             $session = new \SpotifyWebAPI\Session(
-                env('SPOTIFY_CLIENT_ID'),
-                env('SPOTIFY_CLIENT_SECRET')
+                config('services.spotify.client_id'),
+                config('services.spotify.secret')
             );
 
             $session->requestCredentialsToken();

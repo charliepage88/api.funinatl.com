@@ -25,8 +25,8 @@ class AppServiceProvider extends ServiceProvider
             $adapter  = new Client();
             $provider = new AlgoliaPlaces(
                 $adapter,
-                env('ALGOLIA_PLACES_KEY'),
-                env('ALGOLIA_PLACES_APP_ID')
+                config('services.algolia.places.key'),
+                config('services.algolia.places.app_id')
             );
             $geocoder = new \Geocoder\StatefulGeocoder(
                 $provider,

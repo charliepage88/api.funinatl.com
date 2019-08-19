@@ -70,7 +70,7 @@ class SiteHelper
     {
         $response = null;
         try {
-            $url = 'https://circleci.com/api/v1.1/project/github/charliepage88/funinatl.com/build?circle-token=' . env('CIRCLE_CI_TOKEN');
+            $url = 'https://circleci.com/api/v1.1/project/github/charliepage88/funinatl.com/build?circle-token=' . config('services.circleci.token');
 
             $vars = [
                 'branch' => 'master'
@@ -120,7 +120,7 @@ class SiteHelper
     public static function cdn_asset($path, $manifestDirectory = '')
     {
         $mixPath = mix($path, $manifestDirectory);
-        $cdnUrl  = env('ASSETS_S3_URL');
+        $cdnUrl  = config('services.s3.cdn_url');
         $env     = config('app.env');
 
         // Reference CDN assets only in production or staging environemnt.

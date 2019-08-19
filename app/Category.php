@@ -173,7 +173,7 @@ class Category extends Model implements HasMedia
         $photos = $this->getMedia('categories');
 
         if ($photos->count()) {
-            $photo = env('DO_SPACES_URL') . '/' . $photos->first()->getPath();
+            $photo = config('filesystems.disks.spaces.url') . '/' . $photos->first()->getPath();
         } else {
             $photo = null;
         }
