@@ -13,10 +13,6 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
 Route::namespace('Api')->group(function () {
     // main events source
     Route::get('/events/category/{slug}/{start_date}/{end_date}', 'EventsController@getByPeriodAndCategory')
@@ -38,4 +34,7 @@ Route::namespace('Api')->group(function () {
     Route::post('/locations/submit', 'LocationsController@submit');
     Route::post('/contact/submit', 'ContactSubmissionsController@submit');
     Route::get('/routes', 'MetaController@routes');
+
+    // users
+    Route::middleware('auth:api')->get('/user', 'UsersController@show');
 });
