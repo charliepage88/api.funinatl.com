@@ -27,6 +27,18 @@ class DashboardController extends Controller
     }
 
     /**
+    * Admin Index
+    *
+    * @param Request $request
+    *
+    * @return Response
+    */
+    public function adminIndex(Request $request)
+    {
+        return redirect('/admin/dashboard');
+    }
+
+    /**
     * Logout
     *
     * @param Request $request

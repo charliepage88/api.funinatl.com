@@ -18,9 +18,7 @@ Route::get('/', 'HomeController@index')->name('home');
 // Admin Routes
 Route::middleware('auth')->namespace('Admin')->prefix('admin')->group(function () {
     // Admin Dashboard
-    Route::get('/', function () {
-        return redirect('/admin/dashboard');
-    });
+    Route::get('/', 'DashboardController@adminIndex');
 
     Route::get('/dashboard', 'DashboardController@adminDashboard')->name('admin.dashboard');
     Route::get('/logout', 'DashboardController@logout')->name('admin.logout');
