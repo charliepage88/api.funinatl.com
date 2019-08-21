@@ -854,4 +854,71 @@ class DevCommand extends Command
 
         $this->info('fixEventInfo -> end');
     }
+
+    /**
+    * Fix Event Dates And Times
+    *
+    * @return void
+    */
+    public function fixEventDatesAndTimes()
+    {
+        $this->info('fixEventDatesAndTimes');
+
+        $events = Event::all();
+
+        $count = 0;
+        foreach($events as $event) {
+            // date check
+            $startDate = $event->start_date->format('Y-m-d');
+
+            if (!empty($event->end_date)) {
+                $endDate = $event->end_date->format('Y-m-d');
+                $hasEndDate = true;
+            } else {
+                $endDate = null;
+                $hasEndDate = false;
+            }
+
+            if ($hasEndDate && ($startDate === $endDate)) {
+                $count++;
+                $unsetEndDate = true;
+
+                $this->info('Event `' . $event->id . '` has same start & end date - ' . $startDate);
+            } else {
+                $unsetEndDate = false;
+            }
+
+            // time check
+            $startTime = $event->start_time;
+
+            if (!empty($event->end_time)) {
+                $endTime = $event->end_time;
+            } else {
+                $endTime = null;
+            }
+
+            if (!empty($endTime) && ($startTime === $endTime) && (!$hasEndDate || $unsetEndDate)) {
+                $count++;
+                $unsetEndTime = true;
+
+                $this->info('Event `' . $event->id . '` has same start & end time - ' . $startTime);
+            } else {
+                $unsetEndTime = false;
+            }
+
+            if ($unsetEndDate) {
+                $event->end_date = null;
+            }
+
+            if ($unsetEndTime) {
+                $event->end_time = null;
+            }
+
+            if ($unsetEndDate || $unsetEndTime) {
+                $event->save();
+            }
+        }
+
+        $this->info('Issues to fix: ' . $count);
+    }
 }
