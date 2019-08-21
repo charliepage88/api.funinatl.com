@@ -204,4 +204,25 @@ class EventsController extends Controller
 
         return response()->json($response);
     }
+
+    /**
+    * Get By Slug
+    *
+    * @param Request $request
+    * @param string  $slug
+    *
+    * @return Response
+    */
+    public function getBySlug(Request $request, $slug)
+    {
+        $event = Report::getCachedEvents([
+            [
+                'method' => 'where',
+                'key'    => 'slug',
+                'value'  => $slug
+            ]
+        ]);
+
+        return response()->json(compact('event'));
+    }
 }

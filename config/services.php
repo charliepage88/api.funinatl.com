@@ -71,4 +71,9 @@ return [
         'client_id' => env('SPOTIFY_CLIENT_ID'),
         'secret'    => env('SPOTIFY_CLIENT_SECRET')
     ],
+
+    'oauth' => [
+        'client_id' => env('OAUTH_CLIENT_ID'),
+        'client_secret' => env('OAUTH_CLIENT_SECRET')
+    ],
 ];

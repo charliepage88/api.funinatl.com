@@ -578,7 +578,7 @@ class Report extends Model
         $cacheKey = 'events';
 
         if (!empty($params)) {
-            $hash = md5(array_map('json_decode', $params));
+            $hash = md5(json_encode($params));
 
             $cacheKey = $cacheKey . '_' . $hash;
         }
@@ -615,6 +615,10 @@ class Report extends Model
 
             return $item;
         });
+
+        if (count($items) === 1) {
+            $items = $items[0];
+        }
 
         return $items;
     }

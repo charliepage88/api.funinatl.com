@@ -38,16 +38,6 @@ class DevCommand extends Command
     protected $description = 'Dev command for misc testing.';
 
     /**
-     * @var boolean
-     */
-    public $enableSyncToSearch = true;
-
-    /**
-     * @var boolean
-     */
-    public $enableSync = true;
-
-    /**
      * Execute the console command.
      *
      * @return mixed
@@ -84,260 +74,32 @@ class DevCommand extends Command
     }
 
     /**
-     * Flush Mongo
-     *
-     * @return void
-     */
-    public function flushMongo()
-    {
-        DB::connection('mongodb')->collection('tags')->delete();
-        DB::connection('mongodb')->collection('music_bands')->delete();
-        DB::connection('mongodb')->collection('categories')->delete();
-        DB::connection('mongodb')->collection('locations')->delete();
-        DB::connection('mongodb')->collection('events')->delete();
-    }
-
-    /**
-    * Regenerate Event Slugs
+    * Sync
     *
     * @return void
     */
-    public function regenerateEventSlugs()
+    public function sync()
     {
-        $this->info('regenerateEventSlugs');
+        $this->info('sync');
 
-        $now = Carbon::now();
-        $events = Event::all();
-
-        foreach($events as $event) {
-            $event->updated_at = $now;
-
-            $event->save();
-
-            $this->info($event->id . ' :: ' . $event->name);
-        }
+        $this->syncToMongo();
+        $this->syncCache();
     }
 
     /**
-    * Events Without Photo
+    * Sync Cache
     *
     * @return void
     */
-    public function eventsWithoutPhoto()
+    public function syncCache()
     {
-        $this->info('eventsWithoutPhoto');
-
-        $events = Event::isActive()->get();
-
-        foreach($events as $event) {
-            if (empty($event->photo_url)) {
-                $this->info($event->id . ' :: ' . $event->name);
-            }
-        }
-    }
-
-    /**
-    * Locations Without Photo
-    *
-    * @return void
-    */
-    public function locationsWithoutPhoto()
-    {
-        $this->info('locationsWithoutPhoto');
-
-        $locations = Location::isActive()->get();
-
-        foreach($locations as $location) {
-            if (empty($location->photo_url)) {
-                $this->info($location->id . ' :: ' . $location->name);
-            }
-        }
-    }
-
-    /**
-    * Fix Media Collections
-    *
-    * @return void
-    */
-    public function fixMediaCollections()
-    {
-        DB::table('media')
-            ->where('collection_name', '=', 'images')
-            ->where('model_type', '=', 'App\Event')
-            ->update([ 'collection_name' => 'events' ]);
-    }
-
-    /**
-    * Sync Music Bands
-    *
-    * @return void
-    */
-    public function syncMusicBands()
-    {
-        $this->info('syncMusicBands -> start');
-
-        $events = Event::isActive()->get();
-        $categories = Category::isActive()->get()->getList();
-
-        foreach($events as $event) {
-            if (!$event->bands()->count() && $event->category_id === 1) {
-                $message = $event->name . ' @ ';
-                $message .= $event->location->name . ' :: ' . $event->start_date->format('Y-m-d');
-
-                $this->info($message);
-
-                $bands = $this->ask('What are the band(s) for this event?');
-
-                switch ($bands) {
-                    case null:
-                        $this->info('Skipping event...');
-                    break;
-
-                    case 'category-other':
-                        $category = $categories['other'];
-
-                        $event->category_id = $category->id;
-
-                        $event->save();
-
-                        $this->info('Category saved to `' . $category->name . '`');
-                    break;
-
-                    case 'category-food-drinks':
-                        $category = $categories['food-drinks'];
-
-                        $event->category_id = $category->id;
-
-                        $event->save();
-
-                        $this->info('Category saved to `' . $category->name . '`');
-                    break;
-
-                    case 'category-comedy':
-                        $category = $categories['comedy'];
-
-                        $event->category_id = $category->id;
-
-                        $event->save();
-
-                        $this->info('Category saved to `' . $category->name . '`');
-                    break;
-
-                    case 'category-arts-theatre':
-                        $category = $categories['arts-theatre'];
-
-                        $event->category_id = $category->id;
-
-                        $event->save();
-
-                        $this->info('Category saved to `' . $category->name . '`');
-                    break;
-
-                    default:
-                        $ex = explode(',', $bands);
-
-                        $event->syncBands($ex);
-
-                        $this->info('Bands have been synced to event `' . $event->id . '`');
-                    break;
-                }
-            }
-        }
-
-        $this->info('syncMusicBands -> end');
-    }
-
-    /**
-    * Sync Data To S3
-    *
-    * @return void
-    */
-    public function syncDataToS3()
-    {
-        $this->info('syncDataToS3');
-
-        // flush json files first
-        $this->flushJsonFiles();
-
-        $collections = [
-            'events' => [
-                'bySlug'
-            ],
-            'locations' => [
-                'index',
-                'bySlug'
-            ],
-            'categories' => [
-                'index',
-                'bySlug'
-            ],
-            'tags' => [
-                'bySlug'
-            ],
-            'music_bands' => [
-                'index'
-            ]
-        ];
-
-        $data = [
-            'events'      => DB::connection('mongodb')->collection('events')->get(),
-            'locations'   => DB::connection('mongodb')->collection('locations')->get(),
-            'categories'  => DB::connection('mongodb')->collection('categories')->get(),
-            'music_bands' => DB::connection('mongodb')->collection('music_bands')->get(),
-            'tags'        => DB::connection('mongodb')->collection('tags')->get()
-        ];
-
-        foreach($collections as $collection => $methods) {
-            $this->info('Generating JSON for collection `' . $collection . '`');
-
-            foreach($methods as $method) {
-                $this->info('Starting for method `' . $method . '`...');
-
-                $items = $data[$collection];
-
-                switch ($method) {
-                    case 'index':
-                        $json = json_encode($items->toArray());
-
-                        Storage::disk('s3')->put('json/' . $collection . '/index.json', $json);
-                    break;
-
-                    case 'bySlug':
-                        $grouped = $items->groupBy('slug');
-
-                        foreach($grouped as $slug => $rows) {
-                            $json = json_encode($rows[0]);
-
-                            Storage::disk('s3')->put('json/' . $collection . '/bySlug/' . $slug . '.json', $json);
-                        }
-                    break;
-                }
-
-                $this->info('Finished for method `' . $method . '`!');
-            }
-
-            $this->info('Finished collection `' . $collection . '`');
-        }
+        $this->info('syncCache');
 
         // flush cache
         $this->flushCache();
 
         // create cache
         $this->createCache();
-    }
-
-    /**
-     * Flush Json Files
-     *
-     * @return void
-     */
-    public function flushJsonFiles()
-    {
-        $folders = Storage::disk('s3')->directories('json');
-
-        foreach($folders as $folder) {
-            Storage::disk('s3')->deleteDirectory($folder);
-        }
     }
 
     /**
@@ -351,6 +113,9 @@ class DevCommand extends Command
         Cache::tags('eventsByPeriodAndCategory')->flush();
         Cache::tags('eventsByPeriodAndLocation')->flush();
         Cache::tags('eventsByPeriodAndTag')->flush();
+        Cache::tags('eventsBySlug')->flush();
+        Cache::tags('categoriesIndex')->flush();
+        Cache::tags('locationsIndex')->flush();
         Cache::tags('dbcache')->flush();
         Cache::tags('eventsCache')->flush();
     }
@@ -394,7 +159,8 @@ class DevCommand extends Command
         // get first event
         $firstEvent = $events->first();
 
-        $startDate = $firstEvent->start_date;
+        // $startDate = $firstEvent->start_date;
+        $startDate = Carbon::today();
 
         // get end date
         $endDate = $startDate->copy()->addWeeks(2);
@@ -429,6 +195,15 @@ class DevCommand extends Command
         }
 
         $urls = [];
+
+        // location & category index pages
+        $urls[] = $apiUrl . '/api/locations';
+        $urls[] = $apiUrl . '/api/categories';
+
+        // event by slug urls
+        foreach($events as $event) {
+            $urls[] = $apiUrl . '/api/events/bySlug/' . $event['slug'];
+        }
 
         // category urls
         foreach ($categories as $category) {
@@ -472,7 +247,7 @@ class DevCommand extends Command
         // event urls
         foreach($eventDates as $date) {
             $firstDate = $date->copy();
-            $lastDate = $firstDate->copy()->addWeeks(4)->format('Y-m-d');
+            $lastDate = $firstDate->copy()->addWeeks(2)->format('Y-m-d');
 
             $url = $apiUrl . '/api/events/index';
             $url .= '/' . $firstDate->format('Y-m-d') . '/' . $lastDate;
@@ -510,83 +285,17 @@ class DevCommand extends Command
             $this->info('Done: ' . $url);
 
             if ($key > 0 && ($key % 60 === 0)) {
-                $this->info('Sleeping for 60 seconds...');
+                $this->info('Sleeping for 30 seconds...');
 
-                sleep(60);
+                sleep(30);
+            } elseif ($key > 0 && ($key % 20 === 0)) {
+                $this->info('Sleeping for 5 seconds...');
+
+                sleep(5);
             }
         }
 
         $this->info('Done Creating Cache for: ' . $startDate->format('Y-m-d') . '-' . $endDate->format('Y-m-d'));
-    }
-
-    /**
-    * Sync Spotify Music Bands
-    *
-    * @return void
-    */
-    public function syncSpotifyMusicBands()
-    {
-        $spotify = $this->initSpotify();
-
-        $bands = MusicBand::whereNotNull('spotify_artist_id')
-            ->whereNull('spotify_json')
-            ->get();
-
-        foreach($bands as $key => $band) {
-            $info = $spotify->getArtist($band->spotify_artist_id);
-
-            if (!empty($info) && !empty($info->id)) {
-                $band->spotify_json = (array) $info;
-
-                $band->save();
-
-                $this->info('Band info saved for `' . $band->name . '`');
-            } else {
-                $this->error($info);
-            }
-
-            if ($key > 0 && ($key % 3 === 0)) {
-                $this->info('Sleeping for 2 seconds...');
-
-                sleep(2);
-            }
-        }
-    }
-
-    /**
-    * Init Spotify
-    *
-    * @return object
-    */
-    public function initSpotify()
-    {
-        // get new access token
-        if (!Cache::has('spotify_access_token')) {
-            $this->info('getting new access token for Spotify');
-
-            $session = new \SpotifyWebAPI\Session(
-                config('services.spotify.client_id'),
-                config('services.spotify.secret')
-            );
-
-            $session->requestCredentialsToken();
-            $accessToken = $session->getAccessToken();
-
-            if (!empty($accessToken)) {
-                Cache::put('spotify_access_token', $accessToken, 60);
-            } else {
-                throw new \Exception('Cannot get access token from Spotify');
-            }
-        } else {
-            $accessToken = Cache::get('spotify_access_token');
-        }
-
-        // init spotify instance
-        $spotify = new SpotifyWebAPI;
-
-        $spotify->setAccessToken($accessToken);
-
-        return $spotify;
     }
 
     /**
@@ -723,7 +432,7 @@ class DevCommand extends Command
             }
 
             // sync to search
-            if ($search && $changesCount && $this->enableSyncToSearch) {
+            if ($search && $changesCount) {
                 $items->searchable();
 
                 $this->info($fullName . ' synced to Mongo and Scout. ' . $changesCount . ' total changes.');
@@ -734,18 +443,219 @@ class DevCommand extends Command
     }
 
     /**
-    * Sync
+     * Flush Mongo
+     *
+     * @return void
+     */
+    public function flushMongo()
+    {
+        DB::connection('mongodb')->collection('tags')->delete();
+        DB::connection('mongodb')->collection('music_bands')->delete();
+        DB::connection('mongodb')->collection('categories')->delete();
+        DB::connection('mongodb')->collection('locations')->delete();
+        DB::connection('mongodb')->collection('events')->delete();
+    }
+
+    /**
+    * Regenerate Event Slugs
     *
     * @return void
     */
-    public function sync()
+    public function regenerateEventSlugs()
     {
-        $this->info('sync');
+        $this->info('regenerateEventSlugs');
 
-        if ($this->enableSync) {
-            $this->syncToMongo();
-            $this->syncDataToS3();
+        $now = Carbon::now();
+        $events = Event::all();
+
+        foreach($events as $event) {
+            $event->updated_at = $now;
+
+            $event->save();
+
+            $this->info($event->id . ' :: ' . $event->name);
         }
+    }
+
+    /**
+    * Locations Without Photo
+    *
+    * @return void
+    */
+    public function locationsWithoutPhoto()
+    {
+        $this->info('locationsWithoutPhoto');
+
+        $locations = Location::isActive()->get();
+
+        foreach($locations as $location) {
+            if (empty($location->photo_url)) {
+                $this->info($location->id . ' :: ' . $location->name);
+            }
+        }
+    }
+
+    /**
+    * Fix Media Collections
+    *
+    * @return void
+    */
+    public function fixMediaCollections()
+    {
+        DB::table('media')
+            ->where('collection_name', '=', 'images')
+            ->where('model_type', '=', 'App\Event')
+            ->update([ 'collection_name' => 'events' ]);
+    }
+
+    /**
+    * Sync Music Bands
+    *
+    * @return void
+    */
+    public function syncMusicBands()
+    {
+        $this->info('syncMusicBands -> start');
+
+        $events = Event::isActive()->get();
+        $categories = Category::isActive()->get()->getList();
+
+        foreach($events as $event) {
+            if (!$event->bands()->count() && $event->category_id === 1) {
+                $message = $event->name . ' @ ';
+                $message .= $event->location->name . ' :: ' . $event->start_date->format('Y-m-d');
+
+                $this->info($message);
+
+                $bands = $this->ask('What are the band(s) for this event?');
+
+                switch ($bands) {
+                    case null:
+                        $this->info('Skipping event...');
+                    break;
+
+                    case 'category-other':
+                        $category = $categories['other'];
+
+                        $event->category_id = $category->id;
+
+                        $event->save();
+
+                        $this->info('Category saved to `' . $category->name . '`');
+                    break;
+
+                    case 'category-food-drinks':
+                        $category = $categories['food-drinks'];
+
+                        $event->category_id = $category->id;
+
+                        $event->save();
+
+                        $this->info('Category saved to `' . $category->name . '`');
+                    break;
+
+                    case 'category-comedy':
+                        $category = $categories['comedy'];
+
+                        $event->category_id = $category->id;
+
+                        $event->save();
+
+                        $this->info('Category saved to `' . $category->name . '`');
+                    break;
+
+                    case 'category-arts-theatre':
+                        $category = $categories['arts-theatre'];
+
+                        $event->category_id = $category->id;
+
+                        $event->save();
+
+                        $this->info('Category saved to `' . $category->name . '`');
+                    break;
+
+                    default:
+                        $ex = explode(',', $bands);
+
+                        $event->syncBands($ex);
+
+                        $this->info('Bands have been synced to event `' . $event->id . '`');
+                    break;
+                }
+            }
+        }
+
+        $this->info('syncMusicBands -> end');
+    }
+
+    /**
+    * Sync Spotify Music Bands
+    *
+    * @return void
+    */
+    public function syncSpotifyMusicBands()
+    {
+        $spotify = $this->initSpotify();
+
+        $bands = MusicBand::whereNotNull('spotify_artist_id')
+            ->whereNull('spotify_json')
+            ->get();
+
+        foreach($bands as $key => $band) {
+            $info = $spotify->getArtist($band->spotify_artist_id);
+
+            if (!empty($info) && !empty($info->id)) {
+                $band->spotify_json = (array) $info;
+
+                $band->save();
+
+                $this->info('Band info saved for `' . $band->name . '`');
+            } else {
+                $this->error($info);
+            }
+
+            if ($key > 0 && ($key % 3 === 0)) {
+                $this->info('Sleeping for 2 seconds...');
+
+                sleep(2);
+            }
+        }
+    }
+
+    /**
+    * Init Spotify
+    *
+    * @return object
+    */
+    public function initSpotify()
+    {
+        // get new access token
+        if (!Cache::has('spotify_access_token')) {
+            $this->info('getting new access token for Spotify');
+
+            $session = new \SpotifyWebAPI\Session(
+                config('services.spotify.client_id'),
+                config('services.spotify.secret')
+            );
+
+            $session->requestCredentialsToken();
+            $accessToken = $session->getAccessToken();
+
+            if (!empty($accessToken)) {
+                Cache::put('spotify_access_token', $accessToken, 60);
+            } else {
+                throw new \Exception('Cannot get access token from Spotify');
+            }
+        } else {
+            $accessToken = Cache::get('spotify_access_token');
+        }
+
+        // init spotify instance
+        $spotify = new SpotifyWebAPI;
+
+        $spotify->setAccessToken($accessToken);
+
+        return $spotify;
     }
 
     /**

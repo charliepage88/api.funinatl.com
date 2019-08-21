@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
 
 use App\Location;
+use App\Report;
 use App\Http\Controllers\Controller;
 
 use Validator;
@@ -57,5 +58,19 @@ class LocationsController extends Controller
         }
 
         return response()->json(compact('location'));
+    }
+
+    /**
+    * Index
+    *
+    * @param Request $request
+    *
+    * @return Response
+    */
+    public function index(Request $request)
+    {
+        $locations = Report::getCachedLocations();
+
+        return response()->json(compact('locations'));
     }
 }

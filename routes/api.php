@@ -27,6 +27,17 @@ Route::namespace('Api')->group(function () {
     Route::get('/events/index/{start_date}/{end_date}', 'EventsController@indexByPeriod')
         ->middleware('cacheResponse:300,eventsIndexByPeriod');
 
+    Route::get('/events/bySlug/{slug}', 'EventsController@getBySlug')
+        ->middleware('cacheResponse:300,eventsBySlug');
+
+    // locations
+    Route::get('/locations', 'LocationsController@index')
+        ->middleware('cacheResponse:300,locationsIndex');
+
+    // categories
+    Route::get('/categories', 'CategoriesController@index')
+        ->middleware('cacheResponse:300,categoriesIndex');
+
     // misc actions
     Route::post('/newsletter/subscribe', 'NewsletterController@subscribe');
     Route::post('/events/submit', 'EventsController@submit');
@@ -37,4 +48,6 @@ Route::namespace('Api')->group(function () {
 
     // users
     Route::middleware('auth:api')->get('/user', 'UsersController@show');
+    Route::post('/auth/login', 'UsersController@login');
+    Route::post('/auth/register', 'UsersController@register');
 });

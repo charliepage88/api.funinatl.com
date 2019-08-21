@@ -53,4 +53,54 @@ class User extends Authenticatable
     {
         return $this->hasMany(Event::class, 'user_id');
     }
+
+    /**
+     * To Searchable Array
+     *
+     * @return array
+     */
+    public function toSearchableArray()
+    {
+        // user data
+        $fields = [
+            'id',
+            'name',
+            'email'
+        ];
+
+        $user = [];
+        foreach($fields as $field) {
+            $user[$field] = $this->$field;
+        }
+
+        $user['created_at'] = $this->created_at->toAtomString();
+        $user['updated_at'] = $this->updated_at->toAtomString();
+
+        return $user;
+    }
+
+    /**
+     * Get Mongo Array
+     *
+     * @return array
+     */
+    public function getMongoArray()
+    {
+        // user data
+        $fields = [
+            'id',
+            'name',
+            'email'
+        ];
+
+        $user = [];
+        foreach($fields as $field) {
+            $user[$field] = $this->$field;
+        }
+
+        $user['created_at'] = $this->created_at->toAtomString();
+        $user['updated_at'] = $this->updated_at->toAtomString();
+
+        return $user;
+    }
 }
