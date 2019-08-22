@@ -33,7 +33,7 @@
         "scottybo/twitter": "^2.2",
         "silber/bouncer": "v1.0.0-rc.5",
         "sngrl/sphinxsearch": "dev-master",
-        "spatie/laravel-medialibrary": "^7.9",
+        "spatie/laravel-medialibrary": "^7.10",
         "spatie/laravel-newsletter": "^4.5",
         "spatie/laravel-responsecache": "^5.0",
         "spatie/laravel-sluggable": "^2.1",
