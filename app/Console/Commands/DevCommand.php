@@ -921,4 +921,27 @@ class DevCommand extends Command
 
         $this->info('Issues to fix: ' . $count);
     }
+
+    /**
+    * Flush Old Media
+    *
+    * @return void
+    */
+    public function flushOldMedia()
+    {
+        $folders = Storage::directories();
+        $mediaIds = DB::table('media')->pluck('id')->toArray();
+
+        $leftOverFolders = [];
+        $ignoreFolders = [
+            'site'
+        ];
+        foreach ($folders as $folder) {
+            if (!in_array($folder, $mediaIds) && !in_array($folder, $ignoreFolders)) {
+                $leftOverFolders[] = $folder;
+            }
+        }
+
+        dd($leftOverFolders);
+    }
 }
