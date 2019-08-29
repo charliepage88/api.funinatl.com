@@ -98,7 +98,10 @@ class ParseEvent implements ShouldQueue
                 'price',
                 'is_sold_out',
                 'start_time',
-                'is_family_friendly'
+                'end_time',
+                'end_date',
+                'is_family_friendly',
+                'is_explicit'
             ];
 
             $dataToSave = [];

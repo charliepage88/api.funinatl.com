@@ -76,4 +76,8 @@ return [
         'client_id' => env('OAUTH_CLIENT_ID'),
         'client_secret' => env('OAUTH_CLIENT_SECRET')
     ],
+
+    'graphql' => [
+        'endpoint' => env('GRAPHQL_ENDPOINT')
+    ],
 ];

@@ -163,7 +163,7 @@ class DevCommand extends Command
         $startDate = Carbon::today();
 
         // get end date
-        $endDate = $startDate->copy()->addWeeks(2);
+        $endDate = $startDate->copy()->addDays(10);
         $eventsEndDate = $startDate->copy()->addWeeks(4);
 
         // function to hit URI to generate cache
@@ -209,7 +209,7 @@ class DevCommand extends Command
         foreach ($categories as $category) {
             foreach($dates as $date) {
                 $firstDate = $date->copy();
-                $lastDate = $firstDate->copy()->addWeeks(2)->format('Y-m-d');
+                $lastDate = $firstDate->copy()->addDays(10)->format('Y-m-d');
 
                 $url = $apiUrl . '/api/events/category/' . $category->slug;
                 $url .= '/' . $firstDate->format('Y-m-d') . '/' . $lastDate;
@@ -222,7 +222,7 @@ class DevCommand extends Command
         foreach ($tags as $tag) {
             foreach($dates as $date) {
                 $firstDate = $date->copy();
-                $lastDate = $firstDate->copy()->addWeeks(2)->format('Y-m-d');
+                $lastDate = $firstDate->copy()->addDays(10)->format('Y-m-d');
 
                 $url = $apiUrl . '/api/events/tag/' . $tag->slug;
                 $url .= '/' . $firstDate->format('Y-m-d') . '/' . $lastDate;
@@ -235,7 +235,7 @@ class DevCommand extends Command
         foreach ($locations as $location) {
             foreach($dates as $date) {
                 $firstDate = $date->copy();
-                $lastDate = $firstDate->copy()->addWeeks(2)->format('Y-m-d');
+                $lastDate = $firstDate->copy()->addDays(10)->format('Y-m-d');
 
                 $url = $apiUrl . '/api/events/location/' . $location->slug;
                 $url .= '/' . $firstDate->format('Y-m-d') . '/' . $lastDate;
@@ -247,7 +247,7 @@ class DevCommand extends Command
         // event urls
         foreach($eventDates as $date) {
             $firstDate = $date->copy();
-            $lastDate = $firstDate->copy()->addWeeks(2)->format('Y-m-d');
+            $lastDate = $firstDate->copy()->addDays(10)->format('Y-m-d');
 
             $url = $apiUrl . '/api/events/index';
             $url .= '/' . $firstDate->format('Y-m-d') . '/' . $lastDate;

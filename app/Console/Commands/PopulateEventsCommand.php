@@ -15,9 +15,10 @@ use App\EventType;
 use App\Provider;
 use App\Jobs\ParseEvent;
 use App\Jobs\ParseMusicEvent;
-use App\Jobs\Locations\CrawlVenkmansLink;
 use App\Jobs\Locations\CrawlAisleFiveLink;
+use App\Jobs\Locations\CrawlLaughingSkullLoungeLink;
 use App\Jobs\Locations\CrawlTerminalWestLink;
+use App\Jobs\Locations\CrawlVenkmansLink;
 
 use Cache;
 use DB;
@@ -59,7 +60,7 @@ class PopulateEventsCommand extends Command
 
         $providers = Provider::isActive()
             // ->where('last_scraped', '<=', $this->today->format('Y-m-d H:i:s'))
-            ->where('id', '=', 2)
+            ->where('id', '=', 1)
             // ->orWhereNull('last_scraped')
             ->get();
 
@@ -1918,5 +1919,105 @@ class PopulateEventsCommand extends Command
         Cache::put($keyDate, $date);
 
         $this->info('regenerateChecksums -> end');
+    }
+
+    /**
+    * Provider Laughing Skull Lounge
+    *
+    * @param Provider      $provider
+    * @param WebScraper    $scraper
+    * @param SpotifyWebAPI $spotify
+    *
+    * @return array
+    */
+    public function providerLaughingSkullLounge(Provider $provider, $scraper, SpotifyWebAPI $spotify)
+    {
+        // get events for 5 months
+        $startDate = Carbon::now();
+        $endDate = $startDate->copy()->addMonths(5);
+        $months = [];
+
+        $months[] = $startDate->copy();
+
+        for ($date = $startDate->copy(); $date->lte($endDate); $date->addMonth()) {
+            $months[] = $date->copy();
+        }
+
+        $urls = [];
+        foreach($months as $date) {
+            $url = $provider->scrape_url . '?m=' . $date->format('n') . '&y=' . $date->format('Y');
+
+            $crawler = $scraper->request('GET', $url);
+
+            // let's just collect links, that's it
+            $links = [];
+            $today = Carbon::now();
+
+            $crawler->filter('.eventContainer')->each(function ($node) use (&$links, $provider, $today, $date) {
+
+                // get day
+                $day = trim($node->parents()->filter('.day')->text());
+
+                if (strlen($day) === 1) {
+                    $day = '0' . $day;
+                }
+
+                // figure out date time
+                $startDate = Carbon::parse($date->format('Y-m') . '-' . $day);
+
+                if ($startDate->greaterThanOrEqualTo($today)) {
+                    for ($i = 1; $i <= 5; $i++) {
+                        try {
+                            $hasTitle = $node->filter('.title-' . $i)->text();
+
+                            if (!empty($hasTitle)) {
+                                $links[] = [
+                                    'website' => $node->filter('.title-' . $i . ' > a')->attr('href'),
+                                    'location_id' => $provider->location_id,
+                                    'category_id' => $provider->location->category_id,
+                                    'start_date' => $startDate->format('Y-m-d')
+                                ];
+                            }
+                        } catch (\Exception $e) {
+                            // do nothing
+                        }
+                    }
+                }
+
+                return true;
+            });
+
+            foreach($links as $link) {
+                $urls[] = $link;
+            }
+        }
+
+        $this->info(count($urls) . ' links found that need to be crawled for provider `' . $provider->name . '`');
+
+        $delays = [];
+        $max = 180;
+        foreach($urls as $event) {
+            do {
+                $rand = rand(5, $max);
+
+                if (!in_array($rand, $delays)) {
+                    $delays[] = $rand;
+
+                    break;
+                }
+            } while (0);
+
+            CrawlLaughingSkullLoungeLink::dispatch($event)
+                ->delay(now()->addSeconds($rand));
+
+            $this->info('Dispatching crawler for url: ' . $event['website'] . '. Delay: ' . $rand);
+        }
+
+        // save last scraped time
+        $provider->last_scraped = Carbon::now();
+
+        $provider->save();
+
+        return $urls;
     }
 }

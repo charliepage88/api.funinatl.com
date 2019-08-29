@@ -55,7 +55,8 @@ class Event extends Model implements HasMedia
         'website',
         'is_sold_out',
         'is_family_friendly',
-        'is_explicit'
+        'is_explicit',
+        'event_type_id'
     ];
 
     /**
@@ -1130,10 +1131,18 @@ class Event extends Model implements HasMedia
                     $description = 'See live music at ' . $location . ' on ' . $date . '. Starting at ' . $time . ' with plenty of great music.';
                 }
             } else {
-                if ($category === 'Other') {
-                    $description = 'On ' . $date . ', starting at ' . $time . '. Go check out this event at ' . $location . '!';
-                } else {
-                    $description = 'On ' . $date . ', starting at ' . $time . '. Enjoy ' . $category . ' with this event at ' . $location;
+                switch ($category) {
+                    case 'Other':
+                        $description = 'On ' . $date . ', starting at ' . $time . '. Go check out this event at ' . $location . '!';
+                    break;
+
+                    case 'Comedy':
+                        $description = 'Catch some laughs at ' . $location . ' on ' . $date . ', starting at ' . $time . '. Drink minimum may apply.';
+                    break;
+
+                    default:
+                        $description = 'On ' . $date . ', starting at ' . $time . '. Enjoy ' . $category . ' with this event at ' . $location;
+                    break;
                 }
             }
 
