@@ -198,6 +198,13 @@ class Report extends Model
                     'responsive' => true
                 ],
                 'data' => []
+            ],
+
+            'events_upcoming_slow' => [
+                'options' => [
+                    'responsive' => true
+                ],
+                'data' => []
             ]
         ];
 
@@ -235,6 +242,59 @@ class Report extends Model
         }
 
         $charts['events_timeline']['data'] = $data;
+
+        // events upcoming slow days chart
+        $data = [
+            'labels' => [],
+            'datasets' => [
+                [
+                    'label' => '# of Events',
+                    'data' => [],
+                    'fill' => false,
+                    'lineTension' => 0.1,
+                    'borderColor' => 'rgb(75, 192, 192)'
+                ]
+            ]
+        ];
+
+        $startDate = Carbon::now();
+        $endDate = $startDate->copy()->addDays(30);
+
+        // get events
+        $tmpEvents = DB::table('events')
+            ->where('active', true)
+            ->where('is_explicit', false)
+            ->whereNull('deleted_at')
+            ->where('start_date', '>=', $startDate->format('Y-m-d'))
+            ->where('start_date', '<=', $endDate->format('Y-m-d'))
+            ->get();
+
+
+        $events = [];
+        foreach($tmpEvents as $event) {
+            if (!isset($events[$event->start_date])) {
+                $events[$event->start_date] = [];
+            }
+
+            $events[$event->start_date][] = $event;
+        }
+
+        // get data
+        $min = 3;
+        for($date = $startDate; $date->lte($endDate); $date->addDay()) {
+            $ymd = $date->format('Y-m-d');
+            $eventsCount = isset($events[$ymd]) ? count($events[$ymd]) : 0;
+
+            if ($eventsCount < 8) {
+                // add label
+                $data['labels'][] = $date->format('Y-m-d');
+
+                // add count
+                $data['datasets'][0]['data'][] = $eventsCount;
+            }
+        }
+
+        $charts['events_upcoming_slow']['data'] = $data;
 
         return $charts;
     }

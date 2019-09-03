@@ -275,25 +275,12 @@
         <div class="column is-half">
             <!--Graph Card-->
             <div class="box">
-                <h5 class="subtitle is-5">Graph</h5>
+                <h5 class="subtitle is-5">Upcoming Events Slow Days</h5>
 
-                {{-- <canvas id="chartjs-0" class="chartjs" width="undefined" height="undefined"></canvas>
-                <script>
-                    new Chart(document.getElementById("chartjs-0"), {
-                        "type": "line",
-                        "data": {
-                            "labels": ["January", "February", "March", "April", "May", "June", "July"],
-                            "datasets": [{
-                                "label": "Views",
-                                "data": [65, 59, 80, 81, 56, 55, 40],
-                                "fill": false,
-                                "borderColor": "rgb(75, 192, 192)",
-                                "lineTension": 0.1
-                            }]
-                        },
-                        "options": {}
-                    });
-                </script> --}}
+                <chart-upcoming-events-slow-days
+                    options-json="{{ json_encode($charts['events_upcoming_slow']['options']) }}"
+                    data-json="{{ json_encode($charts['events_upcoming_slow']['data']) }}"
+                />
             </div>
             <!--/Graph Card-->
         </div>

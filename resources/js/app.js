@@ -33,6 +33,7 @@ Vue.component('admin-delete-button', require('./components/Common/AdminDeleteBut
 
 // chart components
 Vue.component('chart-events-timeline', require('./components/Charts/ChartEventsTimeline.vue').default);
+Vue.component('chart-upcoming-events-slow-days', require('./components/Charts/ChartUpcomingEventsSlowDays.vue').default);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
