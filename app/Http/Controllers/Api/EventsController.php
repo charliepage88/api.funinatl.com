@@ -42,23 +42,30 @@ class EventsController extends Controller
         // save event
         $event = new Event;
 
-        $event->fill($request->except('photo', 'tags'));
+        $event->fill($request->except('photo', 'tags', 'start_date', 'end_date'));
 
         $event->user_id = 1;
         $event->event_type_id = 1;
         $event->source = 'submission';
         $event->active = false;
 
+        // parse dates
+        $event->start_date = Carbon::parse($request->input('start_date'))->format('Y-m-d');
+
+        if ($request->input('end_date')) {
+            $event->end_date = Carbon::parse($request->input('end_date'))->format('Y-m-d');
+        }
+
         // parse start time
-        if ($request->input('start_date') && $event->has('start_time')) {
-            $date = $request->input('start_date') . ' ' . $request->input('start_time');
+        if ($event->has('start_time')) {
+            $date = $event->start_date . ' ' . $request->input('start_time');
 
             $event->start_time = Carbon::parse($date)->format('g:i A');
         }
 
         // parse end time
-        if ($request->input('end_date') && $event->has('end_time')) {
-            $date = $request->input('end_date') . ' ' . $request->input('end_time');
+        if ($event->has('end_date') && $event->has('end_time')) {
+            $date = $event->end_date . ' ' . $request->input('end_time');
 
             $event->end_time = Carbon::parse($date)->format('g:i A');
         }

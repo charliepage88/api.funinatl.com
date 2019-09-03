@@ -25,7 +25,7 @@
         "vue-template-compiler": "^2.6.10"
     },
     "dependencies": {
-        "buefy": "^0.8.2",
+        "buefy": "^0.8.3",
         "chart.js": "^2.8.0",
         "flatpickr": "^4.6.2",
         "lodash.get": "^4.4.2",
