@@ -57,14 +57,12 @@ class EventsController extends Controller
         }
 
         // parse start time
-        if ($event->has('start_time')) {
-            $date = $event->start_date . ' ' . $request->input('start_time');
+        $date = $event->start_date . ' ' . $request->input('start_time');
 
-            $event->start_time = Carbon::parse($date)->format('g:i A');
-        }
+        $event->start_time = Carbon::parse($date)->format('g:i A');
 
         // parse end time
-        if ($event->has('end_date') && $event->has('end_time')) {
+        if ($request->has('end_date') && $request->has('end_time')) {
             $date = $event->end_date . ' ' . $request->input('end_time');
 
             $event->end_time = Carbon::parse($date)->format('g:i A');
@@ -72,10 +70,12 @@ class EventsController extends Controller
 
         $event->save();
 
+        // add any photo's
         if ($request->has('photo')) {
             $event->addMedia($request->file('photo'))->toMediaCollection('events');
         }
 
+        // add tags
         if ($request->has('tags') && $request->input('tags') !== null) {
             $event->syncTags(explode(',', $request->input('tags')));
         }
