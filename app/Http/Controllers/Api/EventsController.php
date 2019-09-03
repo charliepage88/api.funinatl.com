@@ -50,20 +50,22 @@ class EventsController extends Controller
         $event->active = false;
 
         // parse dates
-        $event->start_date = Carbon::parse($request->input('start_date'))->format('Y-m-d');
+        $event->start_date = Carbon::parse($request->input('start_date'));
 
         if ($request->input('end_date')) {
-            $event->end_date = Carbon::parse($request->input('end_date'))->format('Y-m-d');
+            $event->end_date = Carbon::parse($request->input('end_date'));
         }
 
         // parse start time
-        $date = $event->start_date . ' ' . $request->input('start_time');
+        $startTime = Carbon::parse($request->input('start_time'))->format('H:i:s');
+        $date = $event->start_date->format('Y-m-d') . ' ' . $startTime;
 
         $event->start_time = Carbon::parse($date)->format('g:i A');
 
         // parse end time
-        if ($request->has('end_date') && $request->has('end_time')) {
-            $date = $event->end_date . ' ' . $request->input('end_time');
+        if ($request->input('end_date') && $request->input('end_time')) {
+            $endTime = Carbon::parse($request->input('end_time'))->format('H:i:s');
+            $date = $event->end_date->format('Y-m-d') . ' ' . $endTime;
 
             $event->end_time = Carbon::parse($date)->format('g:i A');
         }
