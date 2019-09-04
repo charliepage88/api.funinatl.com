@@ -195,14 +195,16 @@ class Report extends Model
         $charts = [
             'events_timeline' => [
                 'options' => [
-                    'responsive' => true
+                    'responsive' => true,
+                    'maintainAspectRatio' => true
                 ],
                 'data' => []
             ],
 
             'events_upcoming_slow' => [
                 'options' => [
-                    'responsive' => true
+                    'responsive' => true,
+                    'maintainAspectRatio' => true
                 ],
                 'data' => []
             ]
@@ -681,5 +683,21 @@ class Report extends Model
         }
 
         return $items;
+    }
+
+    /**
+    * Get Report Daily Tweets
+    *
+    * @param array $filters
+    *
+    * @return array
+    */
+    public static function getReportDailyTweets($filters = [])
+    {
+        $report = [];
+
+
+
+        return $report;
     }
 }

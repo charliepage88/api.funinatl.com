@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 use Goutte\Client as WebScraper;
+use GuzzleHttp\Client as Guzzle;
 use ICal\ICal;
 use SpotifyWebAPI\SpotifyWebAPI;
 use Symfony\Component\DomCrawler\Crawler;
@@ -60,7 +61,7 @@ class PopulateEventsCommand extends Command
 
         $providers = Provider::isActive()
             // ->where('last_scraped', '<=', $this->today->format('Y-m-d H:i:s'))
-            ->where('id', '=', 1)
+            ->where('id', '=', 11)
             // ->orWhereNull('last_scraped')
             ->get();
 
@@ -2008,6 +2009,185 @@ class PopulateEventsCommand extends Command
             } while (0);
 
             CrawlLaughingSkullLoungeLink::dispatch($event)
+                ->delay(now()->addSeconds($rand));
+
+            $this->info('Dispatching crawler for url: ' . $event['website'] . '. Delay: ' . $rand);
+        }
+
+        // save last scraped time
+        $provider->last_scraped = Carbon::now();
+
+        $provider->save();
+
+        return $urls;
+    }
+
+    /**
+    * Provider Red Light Cafe
+    *
+    * @param Provider      $provider
+    * @param WebScraper    $scraper
+    * @param SpotifyWebAPI $spotify
+    *
+    * @return array
+    */
+    public function providerRedLightCafe(Provider $provider, $scraper, SpotifyWebAPI $spotify)
+    {
+        // get client
+        $client = new Guzzle;
+
+        // get website url
+        $locationWebsite = $provider->location->website;
+
+        // get events for 4 months
+        $today = Carbon::now();
+        $endDate = $today->copy()->addMonths(4);
+        $months = [];
+
+        $months[] = $today->copy();
+
+        for ($date = $today->copy(); $date->lte($endDate); $date->addMonth()) {
+            $months[] = $date->copy();
+        }
+
+        // get categories
+        $items = Category::all();
+
+        $categories = [];
+        foreach($items as $item) {
+            $categories[$item->slug] = $item;
+        }
+
+        // get event data
+        $events = [];
+        foreach($months as $date) {
+            $url = $provider->scrape_url . '?month=' . $date->format('m-Y');
+            $url .= '&collectionId=516db1d0e4b0633e7b269026';
+
+            $response = $client->get($url);
+            $response = json_decode((string) $response->getBody(), true);
+
+            foreach($response as $item) {
+                // init data
+                $event = [
+                    'name' => $item['title'],
+                    'website' => $locationWebsite . $item['fullUrl'],
+                    'image_url' => $item['assetUrl'],
+                    'start_date' => '',
+                    'start_time' => '',
+                    'end_date' => '',
+                    'end_time' => '',
+                    'category_id' => $provider->location->category_id,
+                    'location_id' => $provider->location_id,
+                    'user_id' => 1,
+                    'event_type_id' => 2,
+                    'price' => '',
+                    'is_sold_out' => false,
+                    'tags' => [],
+                    'bands' => []
+                ];
+
+                // parse start date & time
+                $start_date = floor(($item['startDate'] / 1000));
+                $start_date = Carbon::createFromFormat('U', $start_date)
+                    ->subHours(4);
+
+                $event['start_date'] = $start_date->format('Y-m-d');
+                $event['start_time'] = $start_date->format('g:i A');
+
+                // parse end date & time
+                if (!empty($item['endDate'])) {
+                    $end_date = floor(($item['endDate'] / 1000));
+                    $end_date = Carbon::createFromFormat('U', $end_date)
+                        ->subHours(4);
+
+                    $event['end_date'] = $end_date->format('Y-m-d');
+                    $event['end_time'] = $end_date->format('g:i A');
+
+                    if ($event['start_date'] === $event['end_date']) {
+                        $event['end_date'] = null;
+                    }
+                } else {
+                    $event['end_time'] = $start_date->addHours(3)->format('g:i A');
+                }
+
+                // get event price
+                // and meta info
+                $crawler = new Crawler($item['excerpt']);
+
+                $metaItems = $crawler->filter('p')->each(function ($node) {
+                    $text = trim($node->text());
+                    $html = trim($node->html());
+                    $metaValue = null;
+                    $metaType = 'price';
+
+                    if (strstr($text, '$')) {
+                        $ex = explode('</strong>', $html);
+                        $ex2 = explode('<br>', $ex[1]);
+
+                        $metaValue = $ex2[0];
+                    } elseif (strstr($text, ' TICKETS')) {
+                        $metaValue = null;
+                        $metaType = null;
+                    } else {
+                        $metaValue = $text;
+                        $metaType = 'description';
+                    }
+
+                    return [
+                        'type' => $metaType,
+                        'value' => trim($metaValue)
+                    ];
+                });
+
+                foreach($metaItems as $metaRow) {
+                    if (!empty($metaRow['type']) && !empty($metaRow['value'])) {
+                        switch {
+                            case 'price':
+                                $event['price'] = $metaRow['value'];
+                            break;
+
+                            case 'description':
+                                $event['short_description'] = $metaRow['value'];
+                            break;
+                        }
+                    }
+                }
+
+                // check if event is "music" or not
+                $nameLower = strtolower($event['name']);
+
+                if (strstr($nameLower, 'comedy')) {
+                    $event['category_id'] = $categories['comedy']->id;
+                }
+
+                // check for tags
+
+                // gather bands if music event
+                if ($event['category_id'] === $categories['music']->id) {
+                    
+                }
+
+                // only add event if date >= today
+                if ($start_date->greaterThanOrEqualTo($today)) {
+                    $find = [
+                        '&amp;'
+                    ];
+
+                    $event['name'] = trim(str_replace($find, '', $event['name']));
+                    $event['name'] = str_replace('  ', ' ', $event['name']);
+
+                    $events[] = $event;
+                }
+            }
+        }
+
+        dd($events);
+
+        $this->info(count($events) . ' links found that need to be crawled for provider `' . $provider->name . '`');
+
+        foreach($events as $event) {
+            ParseMusicEvent::dispatch($event, $spotify)
                 ->delay(now()->addSeconds($rand));
 
             $this->info('Dispatching crawler for url: ' . $event['website'] . '. Delay: ' . $rand);

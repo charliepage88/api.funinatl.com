@@ -1,15 +1,21 @@
+<template>
+  <line-chart :chartData="chartData" :chartOptions="chartOptions" />
+</template>
+
 <script>
-import { Line } from 'vue-chartjs'
+import LineChart from './LineChart.js'
 
 export default {
   name: 'chart-events-timeline',
-
-  extends: Line,
 
   props: [
     'dataJson',
     'optionsJson'
   ],
+
+  components: {
+    LineChart
+  },
 
   computed: {
     chartData () {
@@ -19,10 +25,6 @@ export default {
     chartOptions () {
       return JSON.parse(this.optionsJson)
     }
-  },
-
-  mounted () {
-    this.renderChart(this.chartData, this.chartOptions)
   }
 }
 </script>
