@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use Geocoder\Provider\AlgoliaPlaces\AlgoliaPlaces;
-use Http\Adapter\Guzzle6\Client;
+use GuzzleHttp\Client;
 use Illuminate\Support\ServiceProvider;
 
 use App\Event;
@@ -22,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->singleton('geocoder', function () {
-            $adapter  = new Client();
+            $adapter  = new Client;
             $provider = new AlgoliaPlaces(
                 $adapter,
                 config('services.algolia.places.key'),

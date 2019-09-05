@@ -78,6 +78,10 @@ Route::middleware('auth')->namespace('Admin')->prefix('admin')->group(function (
         ->name('admin.contact_submissions.review');
     Route::get('/contact-submissions/delete/{submission}', 'ContactSubmissionsController@destroy')
         ->name('admin.contact_submissions.delete');
+
+    // Reports
+    Route::get('/reports/daily-tweets', 'ReportsController@dailyTweets')
+        ->name('admin.reports.daily_tweets');
 });
 
 // Webhooks

@@ -4,14 +4,51 @@
  * building robust, powerful web applications using Vue and Laravel.
  */
 
-// require('./bootstrap');
+require('./bootstrap');
 
 window.Vue = require('vue');
 
 import Buefy from 'buefy'
 import 'buefy/dist/buefy.css'
+import moment from 'moment'
 
 Vue.use(Buefy)
+
+Vue.filter('date', (val) => {
+  return moment(val).format('MMMM Do YYYY, h:mm a')
+})
+
+Vue.filter('timeAgo', (val) => {
+  return moment(val).fromNow()
+})
+
+Vue.filter('truncate', function (text, stop, clamp) {
+  return text.slice(0, stop) + (stop < text.length ? clamp || '...' : '')
+})
+
+Vue.filter('normalDate', (value) => {
+  let date = moment(value)
+
+  return date.format('dddd, MMMM Do')
+})
+
+Vue.filter('dayOfWeek', (value) => {
+  let date = moment(value)
+
+  return date.format('dddd, MMM Do')
+})
+
+Vue.filter('friendlyDate', (value) => {
+  return moment(value).format('dddd, MMM Do')
+})
+
+Vue.filter('fullDate', (value) => {
+  return moment(value).format('dddd, MMMM Do')
+})
+
+Vue.filter('friendlyTime', (value) => {
+  return moment(value).format('h:mm A')
+})
 
 /**
  * The following block of code may be used to automatically register your
@@ -36,7 +73,7 @@ Vue.component('chart-events-timeline', require('./components/Charts/ChartEventsT
 Vue.component('chart-upcoming-events-slow-days', require('./components/Charts/ChartUpcomingEventsSlowDays.vue').default);
 
 // admin report components
-Vue.component('report-daily-tweets', require('./components/reports/ReportDailyTweets.vue').default);
+Vue.component('report-daily-tweets', require('./components/Reports/ReportDailyTweets.vue').default);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to

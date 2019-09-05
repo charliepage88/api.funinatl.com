@@ -50,4 +50,8 @@ Route::namespace('Api')->group(function () {
     Route::middleware('auth:api')->get('/user', 'UsersController@show');
     Route::post('/auth/login', 'UsersController@login');
     Route::post('/auth/register', 'UsersController@register');
+
+    // Reports
+    Route::get('/reports/daily-tweets', 'ReportsController@dailyTweets');
+    Route::post('/reports/daily-tweets', 'ReportsController@updateDailyTweets');
 });

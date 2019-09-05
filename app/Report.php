@@ -694,9 +694,64 @@ class Report extends Model
     */
     public static function getReportDailyTweets($filters = [])
     {
-        $report = [];
+        // collect dates
+        if (empty($filters['start_date'])) {
+            $startDate = Carbon::now()->addDay();
+        } else {
+            $startDate = Carbon::parse($filters['start_date']);
+        }
 
+        if (empty($filters['end_date'])) {
+            $endDate = Carbon::now()->addDays(14);
+        } else {
+            $endDate = Carbon::parse($filters['end_date']);
+        }
 
+        $startDate = $startDate->format('Y-m-d');
+        $endDate = $endDate->format('Y-m-d');
+
+        $data = self::getEventsByPeriod($startDate, $endDate);
+
+        $report = $data['events'];
+
+        // get data
+        foreach($report as $periodKey => $period) {
+
+            foreach($period['days'] as $dayKey => $day) {
+                $report[$periodKey]['days'][$dayKey]['tweet_content'] = null;
+
+                // collect event ids
+                $eventIds = [];
+                foreach($day['events'] as $event) {
+                    $eventIds[] = $event['id'];
+                }
+
+                // get events
+                $events = Event::whereIn('id', $eventIds)->get();
+
+                $tweetContent = null;
+                foreach($events as $index => $event) {
+                    // add tweet content if there is any
+                    if ($index === 0 && $event->hasMeta('tweet_content')) {
+                        $tweetContent = $event->getMeta('tweet_content');
+                    }
+
+                    // check if event will be tweeted
+                    if ($event->hasMeta('is_tweetable')) {
+                        $find = array_search($event->id, $day['events']);
+
+                        if ($find !== false) {
+                            $report[$periodKey]['days'][$dayKey]['events'][$find]['is_tweetable'] = $event->getMeta('is_tweetable');
+                        }
+                    }
+                }
+
+                // add tweet content, if any
+                if (!empty($tweetContent)) {
+                    $report[$periodKey]['days'][$dayKey]['tweet_content'] = $tweetContent;
+                }
+            }
+        }
 
         return $report;
     }

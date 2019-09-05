@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Appstract\Meta\Metable;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -26,6 +27,7 @@ class Event extends Model implements HasMedia
     use HasMediaTrait,
         HasSlug,
         HasTags,
+        Metable,
         Searchable,
         SoftDeletes;
 

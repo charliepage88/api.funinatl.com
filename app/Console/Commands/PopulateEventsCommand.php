@@ -2142,7 +2142,7 @@ class PopulateEventsCommand extends Command
 
                 foreach($metaItems as $metaRow) {
                     if (!empty($metaRow['type']) && !empty($metaRow['value'])) {
-                        switch {
+                        switch ($metaRow['type']) {
                             case 'price':
                                 $event['price'] = $metaRow['value'];
                             break;

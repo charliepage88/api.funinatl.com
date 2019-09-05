@@ -1,0 +1,984 @@
+h1, h2, h3, h4, h5, h6
+  letter-spacing: 1px!important
+
+.has-cursor-pointer
+  cursor: pointer!important
+
+  &:hover
+    cursor: pointer!important
+
+.events-container
+
+.event-card
+  width: 32.5%!important
+  margin-right: 7px
+  margin-bottom: 10px
+
+.w-30
+  width: 30%
+
+.is-indigo
+  background-color: indigo
+  color: #fff
+
+  &:hover
+    color: #fafafa!important
+
+// misc
+.media-content
+  overflow: hidden
+
+.card
+  overflow: hidden
+
+  &.large
+    height: 730px
+    -webkit-backface-visibility: hidden
+    backface-visibility: initial
+    border-radius: 5px
+
+.is-centered
+  margin: 0 auto!important
+  display: block!important
+
+.has-text-normal
+  text-transform: initial
+  letter-spacing: initial
+
+.vue-back-to-top
+  z-index: 0
+
+.btn-to-top
+  width: 60px
+  height: 60px
+  padding: 10px 16px
+  border-radius: 50%
+  font-size: 22px
+  line-height: 22px
+
+.control.is-fullwidth
+  span.select
+    min-width: 100%!important
+
+    select
+      min-width: 100%!important
+
+.has-no-underline
+  text-decoration: none!important
+
+  &:hover
+    text-decoration: none!important
+
+// margin & padding helpers
+@for $i from 1 through 8
+  // margin
+  .mt-#{$i}
+    margin-top: (1rem * $i)!important
+
+  .mr-#{$i}
+    margin-right: (1rem * $i)!important
+
+  .ml-#{$i}
+    margin-left: (1rem * $i)!important
+
+  .mb-#{$i}
+    margin-bottom: (1rem * $i)!important
+
+  .m-#{$i}
+    margin: (1rem * $i) (1rem * $i) (1rem * $i) (1rem * $i)!important
+
+  // padding
+  .pt-#{$i}
+    padding-top: (1rem * $i)!important
+
+  .pr-#{$i}
+    padding-right: (1rem * $i)!important
+
+  .pl-#{$i}
+    padding-left: (1rem * $i)!important
+
+  .pb-#{$i}
+    padding-bottom: (1rem * $i)!important
+
+  .p-#{$i}
+    padding: (1rem * $i) (1rem * $i) (1rem * $i) (1rem * $i)!important
+
+// px helpers for margin/padding
+@for $i from 1 through 30
+  // margin
+  .mt-px-#{$i}
+    margin-top: (1px * $i)!important
+
+  .mr-px-#{$i}
+    margin-right: (1px * $i)!important
+
+  .ml-px-#{$i}
+    margin-left: (1px * $i)!important
+
+  .mb-px-#{$i}
+    margin-bottom: (1px * $i)!important
+
+  .m-px-#{$i}
+    margin: (1px * $i) (1px * $i) (1px * $i) (1px * $i)!important
+
+  // padding
+  .pt-px-#{$i}
+    padding-top: (1px * $i)!important
+
+  .pr-px-#{$i}
+    padding-right: (1px * $i)!important
+
+  .pl-px-#{$i}
+    padding-left: (1px * $i)!important
+
+  .pb-px-#{$i}
+    padding-bottom: (1px * $i)!important
+
+  .p-px-#{$i}
+    padding: (1px * $i) (1px * $i) (1px * $i) (1px * $i)!important
+
+// no padding
+.p-0
+  padding: 0!important
+
+.pt-0
+  padding-top: 0!important
+
+.pb-0
+  padding-bottom: 0!important
+
+.pl-0
+  padding-left: 0!important
+
+.pr-0
+  padding-right: 0!important
+
+// no margin
+.m-0
+  margin: 0!important
+
+.mt-0
+  margin-top: 0!important
+
+.mb-0
+  margin-bottom: 0!important
+
+.ml-0
+  margin-left: 0!important
+
+.mr-0
+  margin-right: 0!important
+
+// position classes
+.relative
+  position: relative!important
+
+.absolute
+  position: absolute!important
+
+@for $i from 0 through 10
+  .bottom-#{$i}
+    bottom: (1px * $i)!important
+
+  .top-#{$i}
+    top: (1px * $i)!important
+
+  .left-#{$i}
+    left: (1px * $i)!important
+
+  .right-#{$i}
+    right: (1px * $i)!important
+
+// shadows
+
+.shadow
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)
+
+.shadow-md
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)
+
+.shadow-lg
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)
+
+.shadow-xl
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)
+
+.shadow-2xl
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25)
+
+.shadow-inner
+  box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)
+
+.shadow-outline
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5)
+
+.shadow-none
+  box-shadow: none
+
+// borders
+@for $i from 1 through 5
+  // primary
+  .border-primary-#{$i}
+    border: (1px * $i) solid #209cee
+
+  .border-t-primary-#{$i}
+    border-top: (1px * $i) solid #209cee
+
+  .border-b-primary-#{$i}
+    border-bottom: (1px * $i) solid #209cee
+
+  .border-l-primary-#{$i}
+    border-left: (1px * $i) solid #209cee
+
+  .border-r-primary-#{$i}
+    border-right: (1px * $i) solid #209cee
+
+  // danger
+  .border-danger-#{$i}
+    border: (1px * $i) solid #d9534f
+
+  .border-t-danger-#{$i}
+    border-top: (1px * $i) solid #d9534f
+
+  .border-b-danger-#{$i}
+    border-bottom: (1px * $i) solid #d9534f
+
+  .border-l-danger-#{$i}
+    border-left: (1px * $i) solid #d9534f
+
+  .border-r-danger-#{$i}
+    border-right: (1px * $i) solid #d9534f
+
+// MOBILE
+@media screen and (max-width: 480px)
+  .card
+    height: auto!important
+
+  .is-visible-tablet
+    display: none!important
+
+  .is-visible-desktop
+    display: none!important
+
+  .is-fullwidth-mobile
+    width: 100%!important
+
+  section.section.is-content
+    padding-top: 10px!important
+
+  .has-text-centered-mobile
+    text-align: center!important
+
+  .container.is-auth, .container.is-content
+    padding: 1rem
+
+  .column.is-narrow-mobile
+    width: auto!important
+
+  // margin & padding helpers
+  @for $i from 1 through 8
+    // margin
+    .mt-mobile-#{$i}
+      margin-top: (1rem * $i)!important
+
+    .mr-mobile-#{$i}
+      margin-right: (1rem * $i)!important
+
+    .ml-mobile-#{$i}
+      margin-left: (1rem * $i)!important
+
+    .mb-mobile-#{$i}
+      margin-bottom: (1rem * $i)!important
+
+    .m-mobile-#{$i}
+      margin: (1rem * $i) (1rem * $i) (1rem * $i) (1rem * $i)!important
+
+    // padding
+    .pt-mobile-#{$i}
+      padding-top: (1rem * $i)!important
+
+    .pr-mobile-#{$i}
+      padding-right: (1rem * $i)!important
+
+    .pl-mobile-#{$i}
+      padding-left: (1rem * $i)!important
+
+    .pb-mobile-#{$i}
+      padding-bottom: (1rem * $i)!important
+
+    .p-mobile-#{$i}
+      padding: (1rem * $i) (1rem * $i) (1rem * $i) (1rem * $i)!important
+
+  // px helpers for margin/padding
+  @for $i from 1 through 30
+    // margin
+    .mt-px-mobile-#{$i}
+      margin-top: (1px * $i)!important
+
+    .mr-px-mobile-#{$i}
+      margin-right: (1px * $i)!important
+
+    .ml-px-mobile-#{$i}
+      margin-left: (1px * $i)!important
+
+    .mb-px-mobile-#{$i}
+      margin-bottom: (1px * $i)!important
+
+    .m-px-mobile-#{$i}
+      margin: (1px * $i) (1px * $i) (1px * $i) (1px * $i)!important
+
+    // padding
+    .pt-px-mobile-#{$i}
+      padding-top: (1px * $i)!important
+
+    .pr-px-mobile-#{$i}
+      padding-right: (1px * $i)!important
+
+    .pl-px-mobile-#{$i}
+      padding-left: (1px * $i)!important
+
+    .pb-px-mobile-#{$i}
+      padding-bottom: (1px * $i)!important
+
+    .p-px-mobile-#{$i}
+      padding: (1px * $i) (1px * $i) (1px * $i) (1px * $i)!important
+
+  // no padding
+  .p-mobile-0
+    padding: 0!important
+
+  .pt-mobile-0
+    padding-top: 0!important
+
+  .pb-mobile-0
+    padding-bottom: 0!important
+
+  .pl-mobile-0
+    padding-left: 0!important
+
+  .pr-mobile-0
+    padding-right: 0!important
+
+  // no margin
+  .m-mobile-0
+    margin: 0!important
+
+  .mt-mobile-0
+    margin-top: 0!important
+
+  .mb-mobile-0
+    margin-bottom: 0!important
+
+  .ml-mobile-0
+    margin-left: 0!important
+
+  .mr-mobile-0
+    margin-right: 0!important
+
+// TABLET
+@media screen and (min-width: 481px) and (max-width: 1250px)
+  .is-visible-mobile
+    display: none!important
+
+  .is-visible-desktop
+    display: none!important
+
+  .container.is-auth
+    margin: 0 auto!important
+    width: 70%!important
+    padding: 1.25rem!important
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -1px rgba(0,0,0,.06)
+    background-color: #fff!important
+    border-radius: 6px
+
+  .container.is-content
+    margin: 0 auto!important
+    width: 90%!important
+    padding: 1.25rem!important
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -1px rgba(0,0,0,.06)
+    background-color: #fff!important
+    border-radius: 6px
+
+  .column.is-narrow-tablet
+    width: auto!important
+
+  // margin & padding helpers
+  @for $i from 1 through 8
+    // margin
+    .mt-tablet-#{$i}
+      margin-top: (1rem * $i)!important
+
+    .mr-tablet-#{$i}
+      margin-right: (1rem * $i)!important
+
+    .ml-tablet-#{$i}
+      margin-left: (1rem * $i)!important
+
+    .mb-tablet-#{$i}
+      margin-bottom: (1rem * $i)!important
+
+    .m-tablet-#{$i}
+      margin: (1rem * $i) (1rem * $i) (1rem * $i) (1rem * $i)!important
+
+    // padding
+    .pt-tablet-#{$i}
+      padding-top: (1rem * $i)!important
+
+    .pr-tablet-#{$i}
+      padding-right: (1rem * $i)!important
+
+    .pl-tablet-#{$i}
+      padding-left: (1rem * $i)!important
+
+    .pb-tablet-#{$i}
+      padding-bottom: (1rem * $i)!important
+
+    .p-tablet-#{$i}
+      padding: (1rem * $i) (1rem * $i) (1rem * $i) (1rem * $i)!important
+
+  // px helpers for margin/padding
+  @for $i from 1 through 30
+    // margin
+    .mt-px-tablet-#{$i}
+      margin-top: (1px * $i)!important
+
+    .mr-px-tablet-#{$i}
+      margin-right: (1px * $i)!important
+
+    .ml-px-tablet-#{$i}
+      margin-left: (1px * $i)!important
+
+    .mb-px-tablet-#{$i}
+      margin-bottom: (1px * $i)!important
+
+    .m-px-tablet-#{$i}
+      margin: (1px * $i) (1px * $i) (1px * $i) (1px * $i)!important
+
+    // padding
+    .pt-px-tablet-#{$i}
+      padding-top: (1px * $i)!important
+
+    .pr-px-tablet-#{$i}
+      padding-right: (1px * $i)!important
+
+    .pl-px-tablet-#{$i}
+      padding-left: (1px * $i)!important
+
+    .pb-px-tablet-#{$i}
+      padding-bottom: (1px * $i)!important
+
+    .p-px-tablet-#{$i}
+      padding: (1px * $i) (1px * $i) (1px * $i) (1px * $i)!important
+
+  // no padding
+  .p-tablet-0
+    padding: 0!important
+
+  .pt-tablet-0
+    padding-top: 0!important
+
+  .pb-tablet-0
+    padding-bottom: 0!important
+
+  .pl-tablet-0
+    padding-left: 0!important
+
+  .pr-tablet-0
+    padding-right: 0!important
+
+  // no margin
+  .m-tablet-0
+    margin: 0!important
+
+  .mt-tablet-0
+    margin-top: 0!important
+
+  .mb-tablet-0
+    margin-bottom: 0!important
+
+  .ml-tablet-0
+    margin-left: 0!important
+
+  .mr-tablet-0
+    margin-right: 0!important
+  
+
+// route transition
+.page-enter-active, .page-leave-active
+  transition: opacity .5s
+
+.page-enter, .page-leave-to
+  opacity: 0
+
+// DESKTOP
+@media screen and (min-width: 1251px) and (max-width: 1439px)
+  .column.is-narrow-mobile
+    width: auto!important
+
+  // margin & padding helpers
+  @for $i from 1 through 8
+    // margin
+    .mt-desktop-#{$i}
+      margin-top: (1rem * $i)!important
+
+    .mr-desktop-#{$i}
+      margin-right: (1rem * $i)!important
+
+    .ml-desktop-#{$i}
+      margin-left: (1rem * $i)!important
+
+    .mb-desktop-#{$i}
+      margin-bottom: (1rem * $i)!important
+
+    .m-desktop-#{$i}
+      margin: (1rem * $i) (1rem * $i) (1rem * $i) (1rem * $i)!important
+
+    // padding
+    .pt-desktop-#{$i}
+      padding-top: (1rem * $i)!important
+
+    .pr-desktop-#{$i}
+      padding-right: (1rem * $i)!important
+
+    .pl-desktop-#{$i}
+      padding-left: (1rem * $i)!important
+
+    .pb-desktop-#{$i}
+      padding-bottom: (1rem * $i)!important
+
+    .p-desktop-#{$i}
+      padding: (1rem * $i) (1rem * $i) (1rem * $i) (1rem * $i)!important
+
+  // px helpers for margin/padding
+  @for $i from 1 through 30
+    // margin
+    .mt-px-desktop-#{$i}
+      margin-top: (1px * $i)!important
+
+    .mr-px-desktop-#{$i}
+      margin-right: (1px * $i)!important
+
+    .ml-px-desktop-#{$i}
+      margin-left: (1px * $i)!important
+
+    .mb-px-desktop-#{$i}
+      margin-bottom: (1px * $i)!important
+
+    .m-px-desktop-#{$i}
+      margin: (1px * $i) (1px * $i) (1px * $i) (1px * $i)!important
+
+    // padding
+    .pt-px-desktop-#{$i}
+      padding-top: (1px * $i)!important
+
+    .pr-px-desktop-#{$i}
+      padding-right: (1px * $i)!important
+
+    .pl-px-desktop-#{$i}
+      padding-left: (1px * $i)!important
+
+    .pb-px-desktop-#{$i}
+      padding-bottom: (1px * $i)!important
+
+    .p-px-desktop-#{$i}
+      padding: (1px * $i) (1px * $i) (1px * $i) (1px * $i)!important
+
+  // no padding
+  .p-desktop-0
+    padding: 0!important
+
+  .pt-desktop-0
+    padding-top: 0!important
+
+  .pb-desktop-0
+    padding-bottom: 0!important
+
+  .pl-desktop-0
+    padding-left: 0!important
+
+  .pr-desktop-0
+    padding-right: 0!important
+
+  // no margin
+  .m-desktop-0
+    margin: 0!important
+
+  .mt-desktop-0
+    margin-top: 0!important
+
+  .mb-desktop-0
+    margin-bottom: 0!important
+
+  .ml-desktop-0
+    margin-left: 0!important
+
+  .mr-desktop-0
+    margin-right: 0!important
+
+// WIDESCREEN
+@media screen and (min-width: 1440px)
+  .column.is-narrow-widescreen
+    width: auto!important
+
+  // margin & padding helpers
+  @for $i from 1 through 8
+    // margin
+    .mt-widescreen-#{$i}
+      margin-top: (1rem * $i)!important
+
+    .mr-widescreen-#{$i}
+      margin-right: (1rem * $i)!important
+
+    .ml-widescreen-#{$i}
+      margin-left: (1rem * $i)!important
+
+    .mb-widescreen-#{$i}
+      margin-bottom: (1rem * $i)!important
+
+    .m-widescreen-#{$i}
+      margin: (1rem * $i) (1rem * $i) (1rem * $i) (1rem * $i)!important
+
+    // padding
+    .pt-widescreen-#{$i}
+      padding-top: (1rem * $i)!important
+
+    .pr-widescreen-#{$i}
+      padding-right: (1rem * $i)!important
+
+    .pl-widescreen-#{$i}
+      padding-left: (1rem * $i)!important
+
+    .pb-widescreen-#{$i}
+      padding-bottom: (1rem * $i)!important
+
+    .p-widescreen-#{$i}
+      padding: (1rem * $i) (1rem * $i) (1rem * $i) (1rem * $i)!important
+
+  // px helpers for margin/padding
+  @for $i from 1 through 30
+    // margin
+    .mt-px-widescreen-#{$i}
+      margin-top: (1px * $i)!important
+
+    .mr-px-widescreen-#{$i}
+      margin-right: (1px * $i)!important
+
+    .ml-px-widescreen-#{$i}
+      margin-left: (1px * $i)!important
+
+    .mb-px-widescreen-#{$i}
+      margin-bottom: (1px * $i)!important
+
+    .m-px-widescreen-#{$i}
+      margin: (1px * $i) (1px * $i) (1px * $i) (1px * $i)!important
+
+    // padding
+    .pt-px-widescreen-#{$i}
+      padding-top: (1px * $i)!important
+
+    .pr-px-widescreen-#{$i}
+      padding-right: (1px * $i)!important
+
+    .pl-px-widescreen-#{$i}
+      padding-left: (1px * $i)!important
+
+    .pb-px-widescreen-#{$i}
+      padding-bottom: (1px * $i)!important
+
+    .p-px-widescreen-#{$i}
+      padding: (1px * $i) (1px * $i) (1px * $i) (1px * $i)!important
+
+  // no padding
+  .p-widescreen-0
+    padding: 0!important
+
+  .pt-widescreen-0
+    padding-top: 0!important
+
+  .pb-widescreen-0
+    padding-bottom: 0!important
+
+  .pl-widescreen-0
+    padding-left: 0!important
+
+  .pr-widescreen-0
+    padding-right: 0!important
+
+  // no margin
+  .m-widescreen-0
+    margin: 0!important
+
+  .mt-widescreen-0
+    margin-top: 0!important
+
+  .mb-widescreen-0
+    margin-bottom: 0!important
+
+  .ml-widescreen-0
+    margin-left: 0!important
+
+  .mr-widescreen-0
+    margin-right: 0!important
+
+// MOBILE OR TABLET
+@media screen and (max-width: 1250px)
+  .is-visible-computer
+    display: none!important
+
+  .column.is-narrow-touch
+    width: auto!important
+
+  // margin & padding helpers
+  @for $i from 1 through 8
+    // margin
+    .mt-handheld-#{$i}
+      margin-top: (1rem * $i)!important
+
+    .mr-handheld-#{$i}
+      margin-right: (1rem * $i)!important
+
+    .ml-handheld-#{$i}
+      margin-left: (1rem * $i)!important
+
+    .mb-handheld-#{$i}
+      margin-bottom: (1rem * $i)!important
+
+    .m-handheld-#{$i}
+      margin: (1rem * $i) (1rem * $i) (1rem * $i) (1rem * $i)!important
+
+    // padding
+    .pt-handheld-#{$i}
+      padding-top: (1rem * $i)!important
+
+    .pr-handheld-#{$i}
+      padding-right: (1rem * $i)!important
+
+    .pl-handheld-#{$i}
+      padding-left: (1rem * $i)!important
+
+    .pb-handheld-#{$i}
+      padding-bottom: (1rem * $i)!important
+
+    .p-handheld-#{$i}
+      padding: (1rem * $i) (1rem * $i) (1rem * $i) (1rem * $i)!important
+
+  // px helpers for margin/padding
+  @for $i from 1 through 30
+    // margin
+    .mt-px-handheld-#{$i}
+      margin-top: (1px * $i)!important
+
+    .mr-px-handheld-#{$i}
+      margin-right: (1px * $i)!important
+
+    .ml-px-handheld-#{$i}
+      margin-left: (1px * $i)!important
+
+    .mb-px-handheld-#{$i}
+      margin-bottom: (1px * $i)!important
+
+    .m-px-handheld-#{$i}
+      margin: (1px * $i) (1px * $i) (1px * $i) (1px * $i)!important
+
+    // padding
+    .pt-px-handheld-#{$i}
+      padding-top: (1px * $i)!important
+
+    .pr-px-handheld-#{$i}
+      padding-right: (1px * $i)!important
+
+    .pl-px-handheld-#{$i}
+      padding-left: (1px * $i)!important
+
+    .pb-px-handheld-#{$i}
+      padding-bottom: (1px * $i)!important
+
+    .p-px-handheld-#{$i}
+      padding: (1px * $i) (1px * $i) (1px * $i) (1px * $i)!important
+
+  // no padding
+  .p-handheld-0
+    padding: 0!important
+
+  .pt-handheld-0
+    padding-top: 0!important
+
+  .pb-handheld-0
+    padding-bottom: 0!important
+
+  .pl-handheld-0
+    padding-left: 0!important
+
+  .pr-handheld-0
+    padding-right: 0!important
+
+  // no margin
+  .m-handheld-0
+    margin: 0!important
+
+  .mt-handheld-0
+    margin-top: 0!important
+
+  .mb-handheld-0
+    margin-bottom: 0!important
+
+  .ml-handheld-0
+    margin-left: 0!important
+
+  .mr-handheld-0
+    margin-right: 0!important
+
+// DESKTOP OR WIDESCREEN
+@media screen and (min-width: 1251px)
+  .is-visible-touch
+    display: none!important
+
+  .is-visible-mobile
+    display: none!important
+
+  .is-visible-tablet
+    display: none!important
+
+  .column.is-narrow-computer
+    width: auto!important
+
+  .container.is-auth
+    margin: 0 auto!important
+    width: 50%!important
+    padding: 1.25rem!important
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -1px rgba(0,0,0,.06)
+    background-color: #fff!important
+    border-radius: 6px
+
+  .container.is-content
+    margin: 0 auto!important
+    width: 80%!important
+    padding: 1.25rem!important
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -1px rgba(0,0,0,.06)
+    background-color: #fff!important
+    border-radius: 6px
+
+  // margin & padding helpers
+  @for $i from 1 through 8
+    // margin
+    .mt-computer-#{$i}
+      margin-top: (1rem * $i)!important
+
+    .mr-computer-#{$i}
+      margin-right: (1rem * $i)!important
+
+    .ml-computer-#{$i}
+      margin-left: (1rem * $i)!important
+
+    .mb-computer-#{$i}
+      margin-bottom: (1rem * $i)!important
+
+    .m-computer-#{$i}
+      margin: (1rem * $i) (1rem * $i) (1rem * $i) (1rem * $i)!important
+
+    // padding
+    .pt-computer-#{$i}
+      padding-top: (1rem * $i)!important
+
+    .pr-computer-#{$i}
+      padding-right: (1rem * $i)!important
+
+    .pl-computer-#{$i}
+      padding-left: (1rem * $i)!important
+
+    .pb-computer-#{$i}
+      padding-bottom: (1rem * $i)!important
+
+    .p-computer-#{$i}
+      padding: (1rem * $i) (1rem * $i) (1rem * $i) (1rem * $i)!important
+
+  // px helpers for margin/padding
+  @for $i from 1 through 30
+    // margin
+    .mt-px-computer-#{$i}
+      margin-top: (1px * $i)!important
+
+    .mr-px-computer-#{$i}
+      margin-right: (1px * $i)!important
+
+    .ml-px-computer-#{$i}
+      margin-left: (1px * $i)!important
+
+    .mb-px-computer-#{$i}
+      margin-bottom: (1px * $i)!important
+
+    .m-px-computer-#{$i}
+      margin: (1px * $i) (1px * $i) (1px * $i) (1px * $i)!important
+
+    // padding
+    .pt-px-computer-#{$i}
+      padding-top: (1px * $i)!important
+
+    .pr-px-computer-#{$i}
+      padding-right: (1px * $i)!important
+
+    .pl-px-computer-#{$i}
+      padding-left: (1px * $i)!important
+
+    .pb-px-computer-#{$i}
+      padding-bottom: (1px * $i)!important
+
+    .p-px-computer-#{$i}
+      padding: (1px * $i) (1px * $i) (1px * $i) (1px * $i)!important
+
+  // no padding
+  .p-computer-0
+    padding: 0!important
+
+  .pt-computer-0
+    padding-top: 0!important
+
+  .pb-computer-0
+    padding-bottom: 0!important
+
+  .pl-computer-0
+    padding-left: 0!important
+
+  .pr-computer-0
+    padding-right: 0!important
+
+  // no margin
+  .m-computer-0
+    margin: 0!important
+
+  .mt-computer-0
+    margin-top: 0!important
+
+  .mb-computer-0
+    margin-bottom: 0!important
+
+  .ml-computer-0
+    margin-left: 0!important
+
+  .mr-computer-0
+    margin-right: 0!important
+
+  // position classes
+  .is-relative-computer
+    position: relative!important
+
+  .is-absolute-computer
+    position: absolute!important
+
+  .is-bottom-computer-0
+    bottom: 0!important
+
+// NOT MOBILE
+@media screen and (min-width: 481px)
+  .is-newsletter-column
+    margin-left: 5rem
+
+// width helpers
+.is-w-96
+  width: 96px!important
+
+.is-w-128
+  width: 128px!important
+
+.is-w-half
+  width: 50%!important

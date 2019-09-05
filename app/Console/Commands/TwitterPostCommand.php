@@ -15,7 +15,7 @@ class TwitterPostCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'twitter:post';
+    protected $signature = 'twitter:post {action?}';
 
     /**
      * The console command description.
@@ -31,6 +31,38 @@ class TwitterPostCommand extends Command
      */
     public function handle()
     {
+        // can call methods directly
+        $action = $this->argument('action');
+        if (!empty($action)) {
+            $methodName = Str::camel($action);
+
+            if (method_exists($this, $methodName)) {
+                $params = $this->argument('params');
+
+                if (!empty($params)) {
+                    $ex = explode(',', $params);
+
+                    $this->$methodName(...$ex);
+                } else {
+                    $this->$methodName();
+                }
+            } else {
+                $this->error('Cannot find method name `' . $methodName . '`');
+            }
+        } else {
+            $this->error('No method name supplied. ex: `php artisan twitter:post daily`');
+        }
+    }
+
+    /**
+    * Daily
+    *
+    * @return void
+    */
+    public function daily()
+    {
+
+
         /*
         // post tweet
         Twitter::postTweet([

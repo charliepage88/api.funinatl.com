@@ -18,8 +18,6 @@ class ReportsController extends Controller
     */
     public function dailyTweets(Request $request)
     {
-        $report = Report::getReportDailyTweets($request->all());
-
-        return view('admin.reports.daily_tweets', compact('report'));
+        return view('admin.reports.daily_tweets');
     }
 }

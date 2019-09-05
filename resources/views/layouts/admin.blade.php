@@ -106,6 +106,17 @@
                     </div>
                 </div>
 
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <div class="navbar-link {{ (strstr($routeName, 'admin.reports') ? 'is-active' : '') }}">
+                      Reports
+                    </div>
+                    <div class="navbar-dropdown is-boxed">
+                        <a class="navbar-item {{ $routeName === 'admin.reports.daily_tweets' ? 'is-active' : '' }}" href="{{ route('admin.reports.daily_tweets') }}">
+                            Daily Tweets
+                        </a>
+                    </div>
+                  </div>
+
                 <a href="{{ route('admin.logout') }}" class="navbar-item is-hidden-touch">
                     Logout
                 </a>

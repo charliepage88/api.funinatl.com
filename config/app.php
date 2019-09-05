@@ -166,7 +166,6 @@ return [
          * Package Service Providers...
          */
         Scottybo\Twitter\TwitterServiceProvider::class,
-	sngrl\SphinxSearch\SphinxSearchServiceProvider::class,
 
         /*
          * Application Service Providers...

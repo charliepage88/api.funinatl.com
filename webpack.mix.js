@@ -1,6 +1,9 @@
 const mix = require('laravel-mix')
 const s3Plugin = require('webpack-s3-plugin')
 
+// vars
+const enableBrowserSync = false
+
 /*
  |--------------------------------------------------------------------------
  | Mix Asset Management
@@ -30,6 +33,15 @@ if (mix.inProduction() && process.env.UPLOAD_S3) {
       directory: 'public'
     })
   ]
+}
+
+if (enableBrowserSync) {
+  let url = process.env.APP_URL
+
+  url = url.replace('http://', '')
+  url = url.replace('https://', '')
+
+  mix.browserSync(url)
 }
 
 mix.js('resources/js/app.js', 'public/js')
