@@ -716,40 +716,51 @@ class Report extends Model
 
         // get data
         foreach($report as $periodKey => $period) {
-
             foreach($period['days'] as $dayKey => $day) {
-                $report[$periodKey]['days'][$dayKey]['tweet_content'] = null;
-
                 // collect event ids
                 $eventIds = [];
-                foreach($day['events'] as $event) {
+                $eventIdsKeyed = [];
+                foreach($day['events'] as $eventKey => $event) {
+                    $eventIdsKeyed[$eventKey] = $event['id'];
                     $eventIds[] = $event['id'];
                 }
 
                 // get events
                 $events = Event::whereIn('id', $eventIds)->get();
 
+                $eventTweetableIds = []; 
                 $tweetContent = null;
-                foreach($events as $index => $event) {
+                foreach($events as $event) {
                     // add tweet content if there is any
-                    if ($index === 0 && $event->hasMeta('tweet_content')) {
-                        $tweetContent = $event->getMeta('tweet_content');
+                    if (empty($tweetContent) && $event->hasMeta('tweet_content')) {
+                        $tweetContent = $event->getMeta('tweet_content')->value;
                     }
 
                     // check if event will be tweeted
-                    if ($event->hasMeta('is_tweetable')) {
-                        $find = array_search($event->id, $day['events']);
+                    $find = array_search($event->id, $eventIdsKeyed);
+                    if ($find !== false) {
+                        $is_tweetable = false;
 
-                        if ($find !== false) {
-                            $report[$periodKey]['days'][$dayKey]['events'][$find]['is_tweetable'] = $event->getMeta('is_tweetable');
+                        if ($event->hasMeta('is_tweetable')) {
+                            $meta = $event->getMeta('is_tweetable');
+
+                            $is_tweetable = ($meta->value === 'true' || $meta->value === true);
+
+                            $eventTweetableIds[] = $event->id;
                         }
+
+                        $report[$periodKey]['days'][$dayKey]['events'][$find]['is_tweetable'] = $is_tweetable;
                     }
                 }
 
-                // add tweet content, if any
-                if (!empty($tweetContent)) {
-                    $report[$periodKey]['days'][$dayKey]['tweet_content'] = $tweetContent;
-                }
+                // add tweet content
+                $report[$periodKey]['days'][$dayKey]['tweet_content'] = $tweetContent;
+
+                // add event ids
+                $report[$periodKey]['days'][$dayKey]['event_ids'] = $eventIds;
+
+                // add tweetable event ids
+                $report[$periodKey]['days'][$dayKey]['tweetable_event_ids'] = $eventTweetableIds;
             }
         }
 
