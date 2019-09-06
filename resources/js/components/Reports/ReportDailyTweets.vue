@@ -1,10 +1,10 @@
 <template>
   <div class="columns is-multiline">
-    <div class="column is-half">
-      <h1 class="title is-1">Report - Daily Tweets</h1>
+    <div class="column is-full-tablet is-half-desktop">
+      <h1 class="title is-1 is-size-3-mobile is-size-2-tablet">Report - Daily Tweets</h1>
     </div>
 
-    <div class="column is-one-quarter">
+    <div class="column is-half-tablet is-one-quarter-desktop">
       <b-field label="Start Date">
         <form-date-picker
           name="start_date"
@@ -14,7 +14,7 @@
       </b-field>
     </div>
 
-    <div class="column is-one-quarter">
+    <div class="column is-half-tablet is-one-quarter-desktop">
       <b-field label="End Date">
         <form-date-picker
           name="end_date"
@@ -25,7 +25,7 @@
     </div>
 
     <div class="column is-full" v-if="hasDates">
-      <div class="centered-container pl-computer-4 pr-computer-4 pl-handheld-1 pr-handheld-1 pt-0">
+      <div class="centered-container pl-computer-4 pr-computer-4 pt-0">
         <div v-for="(row, periodKey) in dates" :key="row.label">
           <h3
             class="subtitle has-text-centered is-3 mt-0 mb-0"

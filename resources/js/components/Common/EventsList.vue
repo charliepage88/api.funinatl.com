@@ -26,7 +26,7 @@
 
         <div class="card-content">
           <div class="media">
-            <div class="media-left" v-if="event.location.thumb_small">
+            <div class="media-left" v-if="1 === 2 && event.location.thumb_small">
               <figure class="image is-128x128">
                 <img :alt="event.location.name" :src="event.location.thumb_small">
               </figure>
@@ -37,11 +37,15 @@
             </div>
 
             <div class="media-content">
-              <h4 class="title is-3 is-size-3-desktop is-size-2-tablet is-size-4-mobile is-capitalized" :class="{ 'has-text-white': event.is_tweetable }">
+              <span class="tag is-success is-medium is-fullwidth has-text-centered mb-1">
+                {{ event.category.name }}
+              </span>
+
+              <h4 class="title is-3 is-size-3-desktop is-size-5-tablet is-size-4-mobile is-capitalized" :class="{ 'has-text-white': event.is_tweetable }">
                 {{ event.name }}
               </h4>
 
-              <h5 class="subtitle is-5 is-size-5-desktop is-size-3-tablet is-size-5-mobile is-capitalized" :class="{ 'has-text-white': event.is_tweetable }">
+              <h5 class="subtitle is-5 is-size-5-desktop is-size-6-tablet is-size-5-mobile is-capitalized" :class="{ 'has-text-white': event.is_tweetable }">
                 {{ event.location.name }}
               </h5>
             </div>
@@ -49,22 +53,22 @@
 
           <div class="content">
             <!-- start/end date -->
-            <h4 class="title is-5 is-size-5-mobile has-text-normal has-text-centered" v-if="event.end_date" :class="{ 'has-text-white': event.is_tweetable }">
+            <h4 class="title is-5 is-size-5-mobile is-size-6-tablet has-text-normal has-text-centered" v-if="event.end_date" :class="{ 'has-text-white': event.is_tweetable }">
               {{ event.start_date | fullDate }} - {{ event.end_date | fullDate }}
             </h4>
 
-            <h4 class="title is-5 is-size-5-mobile has-text-normal has-text-centered" :class="{ 'has-text-white': event.is_tweetable }" v-else>
+            <h4 class="title is-5 is-size-5-mobile is-size-6-tablet has-text-normal has-text-centered" :class="{ 'has-text-white': event.is_tweetable }" v-else>
               {{ event.start_date | fullDate }}
             </h4>
 
             <!-- start time/end time -->
-            <h4 class="subtitle is-5 is-size-5-mobile has-text-normal has-text-centered" v-if="event.end_time" :class="{ 'has-text-white': event.is_tweetable }">
+            <span class="subtitle is-5 is-size-5-mobile is-size-6-tablet block has-text-centered" v-if="event.end_time" :class="{ 'has-text-white': event.is_tweetable }">
               {{ event.start_time }} - {{ event.end_time }}
-            </h4>
+            </span>
 
-            <h4 class="subtitle is-5 is-size-5-mobile has-text-normal has-text-centered" :class="{ 'has-text-white': event.is_tweetable }" v-else>
+            <span class="subtitle is-5 is-size-5-mobile is-size-6-tablet block has-text-centered" :class="{ 'has-text-white': event.is_tweetable }" v-else>
               {{ event.start_time }}
-            </h4>
+            </span>
 
             <!-- price -->
             <b-button
@@ -89,7 +93,7 @@
             </div>
 
             <!-- descriptions -->
-            <p class="mt-2" v-if="event.short_description">
+            <p class="mt-2 is-size-7-tablet" v-if="event.short_description">
               {{ event.short_description | truncate(200) }}
             </p>
 
@@ -103,7 +107,7 @@
                 <span
                   v-for="band in event.bands"
                   :key="band.slug"
-                  class="tag block is-success is-small has-text-white has-no-underline"
+                  class="tag is-success is-small has-text-white has-no-underline"
                   :aria-label="band.name"
                 >
                   {{ band.name }}

@@ -2054,9 +2054,13 @@ class PopulateEventsCommand extends Command
         $items = Category::all();
 
         $categories = [];
+        $categorySlugs = [];
         foreach($items as $item) {
             $categories[$item->slug] = $item;
+            $categorySlugs[] = '`' . $item->slug . '`';
         }
+
+        $categorySlugs = implode(', ', $categorySlugs);
 
         // get event data
         $events = [];
@@ -2083,6 +2087,7 @@ class PopulateEventsCommand extends Command
                     'event_type_id' => 2,
                     'price' => '',
                     'is_sold_out' => false,
+                    'short_description' => '',
                     'tags' => [],
                     'bands' => []
                 ];
@@ -2111,6 +2116,15 @@ class PopulateEventsCommand extends Command
                     $event['end_time'] = $start_date->addHours(3)->format('g:i A');
                 }
 
+                // cache check
+                $cacheKey = $provider->id . '-' . md5($event['name']) . '-' . $event['start_date'];
+
+                if (Cache::has($cacheKey)) {
+                    $this->info('Already in DB...');
+
+                    continue;
+                }
+
                 // get event price
                 // and meta info
                 $crawler = new Crawler($item['excerpt']);
@@ -2123,9 +2137,30 @@ class PopulateEventsCommand extends Command
 
                     if (strstr($text, '$')) {
                         $ex = explode('</strong>', $html);
-                        $ex2 = explode('<br>', $ex[1]);
 
-                        $metaValue = $ex2[0];
+                        if (!empty($ex[1])) {
+                            $ex2 = explode('<br>', $ex[1]);
+
+                            $metaValue = $ex2[0];
+                        } elseif (strstr($ex[0], ' | ')) {
+                            $ex2 = explode(' | ', $ex[0]);
+
+                            foreach($ex2 as $ex2Row) {
+                                if (strstr($ex2Row, '$')) {
+                                    if (strstr($ex2Row, ') ')) {
+                                        $ex3 = explode(') ', $ex2Row);
+
+                                        $metaValue = $ex3[0] . ')';
+                                    } elseif (empty($metaValue)) {
+                                        $metaValue = $ex2Row;
+                                    }
+                                }
+                            }
+                        } elseif (strstr($ex[0], ' free ')) {
+                            $metaValue = 'Free';
+                        } else {
+                            $metaValue = $this->ask('No price could be found, please enter a value based off of this: `' . $ex[0] . '`');
+                        }
                     } elseif (strstr($text, ' TICKETS')) {
                         $metaValue = null;
                         $metaType = null;
@@ -2161,11 +2196,43 @@ class PopulateEventsCommand extends Command
                     $event['category_id'] = $categories['comedy']->id;
                 }
 
-                // check for tags
+                if (strstr($nameLower, 'songwriters')) {
+                    $event['category_id'] = $categories['arts-theatre']->id;
+                }
+
+                $categoryOtherTerms = [
+                    'nerdtastic',
+                    'open mic',
+                    'poker tournament'
+                ];
+
+                foreach($categoryOtherTerms as $term) {
+                    if (strstr($nameLower, $term)) {
+                        $event['category_id'] = $categories['other']->id;
+                    }
+                }
+
+                // @TODO - check for tags
 
                 // gather bands if music event
                 if ($event['category_id'] === $categories['music']->id) {
-                    
+                    $this->info($event['name']);
+
+                    if (!empty($event['short_description'])) {
+                        $this->info($event['short_description']);
+                    }
+
+                    $isMusicCategory = $this->ask('Is this a music event? (y/n)');
+
+                    if ($isMusicCategory === 'y') {
+                        $bandsInfo = $this->ask('What bands are playing? (ex. abc,def,ghi)');
+
+                        $event['bands'] = explode(',', $bandsInfo);
+                    } else {
+                        $categorySlug = $this->ask('What category is this event instead of `music`? Options: (' . $categorySlugs . ')');
+
+                        $event['category_id'] = $categories[$categorySlug]->id;
+                    }
                 }
 
                 // only add event if date >= today
@@ -2177,27 +2244,30 @@ class PopulateEventsCommand extends Command
                     $event['name'] = trim(str_replace($find, '', $event['name']));
                     $event['name'] = str_replace('  ', ' ', $event['name']);
 
-                    $events[] = $event;
+                    $validator = $this->validate([ $event ]);
+
+                    if (!$validator) {
+                        $this->error('Empty data for event: ' . json_encode($event));
+                    } else {
+                        $events[] = $event;
+
+                        Cache::put($cacheKey, true);
+
+                        ParseMusicEvent::dispatch($event, $spotify);
+
+                        $this->info('Fired off job to create event.');
+                    }
                 }
             }
         }
 
-        dd($events);
-
-        $this->info(count($events) . ' links found that need to be crawled for provider `' . $provider->name . '`');
-
-        foreach($events as $event) {
-            ParseMusicEvent::dispatch($event, $spotify)
-                ->delay(now()->addSeconds($rand));
-
-            $this->info('Dispatching crawler for url: ' . $event['website'] . '. Delay: ' . $rand);
-        }
+        $this->info(count($events) . ' events parsed for `' . $provider->name . '`');
 
         // save last scraped time
         $provider->last_scraped = Carbon::now();
 
         $provider->save();
 
-        return $urls;
+        return $events;
     }
 }
