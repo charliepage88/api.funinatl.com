@@ -433,7 +433,9 @@ class DevCommand extends Command
 
             // sync to search
             if ($search && $changesCount) {
-                $items->searchable();
+                foreach($items as $item) {
+                    $item->searchable();
+                }
 
                 $this->info($fullName . ' synced to Mongo and Scout. ' . $changesCount . ' total changes.');
             } else {
