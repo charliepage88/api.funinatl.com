@@ -20,7 +20,8 @@ class WebhooksController extends Controller
         // get secret token and body data
         $token = request()->header('Authorization');
         $body = $request->input('body');
-        $validToken = config('services.webhooks.sync.token');
+        $env = config('app.env');
+        $validToken = config('services.webhooks.sync.' . $env . '_token');
 
         if (!empty($token) && !empty($body)) {
             $token = str_replace('Bearer ', '', $token);
