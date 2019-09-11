@@ -1273,13 +1273,13 @@ class Event extends Model implements HasMedia
         $newDescriptionLength = strlen($description);
 
         // debugging for check length
-        if ($newDescriptionLength < $minLength) {
-            \Log::error('Event `' . $this->id . '` has generated description `' . $description . '` which is less than the minimum. Length: ' . $newDescriptionLength . ' :: Min Length: ' . $minLength);
-        }
+        // if ($newDescriptionLength < $minLength) {
+        //     \Log::error('Event `' . $this->id . '` has generated description `' . $description . '` which is less than the minimum. Length: ' . $newDescriptionLength . ' :: Min Length: ' . $minLength);
+        // }
 
-        if ($newDescriptionLength > $maxLength) {
-            \Log::error('Event `' . $this->id . '` has generated description `' . $description . '` which is longer than the max. Length: ' . $newDescriptionLength . ' :: Max Length: ' . $maxLength);
-        }
+        // if ($newDescriptionLength > $maxLength) {
+        //     \Log::error('Event `' . $this->id . '` has generated description `' . $description . '` which is longer than the max. Length: ' . $newDescriptionLength . ' :: Max Length: ' . $maxLength);
+        // }
 
         return $description;
     }

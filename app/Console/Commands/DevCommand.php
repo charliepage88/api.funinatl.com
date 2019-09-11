@@ -292,14 +292,14 @@ class DevCommand extends Command
 
             $this->info('Done: ' . $url);
 
-            if ($key > 0 && ($key % 60 === 0)) {
+            if ($key > 0 && ($key % 30 === 0)) {
                 $this->info('Sleeping for 30 seconds...');
 
                 sleep(30);
-            } elseif ($key > 0 && ($key % 20 === 0)) {
-                $this->info('Sleeping for 5 seconds...');
+            } elseif ($key > 0) {
+                $this->info('Sleeping for 1 second...');
 
-                sleep(5);
+                sleep(1);
             }
         }
 
@@ -957,5 +957,67 @@ class DevCommand extends Command
         }
 
         dd($leftOverFolders);
+    }
+
+    /**
+    * Find Recurring Events
+    *
+    * @return void
+    */
+    public function findRecurringEvents()
+    {
+        $checkFields = [
+            'category_id',
+            'short_description',
+            'price',
+            'list_tags'
+        ];
+
+        $events = Event::with('location')->shouldShow()->get();
+
+        foreach($events as $event) {
+            $location = $event->location;
+            $origDate = $event->start_date->format('l, F jS');
+            $event->category_id = (int) $event->category_id;
+            $find = Event::shouldShow()
+                ->where('id', '!=', $event->id)
+                ->where('location_id', '=', $event->location_id)
+                ->where('name', '=', $event->name)
+                ->get();
+
+            if ($find->count()) {
+                $this->info('Found other events with name `' . $event->name . '` for location `' . $location->name . '`');
+
+                $this->info('Original Event: ' . $event->start_date->format('Y-m-d') . ' @ ' . $event->start_time);
+                
+                foreach($find as $row) {
+                    $row->category_id = (int) $row->category_id;
+
+                    $otherDate = $row->start_date->format('l, F jS');
+
+                    foreach($checkFields as $field) {
+                        if ($field === 'short_description') {
+                            $eventValue = str_replace($origDate, $otherDate, $event->$field);
+                        } else {
+                            $eventValue = $event->$field;
+                        }
+
+                        if ($eventValue !== $row->$field) {
+                            $this->error('Different info for field `' . $field . '`');
+                            $this->error('Original: `' . $eventValue . '`');
+                            $this->error('Other: `' . $row->$field . '`');
+
+                            //
+                        }
+                    }
+
+                    $this->info('Recurring Event: ' . $row->start_date->format('Y-m-d') . ' @ ' . $row->start_time);
+                }
+
+                $this->info('---');
+            } else {
+                $this->info('No other events found with name `' . $event->name . '` for location `' . $location->name . '`');
+            }
+        }
     }
 }
