@@ -209,50 +209,85 @@
                 </div>
             </div>
 
-            <div class="column is-narrow">
-                <div class="field">
-                    <label class="label">
-                        Family Friendly
-                    </label>
+            <div class="column is-one-quarter">
+                <div class="columns">
+                    <div class="column is-half">
+                        <div class="field">
+                            <label class="label">
+                                Family Friendly
+                            </label>
 
-                    <div class="control">
-                        <label class="checkbox">
-                            <input type="checkbox" name="is_family_friendly" value="1" {{ old('is_family_friendly') ? 'checked' : '' }}>
-                        </label>
+                            <div class="control">
+                                <label class="checkbox">
+                                    <input type="checkbox" name="is_family_friendly" value="1" {{ old('is_family_friendly') ? 'checked' : '' }}>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="column">
+                        <div class="field">
+                            <label class="label">
+                                Active
+                                <span class="has-text-danger is-italic">*</span>
+                            </label>
+
+                            <div class="control">
+                                <label class="checkbox">
+                                    <input type="checkbox" name="active" value="1" {{ old('active') !== false ? 'checked' : '' }}>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="column">
+                        <div class="field">
+                            <label class="label">
+                                Featured
+                            </label>
+
+                            <div class="control">
+                                <label class="checkbox">
+                                    <input type="checkbox" name="featured" value="1" {{ old('featured') ? 'checked' : '' }}>
+                                </label>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="column is-narrow">
+            <div class="column is-one-quarter">
                 <div class="field">
                     <label class="label">
-                        Active
+                        Event Type
                         <span class="has-text-danger is-italic">*</span>
                     </label>
 
                     <div class="control">
-                        <label class="checkbox">
-                            <input type="checkbox" name="active" value="1" {{ old('active') !== false ? 'checked' : '' }}>
-                        </label>
+                        <div class="select is-medium is-fullwidth">
+                            <select name="event_type_id">
+                                <option value="">Choose Event Type</option>
+                                @foreach($eventTypes as $id => $name)
+                                    <option
+                                        value="{{ $id }}"
+                                        {{ ((old('event_type_id') === $id) || ($id === 2)) ? 'selected' : '' }}
+                                    >
+                                        {{ $name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
+
+                    @if ($errors->has('event_type_id'))
+                        <p class="help is-danger">
+                            {{ $errors->first('event_type_id') }}
+                        </p>
+                    @endif
                 </div>
             </div>
 
-            <div class="column is-narrow">
-                <div class="field">
-                    <label class="label">
-                        Featured
-                    </label>
-
-                    <div class="control">
-                        <label class="checkbox">
-                            <input type="checkbox" name="featured" value="1" {{ old('featured') ? 'checked' : '' }}>
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="column">
+            <div class="column is-half">
                 <div class="field">
                     <label class="label">
                         Website
@@ -292,18 +327,12 @@
             <div class="column is-half">
                 <div class="field">
                     <label class="label">
-                        Description
+                        Bands
                     </label>
 
                     <div class="control">
-                        <textarea class="textarea is-medium" name="description">{{ old('description') }}</textarea>
+                        <input class="input is-medium" name="bands" value="{{ old('bands') }}">
                     </div>
-
-                    @if ($errors->has('description'))
-                        <p class="help is-danger">
-                            {{ $errors->first('description') }}
-                        </p>
-                    @endif
                 </div>
             </div>
 

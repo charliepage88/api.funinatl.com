@@ -21,6 +21,7 @@ use Spatie\Tags\HasTags;
 use App\Collections\EventCollection;
 
 use DB;
+use Storage;
 
 class Event extends Model implements HasMedia
 {
@@ -409,11 +410,14 @@ class Event extends Model implements HasMedia
     */
     public function bands()
     {
-        return $this->belongsToMany(MusicBand::class, 'event_music_bands', 'event_id', 'music_band_id');
+        $tbl = 'event_music_bands';
+        $class = MusicBand::class;
+
+        return $this->belongsToMany($class, $tbl, 'event_id', 'music_band_id');
     }
 
     /**
-    * Is Active
+    * Scope Is Active
     *
     * @param object $query
     *
@@ -425,7 +429,7 @@ class Event extends Model implements HasMedia
     }
 
     /**
-    * Is Featured
+    * Scope Is Featured
     *
     * @param object $query
     *
@@ -437,7 +441,7 @@ class Event extends Model implements HasMedia
     }
 
     /**
-    * Should Show
+    * Scope Should Show
     *
     * @param object $query
     *
@@ -453,7 +457,7 @@ class Event extends Model implements HasMedia
     }
 
     /**
-    * Should Not Show
+    * Scope Should Not Show
     *
     * @param object $query
     *
@@ -466,6 +470,19 @@ class Event extends Model implements HasMedia
         return $query->where('active', '=', true)
             // ->where('is_explicit', '=', false)
             ->where('start_date', '<', $now);
+    }
+
+    /**
+    * Scope By Date
+    *
+    * @param object $query
+    * @param string $date
+    *
+    * @return object
+    */
+    public function scopeByDate($query, string $date)
+    {
+        return $query->where('start_date', '=', $date)->get();
     }
 
     /**
@@ -790,6 +807,8 @@ class Event extends Model implements HasMedia
 
                 $this->bands()->sync($bandIds);
             }
+        } else {
+            $this->bands()->detach();
         }
 
         return $this;
@@ -816,6 +835,36 @@ class Event extends Model implements HasMedia
             if (!empty($mediaFind)) {
                 $band = $bands->where('id', '=', $mediaFind->model_id)->first();
             }
+        }
+
+        // populate image for band
+        if (!empty($band)) {
+            $imageUrl = $band->photo_url;
+
+            // get image contents
+            $contents = file_get_contents($imageUrl);
+
+            // get image info
+            $info = pathinfo($imageUrl);
+
+            // set filename & path
+            if (!empty($info['extension'])) {
+                $extension = $info['extension'];
+            } else {
+                $extension = '.jpeg';
+            }
+
+            $filename = $this->id . '-' . $this->slug;
+            $filename = $filename . $extension;
+            $tmpPath = storage_path('app') . '/' . $filename;
+
+            // store locally for a moment
+            Storage::disk('local')->put($filename, $contents);
+
+            // then add the url
+            $this->addMedia($tmpPath)->toMediaCollection('events');
+
+            \Log::info('Uploaded image for event #' . $this->id);
         }
 
         return $band;
@@ -1233,5 +1282,44 @@ class Event extends Model implements HasMedia
         }
 
         return $description;
+    }
+
+    /**
+    * Get Is Tweetable Attribute
+    *
+    * @return bool
+    */
+    public function getIsTweetableAttribute()
+    {
+        $status = false;
+        if ($event->hasMeta('is_tweetable')) {
+            $meta = $event->getMeta('is_tweetable');
+
+            $is_tweetable = ($meta->value === 'true' || $meta->value === true);
+
+            if ($is_tweetable) {
+                $status = true;
+            }
+        }
+
+        return $status;
+    }
+
+    /**
+    * Get Bands List Attribute
+    *
+    * @return array
+    */
+    public function getBandsListAttribute()
+    {
+        $bands = [];
+
+        if ($this->bands->count()) {
+            foreach($this->bands as $band) {
+                $bands[] = $band->name;
+            }
+        }
+
+        return $bands;
     }
 }

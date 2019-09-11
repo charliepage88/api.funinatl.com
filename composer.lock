@@ -113,16 +113,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.110.10",
+            "version": "3.110.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "705fc1ffe05747e6789b19480764ebcd06995911"
+                "reference": "3f222649634fa039c59f58082e60159a6bb59bbf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/705fc1ffe05747e6789b19480764ebcd06995911",
-                "reference": "705fc1ffe05747e6789b19480764ebcd06995911",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/3f222649634fa039c59f58082e60159a6bb59bbf",
+                "reference": "3f222649634fa039c59f58082e60159a6bb59bbf",
                 "shasum": ""
             },
             "require": {
@@ -192,7 +192,7 @@
                 "s3",
                 "sdk"
             ],
-            "time": "2019-09-05T18:11:21+00:00"
+            "time": "2019-09-06T18:21:14+00:00"
         },
         {
             "name": "babenkoivan/scout-elasticsearch-driver",
@@ -5038,16 +5038,16 @@
         },
         {
             "name": "spatie/laravel-tags",
-            "version": "2.5.0",
+            "version": "2.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-tags.git",
-                "reference": "c02cfa9a1aa29e585c3f12449364f65ea31cff91"
+                "reference": "ee0f47236f9177b7b98f1fda9d4bb3efdab62ca8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-tags/zipball/c02cfa9a1aa29e585c3f12449364f65ea31cff91",
-                "reference": "c02cfa9a1aa29e585c3f12449364f65ea31cff91",
+                "url": "https://api.github.com/repos/spatie/laravel-tags/zipball/ee0f47236f9177b7b98f1fda9d4bb3efdab62ca8",
+                "reference": "ee0f47236f9177b7b98f1fda9d4bb3efdab62ca8",
                 "shasum": ""
             },
             "require": {
@@ -5091,7 +5091,7 @@
                 "laravel-tags",
                 "spatie"
             ],
-            "time": "2019-09-04T11:01:50+00:00"
+            "time": "2019-09-08T20:40:06+00:00"
         },
         {
             "name": "spatie/laravel-translatable",
@@ -7427,16 +7427,16 @@
         },
         {
             "name": "facade/ignition",
-            "version": "1.4.17",
+            "version": "1.4.19",
             "source": {
                 "type": "git",
                 "url": "https://github.com/facade/ignition.git",
-                "reference": "52cf237a9ec53062e344a53d50428ca2f989035a"
+                "reference": "bf3b9938f39b7e8f6683702526b58553994d97ca"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/facade/ignition/zipball/52cf237a9ec53062e344a53d50428ca2f989035a",
-                "reference": "52cf237a9ec53062e344a53d50428ca2f989035a",
+                "url": "https://api.github.com/repos/facade/ignition/zipball/bf3b9938f39b7e8f6683702526b58553994d97ca",
+                "reference": "bf3b9938f39b7e8f6683702526b58553994d97ca",
                 "shasum": ""
             },
             "require": {
@@ -7491,7 +7491,7 @@
                 "laravel",
                 "page"
             ],
-            "time": "2019-09-06T09:15:50+00:00"
+            "time": "2019-09-09T08:46:24+00:00"
         },
         {
             "name": "facade/ignition-contracts",

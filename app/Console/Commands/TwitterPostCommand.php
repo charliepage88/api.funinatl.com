@@ -8,6 +8,26 @@ use App\Event;
 
 use Twitter;
 
+/*
+// post tweet
+Twitter::postTweet([
+    'status' => 'Laravel is beautiful',
+    'format' => 'json'
+]);
+
+// fields
+// - possibly_sensitive (only if graphic content)
+// - lat
+// - lng (for location?)
+
+// post tweet with uploaded image
+$uploaded_media = Twitter::uploadMedia([ 'media' => Storage::get('abc.jpg') ]);
+
+Twitter::postTweet([
+    'status' => 'Laravel is beautiful',
+    'media_ids' => $uploaded_media->media_id_string
+]);
+*/
 class TwitterPostCommand extends Command
 {
     /**
@@ -61,27 +81,45 @@ class TwitterPostCommand extends Command
     */
     public function daily()
     {
+        $date = Carbon::now()->format('Y-m-d');
 
+        \Log::info('TwitterPostCommand -> daily (' . $date . ')');
 
-        /*
-        // post tweet
-        Twitter::postTweet([
-            'status' => 'Laravel is beautiful',
-            'format' => 'json'
-        ]);
+        $events = Event::shouldShow()->byDate($date);
 
-        // fields
-        // - possibly_sensitive (only if graphic content)
-        // - lat
-        // - lng (for location?)
+        $tweetContent = null;
+        $photoUrl = null;
+        $location = null;
+        foreach($events as $event) {
+            if (empty($tweetContent) && $event->hasMeta('tweet_content')) {
+                $tweetContent = $event->getMeta('tweet_content')->value;
+                $location = $event->location;
+            }
 
-        // post tweet with uploaded image
-        $uploaded_media = Twitter::uploadMedia([ 'media' => Storage::get('abc.jpg') ]);
+            if (empty($photoUrl) && $event->is_tweetable) {
+                $photoUrl = $event->photo_url;
+            }
+        }
 
-        Twitter::postTweet([
-            'status' => 'Laravel is beautiful',
-            'media_ids' => $uploaded_media->media_id_string
-        ]);
-        */
+        if (!empty($tweetContent) && !empty($photoUrl) && !empty($location)) {
+            $file = file_get_contents($photoUrl);
+
+            $uploaded_media = Twitter::uploadMedia([
+                'media' => $file
+            ]);
+
+            $response = Twitter::postTweet([
+                'status' => $tweetContent,
+                'media_ids' => $uploaded_media->media_id_string,
+                'lat' => $location->latitude,
+                'lng' => $location->longitude,
+                'possibly_sensitive' => false
+            ]);
+
+            \Log::info('Tweet posted for: ' . $date);
+            \Log::info($response);
+        } else {
+            \Log::error('No events to tweet for: ' . $date);
+        }
     }
 }

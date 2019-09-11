@@ -267,38 +267,7 @@ class ParseMusicEvent implements ShouldQueue
         // get the first band with a photo and copy
         // over to event
         if ($bands->count() && !$event->photo_url) {
-            $band = $event->getFirstBandWithImage();
-
-            if (!empty($band)) {
-                $imageUrl = $band->photo_url;
-
-                // get image contents
-                $contents = file_get_contents($imageUrl);
-
-                // get image info
-                $info = pathinfo($imageUrl);
-
-                // set filename & path
-                if (!empty($info['extension'])) {
-                    $extension = $info['extension'];
-                } else {
-                    $extension = '.jpeg';
-                }
-
-                $filename = $event->id . '-' . $event->slug;
-                $filename = $filename . $extension;
-                $tmpPath = storage_path('app') . '/' . $filename;
-
-                // store locally for a moment
-                Storage::disk('local')->put($filename, $contents);
-
-                // then add the url
-                $event->addMedia($tmpPath)->toMediaCollection('events');
-
-                \Log::info('Uploaded image for event #' . $event->id);
-
-                sleep(2);
-            }
+            $event->getFirstBandWithImage();
         }
 
         // if no photo attached to event

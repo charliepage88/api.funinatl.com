@@ -313,18 +313,12 @@
             <div class="column is-half">
                 <div class="field">
                     <label class="label">
-                        Description
+                        Bands
                     </label>
 
                     <div class="control">
-                        <textarea class="textarea is-medium" name="description">{{ old('description') ?? $event->description }}</textarea>
+                        <input class="input is-medium" name="bands" value="{{ old('bands') ?? implode(',', $event->bands_list) }}">
                     </div>
-
-                    @if ($errors->has('description'))
-                        <p class="help is-danger">
-                            {{ $errors->first('description') }}
-                        </p>
-                    @endif
                 </div>
             </div>
 
