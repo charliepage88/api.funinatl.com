@@ -124,6 +124,7 @@ class DevCommand extends Command
         Cache::tags('eventsBySlug')->flush();
         Cache::tags('categoriesIndex')->flush();
         Cache::tags('locationsIndex')->flush();
+        Cache::tags('routesList')->flush();
         Cache::tags('dbcache')->flush();
         Cache::tags('eventsCache')->flush();
     }
@@ -204,9 +205,10 @@ class DevCommand extends Command
 
         $urls = [];
 
-        // location & category index pages
+        // misc pages
         $urls[] = $apiUrl . '/api/locations';
         $urls[] = $apiUrl . '/api/categories';
+        $urls[] = $apiUrl . '/api/routes';
 
         // event by slug urls
         foreach($events as $event) {
@@ -293,10 +295,10 @@ class DevCommand extends Command
             $this->info('Done: ' . $url);
 
             if ($key > 0 && ($key % 30 === 0)) {
-                $this->info('Sleeping for 30 seconds...');
+                $this->info('Sleeping for 15 seconds...');
 
-                sleep(20);
-            } elseif ($key > 0 && ($key % 10 === 0)) {
+                sleep(15);
+            } elseif ($key > 0 && ($key % 15 === 0)) {
                 $this->info('Sleeping for 2 seconds...');
 
                 sleep(2);

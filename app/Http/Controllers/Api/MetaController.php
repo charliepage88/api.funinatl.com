@@ -53,7 +53,9 @@ class MetaController extends Controller
         $pages = [
             '/about',
             '/contact',
-            '/subscribe'
+            '/subscribe',
+            '/auth/login',
+            '/auth/register'
         ];
 
         foreach($pages as $page) {

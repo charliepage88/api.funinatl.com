@@ -44,7 +44,8 @@ Route::namespace('Api')->group(function () {
     Route::get('/events/search', 'EventsController@search');
     Route::post('/locations/submit', 'LocationsController@submit');
     Route::post('/contact/submit', 'ContactSubmissionsController@submit');
-    Route::get('/routes', 'MetaController@routes');
+    Route::get('/routes', 'MetaController@routes')
+        ->middleware('cacheResponse:300,routesList');
 
     // users
     Route::middleware('auth:api')->get('/user', 'UsersController@show');
