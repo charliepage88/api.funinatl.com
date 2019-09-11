@@ -58,8 +58,10 @@ return [
 
     'webhooks' => [
         'sync' => [
-            'token' => env('WEBHOOK_SYNC_TOKEN'),
-            'url'   => env('WEBHOOK_SYNC_URL')
+            'staging_token'    => env('WEBHOOK_SYNC_STAGING_TOKEN'),
+            'staging_url'      => env('WEBHOOK_SYNC_STAGING_URL'),
+            'production_token' => env('WEBHOOK_SYNC_PRODUCTION_TOKEN'),
+            'production_url'   => env('WEBHOOK_SYNC_PRODUCTION_URL')
         ]
     ],
 
@@ -75,5 +77,11 @@ return [
 
     'graphql' => [
         'endpoint' => env('GRAPHQL_ENDPOINT')
+    ],
+
+    'mongodb' => [
+        'collections' => [
+            'prefix' => env('MONGO_DB_COLLECTIONS_PREFIX')
+        ]
     ],
 ];

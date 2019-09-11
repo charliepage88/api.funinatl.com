@@ -11,6 +11,11 @@ use DB;
 class Report extends Model
 {
     /**
+    * @var string
+    */
+    public static $collection_prefix = '';
+
+    /**
     * Get Admin Dashboard Stats
     *
     * @return array
@@ -547,8 +552,10 @@ class Report extends Model
     */
     public static function getCachedCategories()
     {
-        $items = Cache::tags([ 'dbcache' ])->rememberForever('categories', function () {
-            return DB::connection('mongodb')->collection('categories')->get();
+        $prefix = self::getCollectionPrefix();
+
+        $items = Cache::tags([ 'dbcache' ])->rememberForever('categories', function () use ($prefix) {
+            return DB::connection('mongodb')->collection($prefix . 'categories')->get();
         });
 
         $items = $items->map(function ($item) {
@@ -569,8 +576,10 @@ class Report extends Model
     */
     public static function getCachedLocations()
     {
-        $items = Cache::tags([ 'dbcache' ])->rememberForever('locations', function () {
-            return DB::connection('mongodb')->collection('locations')->get();
+        $prefix = self::getCollectionPrefix();
+
+        $items = Cache::tags([ 'dbcache' ])->rememberForever('locations', function () use ($prefix) {
+            return DB::connection('mongodb')->collection($prefix . 'locations')->get();
         });
 
         $items = $items->map(function ($item) {
@@ -591,8 +600,10 @@ class Report extends Model
     */
     public static function getCachedTags()
     {
-        $items = Cache::tags([ 'dbcache' ])->rememberForever('tags', function () {
-            return DB::connection('mongodb')->collection('tags')->get();
+        $prefix = self::getCollectionPrefix();
+
+        $items = Cache::tags([ 'dbcache' ])->rememberForever('tags', function () use ($prefix) {
+            return DB::connection('mongodb')->collection($prefix . 'tags')->get();
         });
 
         $items = $items->map(function ($item) {
@@ -613,8 +624,10 @@ class Report extends Model
     */
     public static function getCachedBands()
     {
-        $items = Cache::tags([ 'dbcache' ])->rememberForever('music_bands', function () {
-            return DB::connection('mongodb')->collection('music_bands')->get();
+        $prefix = self::getCollectionPrefix();
+
+        $items = Cache::tags([ 'dbcache' ])->rememberForever('music_bands', function () use ($prefix) {
+            return DB::connection('mongodb')->collection($prefix . 'music_bands')->get();
         });
 
         $items = $items->map(function ($item) {
@@ -647,8 +660,10 @@ class Report extends Model
 
         $tags = [ 'dbcache', 'eventsCache' ];
 
-        $items = Cache::tags($tags)->rememberForever($cacheKey, function () use ($params) {
-            $query = DB::connection('mongodb')->collection('events');
+        $prefix = self::getCollectionPrefix();
+
+        $items = Cache::tags($tags)->rememberForever($cacheKey, function () use ($params, $prefix) {
+            $query = DB::connection('mongodb')->collection($prefix . 'events');
 
             if (!empty($params)) {
                 foreach($params as $row) {
@@ -765,5 +780,19 @@ class Report extends Model
         }
 
         return $report;
+    }
+
+    /**
+    * Get Collection Prefix
+    *
+    * @return string
+    */
+    public static function getCollectionPrefix()
+    {
+        if (!self::$collection_prefix) {
+            self::$collection_prefix = config('services.mongodb.collection.prefix');
+        }
+
+        return self::$collection_prefix;
     }
 }

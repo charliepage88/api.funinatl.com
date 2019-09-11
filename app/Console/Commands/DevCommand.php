@@ -38,12 +38,20 @@ class DevCommand extends Command
     protected $description = 'Dev command for misc testing.';
 
     /**
+    * @var string
+    */
+    public $collection_prefix = '';
+
+    /**
      * Execute the console command.
      *
      * @return mixed
      */
     public function handle()
     {
+        // set collection prefix
+        $this->collection_prefix = config('services.mongodb.collection.prefix');
+
         // can call methods directly
         $action = $this->argument('action');
         if (!empty($action)) {
@@ -338,6 +346,8 @@ class DevCommand extends Command
             ]
         ];
 
+        $prefix = $this->collection_prefix;
+
         foreach($models as $model) {
             // init vars
             $items = $model['items'];
@@ -355,7 +365,7 @@ class DevCommand extends Command
             $changesCount = 0;
             foreach($items as $item) {
                 $find = DB::connection('mongodb')
-                    ->collection($collection)
+                    ->collection($prefix . $collection)
                     ->where('id', $item->id)
                     ->first();
 
@@ -365,7 +375,7 @@ class DevCommand extends Command
                     $value = $item->getMongoArray();
 
                     DB::connection('mongodb')
-                        ->collection($collection)
+                        ->collection($prefix . $collection)
                         ->insert($value);
 
                     $this->info('Inserted ' . $name . ' #' . $item->id . ' into MongoDB.');
@@ -389,7 +399,7 @@ class DevCommand extends Command
                     if (!empty($keysDiff)) {
                         foreach(array_values($keysDiff) as $key) {
                             DB::connection('mongodb')
-                                ->collection($collection)
+                                ->collection($prefix . $collection)
                                 ->where('id', $item->id)
                                 ->unset($key);
 
@@ -420,7 +430,7 @@ class DevCommand extends Command
                         $changesCount++;
 
                         DB::connection('mongodb')
-                            ->collection($collection)
+                            ->collection($prefix . $collection)
                             ->where('id', $item->id)
                             ->update($value);
 
@@ -451,11 +461,13 @@ class DevCommand extends Command
      */
     public function flushMongo()
     {
-        DB::connection('mongodb')->collection('tags')->delete();
-        DB::connection('mongodb')->collection('music_bands')->delete();
-        DB::connection('mongodb')->collection('categories')->delete();
-        DB::connection('mongodb')->collection('locations')->delete();
-        DB::connection('mongodb')->collection('events')->delete();
+        $prefix = $this->collection_prefix;
+
+        DB::connection('mongodb')->collection($prefix . 'tags')->delete();
+        DB::connection('mongodb')->collection($prefix . 'music_bands')->delete();
+        DB::connection('mongodb')->collection($prefix . 'categories')->delete();
+        DB::connection('mongodb')->collection($prefix . 'locations')->delete();
+        DB::connection('mongodb')->collection($prefix . 'events')->delete();
     }
 
     /**

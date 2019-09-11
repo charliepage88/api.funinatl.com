@@ -63,9 +63,27 @@ class RunCommand extends Command
     {
         $this->info('RunCommand -> sync');
 
+        $environment = $this->ask('What environment are you syncing? (options: `staging`, `production`)');
+
         // init vars
-        $webhookToken = config('services.webhooks.sync.token');
-        $webhookUrl = config('services.webhooks.sync.url');
+        switch ($environment) {
+            case 'staging':
+                $webhookToken = config('services.webhooks.sync.staging_token');
+                $webhookUrl = config('services.webhooks.sync.staging_url');
+            break;
+
+            case 'production':
+                $webhookToken = config('services.webhooks.sync.production_token');
+                $webhookUrl = config('services.webhooks.sync.production_url');
+            break;
+        }
+
+        if (empty($webhookToken) || empty($webhookUrl)) {
+            $this->error('Cannot find webhook token/url for environment `' . $environment . '`');
+
+            exit;
+        }
+
         $headers = [
             'Authorization' => 'Bearer ' . $webhookToken,
             'Accept' => 'application/json'
