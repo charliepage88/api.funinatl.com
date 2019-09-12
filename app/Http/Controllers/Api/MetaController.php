@@ -54,8 +54,8 @@ class MetaController extends Controller
             '/about',
             '/contact',
             '/subscribe',
-            // '/auth/login',
-            // '/auth/register'
+            '/auth/login',
+            '/auth/register'
         ];
 
         foreach($pages as $page) {

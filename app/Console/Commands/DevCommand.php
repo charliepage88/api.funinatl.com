@@ -295,10 +295,10 @@ class DevCommand extends Command
             $this->info('Done: ' . $url);
 
             if ($key > 0 && ($key % 30 === 0)) {
-                $this->info('Sleeping for 15 seconds...');
+                $this->info('Sleeping for 20 seconds...');
 
-                sleep(15);
-            } elseif ($key > 0 && ($key % 15 === 0)) {
+                sleep(20);
+            } elseif ($key > 0 && ($key % 10 === 0)) {
                 $this->info('Sleeping for 2 seconds...');
 
                 sleep(2);
