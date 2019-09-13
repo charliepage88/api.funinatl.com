@@ -113,16 +113,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.111.2",
+            "version": "3.112.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "5e80d4bec17e197be494af4f38e1fcd17f728138"
+                "reference": "1e21446c6780a3b9b5e4315bd6d4347d2c3381eb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/5e80d4bec17e197be494af4f38e1fcd17f728138",
-                "reference": "5e80d4bec17e197be494af4f38e1fcd17f728138",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/1e21446c6780a3b9b5e4315bd6d4347d2c3381eb",
+                "reference": "1e21446c6780a3b9b5e4315bd6d4347d2c3381eb",
                 "shasum": ""
             },
             "require": {
@@ -192,7 +192,7 @@
                 "s3",
                 "sdk"
             ],
-            "time": "2019-09-11T18:16:47+00:00"
+            "time": "2019-09-12T18:09:53+00:00"
         },
         {
             "name": "babenkoivan/scout-elasticsearch-driver",
@@ -4834,21 +4834,20 @@
         },
         {
             "name": "spatie/laravel-medialibrary",
-            "version": "7.12.0",
+            "version": "7.12.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-medialibrary.git",
-                "reference": "49340036359996c61e767fb2617461c3098130e0"
+                "reference": "8c4adaeb16985a108da4e0dab186bc7561bbbf8f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-medialibrary/zipball/49340036359996c61e767fb2617461c3098130e0",
-                "reference": "49340036359996c61e767fb2617461c3098130e0",
+                "url": "https://api.github.com/repos/spatie/laravel-medialibrary/zipball/8c4adaeb16985a108da4e0dab186bc7561bbbf8f",
+                "reference": "8c4adaeb16985a108da4e0dab186bc7561bbbf8f",
                 "shasum": ""
             },
             "require": {
                 "ext-fileinfo": "*",
-                "ext-imagick": "*",
                 "illuminate/bus": "~5.5.0|~5.6.0|~5.7.0|~5.8.0|^6.0",
                 "illuminate/console": "~5.5.0|~5.6.0|~5.7.0|~5.8.0|^6.0",
                 "illuminate/database": "~5.5.0|~5.6.0|~5.7.0|~5.8.0|^6.0",
@@ -4915,20 +4914,20 @@
                 "media",
                 "spatie"
             ],
-            "time": "2019-09-04T12:47:00+00:00"
+            "time": "2019-09-12T22:01:47+00:00"
         },
         {
             "name": "spatie/laravel-newsletter",
-            "version": "4.6.0",
+            "version": "4.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-newsletter.git",
-                "reference": "3adf8ca71cea4e79dfced6dcbb1fcecd16b84490"
+                "reference": "68a28992ebeba45b856afb1cd42a35e8ce782e30"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-newsletter/zipball/3adf8ca71cea4e79dfced6dcbb1fcecd16b84490",
-                "reference": "3adf8ca71cea4e79dfced6dcbb1fcecd16b84490",
+                "url": "https://api.github.com/repos/spatie/laravel-newsletter/zipball/68a28992ebeba45b856afb1cd42a35e8ce782e30",
+                "reference": "68a28992ebeba45b856afb1cd42a35e8ce782e30",
                 "shasum": ""
             },
             "require": {
@@ -4975,7 +4974,7 @@
                 "mailchimp",
                 "newsletter"
             ],
-            "time": "2019-09-04T09:00:22+00:00"
+            "time": "2019-09-13T09:27:06+00:00"
         },
         {
             "name": "spatie/laravel-responsecache",
@@ -7480,16 +7479,16 @@
         },
         {
             "name": "facade/ignition",
-            "version": "1.6.3",
+            "version": "1.6.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/facade/ignition.git",
-                "reference": "69d7687cb9a4b43978c532b46f05dcdd80be812c"
+                "reference": "43b825a2f77805d1d5495c64eecd272b05ab0e33"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/facade/ignition/zipball/69d7687cb9a4b43978c532b46f05dcdd80be812c",
-                "reference": "69d7687cb9a4b43978c532b46f05dcdd80be812c",
+                "url": "https://api.github.com/repos/facade/ignition/zipball/43b825a2f77805d1d5495c64eecd272b05ab0e33",
+                "reference": "43b825a2f77805d1d5495c64eecd272b05ab0e33",
                 "shasum": ""
             },
             "require": {
@@ -7544,7 +7543,7 @@
                 "laravel",
                 "page"
             ],
-            "time": "2019-09-12T12:36:31+00:00"
+            "time": "2019-09-13T07:41:17+00:00"
         },
         {
             "name": "facade/ignition-contracts",
@@ -8030,35 +8029,33 @@
         },
         {
             "name": "phpdocumentor/reflection-common",
-            "version": "1.0.1",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpDocumentor/ReflectionCommon.git",
-                "reference": "21bdeb5f65d7ebf9f43b1b25d404f87deab5bfb6"
+                "reference": "63a995caa1ca9e5590304cd845c15ad6d482a62a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpDocumentor/ReflectionCommon/zipball/21bdeb5f65d7ebf9f43b1b25d404f87deab5bfb6",
-                "reference": "21bdeb5f65d7ebf9f43b1b25d404f87deab5bfb6",
+                "url": "https://api.github.com/repos/phpDocumentor/ReflectionCommon/zipball/63a995caa1ca9e5590304cd845c15ad6d482a62a",
+                "reference": "63a995caa1ca9e5590304cd845c15ad6d482a62a",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.5"
+                "php": ">=7.1"
             },
             "require-dev": {
-                "phpunit/phpunit": "^4.6"
+                "phpunit/phpunit": "~6"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.0.x-dev"
+                    "dev-master": "2.x-dev"
                 }
             },
             "autoload": {
                 "psr-4": {
-                    "phpDocumentor\\Reflection\\": [
-                        "src"
-                    ]
+                    "phpDocumentor\\Reflection\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -8080,30 +8077,30 @@
                 "reflection",
                 "static analysis"
             ],
-            "time": "2017-09-11T18:02:19+00:00"
+            "time": "2018-08-07T13:53:10+00:00"
         },
         {
             "name": "phpdocumentor/reflection-docblock",
-            "version": "4.3.1",
+            "version": "4.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpDocumentor/ReflectionDocBlock.git",
-                "reference": "bdd9f737ebc2a01c06ea7ff4308ec6697db9b53c"
+                "reference": "b83ff7cfcfee7827e1e78b637a5904fe6a96698e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpDocumentor/ReflectionDocBlock/zipball/bdd9f737ebc2a01c06ea7ff4308ec6697db9b53c",
-                "reference": "bdd9f737ebc2a01c06ea7ff4308ec6697db9b53c",
+                "url": "https://api.github.com/repos/phpDocumentor/ReflectionDocBlock/zipball/b83ff7cfcfee7827e1e78b637a5904fe6a96698e",
+                "reference": "b83ff7cfcfee7827e1e78b637a5904fe6a96698e",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.0",
-                "phpdocumentor/reflection-common": "^1.0.0",
-                "phpdocumentor/type-resolver": "^0.4.0",
+                "phpdocumentor/reflection-common": "^1.0.0 || ^2.0.0",
+                "phpdocumentor/type-resolver": "~0.4 || ^1.0.0",
                 "webmozart/assert": "^1.0"
             },
             "require-dev": {
-                "doctrine/instantiator": "~1.0.5",
+                "doctrine/instantiator": "^1.0.5",
                 "mockery/mockery": "^1.0",
                 "phpunit/phpunit": "^6.4"
             },
@@ -8131,41 +8128,40 @@
                 }
             ],
             "description": "With this component, a library can provide support for annotations via DocBlocks or otherwise retrieve information that is embedded in a DocBlock.",
-            "time": "2019-04-30T17:48:53+00:00"
+            "time": "2019-09-12T14:27:41+00:00"
         },
         {
             "name": "phpdocumentor/type-resolver",
-            "version": "0.4.0",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpDocumentor/TypeResolver.git",
-                "reference": "9c977708995954784726e25d0cd1dddf4e65b0f7"
+                "reference": "2e32a6d48972b2c1976ed5d8967145b6cec4a4a9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpDocumentor/TypeResolver/zipball/9c977708995954784726e25d0cd1dddf4e65b0f7",
-                "reference": "9c977708995954784726e25d0cd1dddf4e65b0f7",
+                "url": "https://api.github.com/repos/phpDocumentor/TypeResolver/zipball/2e32a6d48972b2c1976ed5d8967145b6cec4a4a9",
+                "reference": "2e32a6d48972b2c1976ed5d8967145b6cec4a4a9",
                 "shasum": ""
             },
             "require": {
-                "php": "^5.5 || ^7.0",
-                "phpdocumentor/reflection-common": "^1.0"
+                "php": "^7.1",
+                "phpdocumentor/reflection-common": "^2.0"
             },
             "require-dev": {
-                "mockery/mockery": "^0.9.4",
-                "phpunit/phpunit": "^5.2||^4.8.24"
+                "ext-tokenizer": "^7.1",
+                "mockery/mockery": "~1",
+                "phpunit/phpunit": "^7.0"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.0.x-dev"
+                    "dev-master": "1.x-dev"
                 }
             },
             "autoload": {
                 "psr-4": {
-                    "phpDocumentor\\Reflection\\": [
-                        "src/"
-                    ]
+                    "phpDocumentor\\Reflection\\": "src"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -8178,7 +8174,8 @@
                     "email": "me@mikevanriel.com"
                 }
             ],
-            "time": "2017-07-14T14:27:02+00:00"
+            "description": "A PSR-5 based resolver of Class names, Types and Structural Element Names",
+            "time": "2019-08-22T18:11:29+00:00"
         },
         {
             "name": "phpspec/prophecy",
