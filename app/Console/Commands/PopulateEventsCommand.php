@@ -299,6 +299,10 @@ class PopulateEventsCommand extends Command
 
                     case 'sold out':
                         $event['is_sold_out'] = true;
+
+                        if (empty($event['price'])) {
+                            $event['price'] = 'N/A';
+                        }
                     break;
 
                     case 'free event':
@@ -320,7 +324,7 @@ class PopulateEventsCommand extends Command
             if (strstr($html, '<br>')) {
                 $name = str_replace('<br>', ', ', $html);
 
-                $event['name'] = $name;
+                $event['name'] = Str::title(trim($name));
 
                 // collect band names
                 $ex = explode('<br>', $html);
@@ -335,7 +339,7 @@ class PopulateEventsCommand extends Command
                     }
                 }
             } else {
-                $event['name'] = $info->text();
+                $event['name'] = Str::title(trim($info->text()));
 
                 $event['bands'][] = Str::title(trim($event['name']));
             }
@@ -1471,6 +1475,7 @@ class PopulateEventsCommand extends Command
 
             if (strstr($event['name'], 'Open Mic')) {
                 $event['event_type_id'] = $eventTypes['on-going']->id;
+                $event['price'] = '$5 - $20';
 
                 $event['bands'] = [];
             }
@@ -1503,6 +1508,22 @@ class PopulateEventsCommand extends Command
                     $event['price'] = str_replace('.00', '', trim($row));
 
                     break;
+                }
+            }
+
+            // if price is empty
+            if (empty($event['price'])) {
+                try {
+                    $this->info('empty price lookup. url: ' . $data['purchaseUrl']);
+
+                    $crawler = $scraper->request('GET', $data['purchaseUrl']);
+
+                    $event['price'] = trim($crawler->filter('.js-display-price')->text());
+                    $event['price'] = str_replace('–', '-', $event['price']);
+                } catch (\Exception $e) {
+                    // do nothing
+
+                    $this->error($e->getMessage());
                 }
             }
 

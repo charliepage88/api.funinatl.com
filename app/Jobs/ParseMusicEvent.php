@@ -8,9 +8,11 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Str;
+use SpotifyWebAPI\SpotifyWebAPI;
 
 use App\Event;
 
+use Cache;
 use Storage;
 
 class ParseMusicEvent implements ShouldQueue
@@ -48,6 +50,8 @@ class ParseMusicEvent implements ShouldQueue
      */
     public function handle()
     {
+        \Log::info('ParseMusicEvent -> start -> `' . $this->event['name'] . '`');
+
         // parse event data
         if (strstr($this->event['price'], ' Suggested ')) {
             $this->event['price'] = str_replace(' Suggested ', '', $this->event['price']);
@@ -60,6 +64,8 @@ class ParseMusicEvent implements ShouldQueue
             ->first();
 
         if (empty($find)) {
+            \Log::info('new event');
+
             // create event
             $event = new Event;
 
@@ -119,6 +125,8 @@ class ParseMusicEvent implements ShouldQueue
             // populate image for event
             $this->findArtistAndPopulateImage($event);
         } else {
+            \Log::info('existing event -> `' . $find->id . '`');
+
             // if field values have changed
             // trigger update
             $fields = [
@@ -169,6 +177,8 @@ class ParseMusicEvent implements ShouldQueue
             // populate image for event
             $this->findArtistAndPopulateImage($find);
         }
+
+        \Log::info('ParseMusicEvent -> done -> `' . $this->event['name'] . '`');
     }
 
     /**
@@ -181,13 +191,23 @@ class ParseMusicEvent implements ShouldQueue
     private function findArtistAndPopulateImage(Event $event)
     {
         // first, let's get all the related bands to the event
-        $bands = $event->bands()->whereNull('spotify_artist_id')->get();
+        $bands = $event->bands()->get();
 
         if ($bands->count()) {
             foreach($bands as $band) {
                 if (!$band->photo_url) {
                     // attach image to event if empty
-                    $results = $this->spotify->search($band->name, 'artist');
+                    try {
+                        $results = $this->spotify->search($band->name, 'artist');
+                    } catch (\Exception $e) {
+                        $message = $e->getMessage();
+
+                        if (strstr($message, 'The access token expired')) {
+                            $this->reinitSpotify();
+
+                            $results = $this->spotify->search($band->name, 'artist');
+                        }
+                    }
 
                     $imageUrl = null;
 
@@ -307,5 +327,36 @@ class ParseMusicEvent implements ShouldQueue
         sleep(2);
 
         return $model;
+    }
+
+    /**
+    * Reinit Spotify
+    *
+    * @return SpotifyWebAPI
+    */
+    private function reinitSpotify()
+    {
+        $session = new \SpotifyWebAPI\Session(
+            config('services.spotify.client_id'),
+            config('services.spotify.secret')
+        );
+
+        $session->requestCredentialsToken();
+        $accessToken = $session->getAccessToken();
+
+        if (!empty($accessToken)) {
+            Cache::put('spotify_access_token', $accessToken, 60);
+        } else {
+            throw new \Exception('Cannot get access token from Spotify');
+        }
+
+        // init spotify instance
+        $spotify = new SpotifyWebAPI;
+
+        $spotify->setAccessToken($accessToken);
+
+        $this->spotify = $spotify;
+
+        return $this->spotify;
     }
 }
