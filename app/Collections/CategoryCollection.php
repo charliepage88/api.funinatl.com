@@ -25,17 +25,17 @@ class CategoryCollection extends Collection
     }
 
     /**
-     * Get Mongo Array
+     * Get Formatted Array
      *
      * @param bool $includeRelationships
      *
      * @return array
      */
-    public function getMongoArray($includeRelationships = true)
+    public function getFormattedArray($includeRelationships = true)
     {
         // get array of band data
         $mapped = $this->map(function (Category $category) use ($includeRelationships) {
-            return $category->getMongoArray($includeRelationships);
+            return $category->getFormattedArray($includeRelationships);
         });
 
         // format into array

@@ -4,6 +4,9 @@ namespace App;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Redis;
+
+use App\Event;
 
 use Cache;
 use DB;
@@ -547,19 +550,15 @@ class Report extends Model
     */
     public static function getCachedCategories()
     {
-        $items = Cache::tags([ 'dbcache' ])->rememberForever('categories', function () {
-            return DB::connection('mongodb')->collection('categories')->get();
-        });
+      return Cache::tags([ 'dbcache' ])->rememberForever('categories', function () {
+        $items = Redis::get('categories');
 
-        $items = $items->map(function ($item) {
-            if (isset($item['_id'])) {
-                unset($item['_id']);
-            }
-
-            return $item;
-        });
+        if (!empty($items)) {
+          $items = json_decode($items, true);
+        }
 
         return $items;
+      });
     }
 
     /**
@@ -569,19 +568,15 @@ class Report extends Model
     */
     public static function getCachedLocations()
     {
-        $items = Cache::tags([ 'dbcache' ])->rememberForever('locations', function () {
-            return DB::connection('mongodb')->collection('locations')->get();
-        });
+      return Cache::tags([ 'dbcache' ])->rememberForever('locations', function () {
+        $items = Redis::get('locations');
 
-        $items = $items->map(function ($item) {
-            if (isset($item['_id'])) {
-                unset($item['_id']);
-            }
-
-            return $item;
-        });
+        if (!empty($items)) {
+          $items = json_decode($items, true);
+        }
 
         return $items;
+      });
     }
 
     /**
@@ -591,19 +586,15 @@ class Report extends Model
     */
     public static function getCachedTags()
     {
-        $items = Cache::tags([ 'dbcache' ])->rememberForever('tags', function () {
-            return DB::connection('mongodb')->collection('tags')->get();
-        });
+      return Cache::tags([ 'dbcache' ])->rememberForever('tags', function () {
+        $items = Redis::get('tags');
 
-        $items = $items->map(function ($item) {
-            if (isset($item['_id'])) {
-                unset($item['_id']);
-            }
-
-            return $item;
-        });
+        if (!empty($items)) {
+          $items = json_decode($items, true);
+        }
 
         return $items;
+      });
     }
 
     /**
@@ -613,19 +604,15 @@ class Report extends Model
     */
     public static function getCachedBands()
     {
-        $items = Cache::tags([ 'dbcache' ])->rememberForever('music_bands', function () {
-            return DB::connection('mongodb')->collection('music_bands')->get();
-        });
+      return Cache::tags([ 'dbcache' ])->rememberForever('music_bands', function () {
+        $items = Redis::get('music_bands');
 
-        $items = $items->map(function ($item) {
-            if (isset($item['_id'])) {
-                unset($item['_id']);
-            }
-
-            return $item;
-        });
+        if (!empty($items)) {
+          $items = json_decode($items, true);
+        }
 
         return $items;
+      });
     }
 
     /**
@@ -637,52 +624,67 @@ class Report extends Model
     */
     public static function getCachedEvents($params = [])
     {
-        $cacheKey = 'events';
+      $cacheKey = 'events';
+
+      if (!empty($params)) {
+        $hash = md5(json_encode($params));
+
+        $cacheKey = $cacheKey . '_' . $hash;
+      }
+
+      $tags = [ 'dbcache', 'eventsCache' ];
+
+      $items = Cache::tags($tags)->rememberForever($cacheKey, function () use ($params) {
+        /*
+        $query = DB::collection('events');
 
         if (!empty($params)) {
-            $hash = md5(json_encode($params));
+          foreach($params as $row) {
+            $method = $row['method'];
+            $key = isset($row['key']) ? $row['key'] : null;
+            $value = isset($row['value']) ? $row['value'] : null;
+            $operator = isset($row['operator']) ? $row['operator'] : false;
 
-            $cacheKey = $cacheKey . '_' . $hash;
+            if ($key !== null && $value !== null) {
+              if ($operator) {
+                $query->$method($key, $operator, $value);
+              } else {
+                $query->$method($key, $value);
+              }
+            }
+          }
         }
 
-        $tags = [ 'dbcache', 'eventsCache' ];
+        return $query->get();
+        */
 
-        $items = Cache::tags($tags)->rememberForever($cacheKey, function () use ($params) {
-            $query = DB::connection('mongodb')->collection('events');
+        $query = Event::query();
 
-            if (!empty($params)) {
-                foreach($params as $row) {
-                    $method = $row['method'];
-                    $key = isset($row['key']) ? $row['key'] : null;
-                    $value = isset($row['value']) ? $row['value'] : null;
-                    $operator = isset($row['operator']) ? $row['operator'] : false;
+        if (!empty($params)) {
+          foreach($params as $row) {
+            $method = $row['method'];
+            $key = isset($row['key']) ? $row['key'] : null;
+            $value = isset($row['value']) ? $row['value'] : null;
+            $operator = isset($row['operator']) ? $row['operator'] : false;
 
-                    if ($key !== null && $value !== null) {
-                        if ($operator) {
-                            $query->$method($key, $operator, $value);
-                        } else {
-                            $query->$method($key, $value);
-                        }
-                    }
-                }
+            if ($key !== null && $value !== null) {
+              if ($operator) {
+                $query->$method($key, $operator, $value);
+              } else {
+                $query->$method($key, $value);
+              }
             }
-
-            return $query->get();
-        });
-
-        $items = $items->map(function ($item) {
-            if (isset($item['_id'])) {
-                unset($item['_id']);
-            }
-
-            return $item;
-        });
-
-        if (count($items) === 1) {
-            $items = $items[0];
+          }
         }
 
-        return $items;
+        return $query->get();
+      });
+
+      if (count($items) === 1) {
+        $items = $items[0];
+      }
+
+      return $items;
     }
 
     /**
@@ -728,7 +730,7 @@ class Report extends Model
                 // get events
                 $events = Event::whereIn('id', $eventIds)->get();
 
-                $eventTweetableIds = []; 
+                $eventTweetableIds = [];
                 $tweetContent = null;
                 foreach($events as $event) {
                     // add tweet content if there is any

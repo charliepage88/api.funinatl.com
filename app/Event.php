@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Str;
-use Jenssegers\Mongodb\Eloquent\HybridRelations;
 use ScoutElastic\Searchable;
 use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia\HasMedia;
@@ -705,13 +704,13 @@ class Event extends Model implements HasMedia
     }
 
     /**
-     * Get Mongo Array
+     * Get Formatted Array
      *
      * @param bool $includeRelationships
      *
      * @return array
      */
-    public function getMongoArray($includeRelationships = true)
+    public function getFormattedArray($includeRelationships = true)
     {
         // event data
         $fields = [
@@ -762,10 +761,10 @@ class Event extends Model implements HasMedia
         $event['location_slug'] = $this->location->slug;
 
         $event['event_type'] = $this->eventType->name;
-        $event['location'] = $this->location->getMongoArray(false);
+        $event['location'] = $this->location->getFormattedArray(false);
 
         if ($this->bands->count()) {
-            $event['bands'] = $this->bands->getMongoArray();
+            $event['bands'] = $this->bands->getFormattedArray();
         }
 
         return $event;

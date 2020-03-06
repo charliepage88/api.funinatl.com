@@ -25,17 +25,17 @@ class LocationCollection extends Collection
     }
 
     /**
-     * Get Mongo Array
+     * Get Formatted Array
      *
      * @param bool $includeRelationships
      *
      * @return array
      */
-    public function getMongoArray($includeRelationships = true)
+    public function getFormattedArray($includeRelationships = true)
     {
         // get array of band data
         $mapped = $this->map(function (Location $location) use ($includeRelationships) {
-            return $location->getMongoArray($includeRelationships);
+            return $location->getFormattedArray($includeRelationships);
         });
 
         // format into array

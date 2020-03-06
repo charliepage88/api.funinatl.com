@@ -224,6 +224,7 @@ class EventsController extends Controller
     */
     public function getBySlug(Request $request, $slug)
     {
+        /*
         $event = Report::getCachedEvents([
             [
                 'method' => 'where',
@@ -231,6 +232,9 @@ class EventsController extends Controller
                 'value'  => $slug
             ]
         ]);
+        */
+
+        $event = Event::where('slug', $slug)->firstOrFail();
 
         return response()->json(compact('event'));
     }

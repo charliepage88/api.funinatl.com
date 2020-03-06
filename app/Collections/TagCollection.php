@@ -25,17 +25,17 @@ class TagCollection extends Collection
     }
 
     /**
-     * Get Mongo Array
+     * Get Formatted Array
      *
      * @param bool $includeRelationships
      *
      * @return array
      */
-    public function getMongoArray($includeRelationships = true)
+    public function getFormattedArray($includeRelationships = true)
     {
         // get array of band data
         $mapped = $this->map(function (Tag $tag) use ($includeRelationships) {
-            return $tag->getMongoArray($includeRelationships);
+            return $tag->getFormattedArray($includeRelationships);
         });
 
         // format into array

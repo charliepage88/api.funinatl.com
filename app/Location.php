@@ -452,13 +452,13 @@ class Location extends Model implements HasMedia
     }
 
     /**
-     * Get Mongo Array
+     * Get Formatted Array
      *
      * @param boolean $includeRelationships
      *
      * @return array
      */
-    public function getMongoArray($includeRelationships = true)
+    public function getFormattedArray($includeRelationships = true)
     {
         // location data
         $fields = [
@@ -508,7 +508,7 @@ class Location extends Model implements HasMedia
         if ($includeRelationships) {
             $events = [];
             foreach($this->activeEvents() as $event) {
-                $events[] = $event->getMongoArray(false);
+                $events[] = $event->getFormattedArray(false);
             }
 
             $location['events'] = $events;

@@ -181,13 +181,13 @@ class MusicBand extends Model implements HasMedia
     }
 
     /**
-     * Get Mongo Array
+     * Get Formatted Array
      *
      * @param bool $includeRelationships
      *
      * @return array
      */
-    public function getMongoArray($includeRelationships = true)
+    public function getFormattedArray($includeRelationships = true)
     {
         $fields = [
             'id',

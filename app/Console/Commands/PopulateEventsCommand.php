@@ -244,7 +244,7 @@ class PopulateEventsCommand extends Command
                 'name' => '',
                 'location_id' => $provider->location_id,
                 'user_id' => 1,
-                'category_id' => $provider->location->category_id,  
+                'category_id' => $provider->location->category_id,
                 'event_type_id' => 2,
                 'start_date' => '',
                 'price' => '',
@@ -575,7 +575,7 @@ class PopulateEventsCommand extends Command
                                 'name' => $show['name'],
                                 'location_id' => $provider->location_id,
                                 'user_id' => 1,
-                                'category_id' => $provider->location->category_id,  
+                                'category_id' => $provider->location->category_id,
                                 'event_type_id' => 2,
                                 'start_date' => $date->format('Y-m-d'),
                                 'price' => $show['price'],
@@ -633,7 +633,7 @@ class PopulateEventsCommand extends Command
                             'name' => $eventName,
                             'location_id' => $provider->location_id,
                             'user_id' => 1,
-                            'category_id' => $provider->location->category_id,  
+                            'category_id' => $provider->location->category_id,
                             'event_type_id' => 2,
                             'start_date' => $startDate->format('Y-m-d'),
                             'price' => '$10',
@@ -704,7 +704,7 @@ class PopulateEventsCommand extends Command
                 'name' => '',
                 'location_id' => $provider->location_id,
                 'user_id' => 1,
-                'category_id' => $provider->location->category_id,  
+                'category_id' => $provider->location->category_id,
                 'event_type_id' => 2,
                 'start_date' => '',
                 'price' => '',
@@ -917,7 +917,7 @@ class PopulateEventsCommand extends Command
                 'name' => '',
                 'location_id' => $provider->location_id,
                 'user_id' => 1,
-                'category_id' => $provider->location->category_id,  
+                'category_id' => $provider->location->category_id,
                 'event_type_id' => 2,
                 'start_date' => '',
                 'price' => '',
@@ -956,7 +956,7 @@ class PopulateEventsCommand extends Command
                 'ADV',
                 'Adv'
             ];
-            
+
             foreach($meta as $index => $value) {
                 $value = trim($value);
                 $valueLower = strtolower($value);
@@ -1434,7 +1434,7 @@ class PopulateEventsCommand extends Command
                 'name' => '',
                 'location_id' => $provider->location_id,
                 'user_id' => 1,
-                'category_id' => $provider->location->category_id,  
+                'category_id' => $provider->location->category_id,
                 'event_type_id' => 2,
                 'start_date' => '',
                 'price' => '',
@@ -1684,7 +1684,7 @@ class PopulateEventsCommand extends Command
                 'name' => '',
                 'location_id' => $provider->location_id,
                 'user_id' => 1,
-                'category_id' => $provider->location->category_id,  
+                'category_id' => $provider->location->category_id,
                 'event_type_id' => 2,
                 'start_date' => '',
                 'price' => '',

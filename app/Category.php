@@ -231,13 +231,13 @@ class Category extends Model implements HasMedia
     }
 
     /**
-     * Get Mongo Array
+     * Get Formatted Array
      *
      * @param bool $includeRelationships
      *
      * @return array
      */
-    public function getMongoArray($includeRelationships = true)
+    public function getFormattedArray($includeRelationships = true)
     {
         // category data
         $fields = [
@@ -260,7 +260,7 @@ class Category extends Model implements HasMedia
         if ($includeRelationships) {
             $events = [];
             foreach($this->activeEvents() as $event) {
-                $events[] = $event->getMongoArray(false);
+                $events[] = $event->getFormattedArray(false);
             }
 
             $category['events'] = $events;
@@ -270,7 +270,7 @@ class Category extends Model implements HasMedia
         if ($includeRelationships) {
             $locations = [];
             foreach($this->activeLocations() as $location) {
-                $locations[] = $location->getMongoArray(false);
+                $locations[] = $location->getFormattedArray(false);
             }
 
             $category['locations'] = $locations;

@@ -80,11 +80,11 @@ class User extends Authenticatable
     }
 
     /**
-     * Get Mongo Array
+     * Get Formatted Array
      *
      * @return array
      */
-    public function getMongoArray()
+    public function getFormattedArray()
     {
         // user data
         $fields = [
