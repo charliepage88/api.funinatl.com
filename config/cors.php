@@ -4,42 +4,32 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Laravel CORS
+    | Cross-Origin Resource Sharing (CORS) Configuration
     |--------------------------------------------------------------------------
     |
-    | allowedOrigins, allowedHeaders and allowedMethods can be set to array('*')
-    | to accept any value.
+    | Here you may configure your settings for cross-origin resource sharing
+    | or "CORS". This determines what cross-origin operations may execute
+    | in web browsers. You are free to adjust these settings as needed.
+    |
+    | To learn more: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
     |
     */
-    'supportsCredentials' => false,
-    'allowedOrigins' => [
-        // 'http://api.funinatl.test',
-        // 'https://api.funinatl.com',
-        // 'http://localhost'
-        '*'
-    ],
-    'allowedHeaders' => [
-        'Accepts',
-        'Authorization',
-        'Content-Type',
-        'Content-Disposition',
-        'X-Filename',
-        'X-Timezone',
-        'X-User',
-        'Content-Security-Policy'
-    ],
-    'allowedMethods' => [
-        'GET',
-        'POST',
-        'PUT',
-        'DELETE'
-    ],
-    'exposedHeaders' => [
-        'Content-Type',
-        'Content-Disposition',
-        'X-Filename',
-        'X-Timezone',
-        'X-User'
-    ],
-    'maxAge' => 0,
+
+    'paths' => ['api/*'],
+
+    'allowed_methods' => ['*'],
+
+    'allowed_origins' => ['*'],
+
+    'allowed_origins_patterns' => [],
+
+    'allowed_headers' => ['*'],
+
+    'exposed_headers' => false,
+
+    'max_age' => false,
+
+    'supports_credentials' => false,
+
 ];
+
