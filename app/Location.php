@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use ScoutElastic\Searchable;
 use Spatie\Image\Manipulations;
-use Spatie\MediaLibrary\HasMedia\HasMedia;
-use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
-use Spatie\MediaLibrary\Models\Media;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Spatie\Tags\HasTags;
@@ -20,7 +20,7 @@ use App\Traits\SlugExtend;
 
 class Location extends Model implements HasMedia
 {
-    use HasMediaTrait,
+    use InteractsWithMedia,
         HasSlug,
         HasTags,
         Searchable,
@@ -534,7 +534,7 @@ class Location extends Model implements HasMedia
     *
     * @return void
     */
-    public function registerMediaCollections()
+    public function registerMediaCollections(): void
     {
         $this
            ->addMediaCollection('locations')
@@ -548,7 +548,7 @@ class Location extends Model implements HasMedia
     *
     * @return void
     */
-    public function registerMediaConversions(Media $media = null)
+    public function registerMediaConversions(?Media $media = NULL): void
     {
         $this->addMediaConversion('thumb_small')
             ->optimize()

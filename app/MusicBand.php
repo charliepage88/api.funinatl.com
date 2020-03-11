@@ -4,8 +4,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use ScoutElastic\Searchable;
-use Spatie\MediaLibrary\HasMedia\HasMedia;
-use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
@@ -13,7 +13,7 @@ use App\Collections\MusicBandCollection;
 
 class MusicBand extends Model implements HasMedia
 {
-    use HasMediaTrait,
+    use InteractsWithMedia,
         HasSlug,
         Searchable;
 
@@ -133,7 +133,7 @@ class MusicBand extends Model implements HasMedia
     *
     * @return void
     */
-    public function registerMediaCollections()
+    public function registerMediaCollections(): void
     {
         $this
            ->addMediaCollection('bands')

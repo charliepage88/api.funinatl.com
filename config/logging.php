@@ -36,7 +36,10 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-            'channels' => ['daily'],
+            'channels' => [
+              'single',
+              'papertrail'
+            ],
             'ignore_exceptions' => false,
         ],
 
@@ -63,7 +66,7 @@ return [
 
         'papertrail' => [
             'driver' => 'monolog',
-            'level' => 'debug',
+            'level' => 'notice',
             'handler' => SyslogUdpHandler::class,
             'handler_with' => [
                 'host' => env('PAPERTRAIL_URL'),

@@ -4,8 +4,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use ScoutElastic\Searchable;
-use Spatie\MediaLibrary\HasMedia\HasMedia;
-use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
@@ -14,7 +14,7 @@ use App\Traits\SlugExtend;
 
 class Category extends Model implements HasMedia
 {
-    use HasMediaTrait,
+    use InteractsWithMedia,
         HasSlug,
         Searchable,
         SlugExtend;
@@ -186,7 +186,7 @@ class Category extends Model implements HasMedia
     *
     * @return void
     */
-    public function registerMediaCollections()
+    public function registerMediaCollection()
     {
         $this
            ->addMediaCollection('categories')

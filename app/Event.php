@@ -10,9 +10,9 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Str;
 use ScoutElastic\Searchable;
 use Spatie\Image\Manipulations;
-use Spatie\MediaLibrary\HasMedia\HasMedia;
-use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
-use Spatie\MediaLibrary\Models\Media;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Spatie\Tags\HasTags;
@@ -24,7 +24,7 @@ use Storage;
 
 class Event extends Model implements HasMedia
 {
-    use HasMediaTrait,
+    use InteractsWithMedia,
         HasSlug,
         HasTags,
         Metable,
@@ -919,7 +919,7 @@ class Event extends Model implements HasMedia
     *
     * @return void
     */
-    public function registerMediaCollections()
+    public function registerMediaCollections(): void
     {
         $this
            ->addMediaCollection('events')
@@ -934,7 +934,7 @@ class Event extends Model implements HasMedia
     *
     * @return void
     */
-    public function registerMediaConversions(Media $media = null)
+    public function registerMediaConversions(?Media $media = NULL): void
     {
         // init vars
         $useDefaults = true;

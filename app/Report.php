@@ -10,6 +10,7 @@ use App\Event;
 
 use Cache;
 use DB;
+use SiteHelper;
 
 class Report extends Model
 {
@@ -49,7 +50,7 @@ class Report extends Model
         // event stats
 
         // get stats for current time period
-        $startDate = Carbon::now();
+        $startDate = SiteHelper::timeNow();
         $endDate = $startDate->copy()->addMonth();
 
         $stats['events']['upcoming'] = DB::table('events')
@@ -59,7 +60,7 @@ class Report extends Model
 
         // compare to last week to see if it has
         // increased or not
-        $startDate = Carbon::now()->subWeek();
+        $startDate = SiteHelper::timeNow()->subWeek();
         $endDate = $startDate->copy()->addMonth();
 
         $lastWeekCount = DB::table('events')
@@ -84,7 +85,7 @@ class Report extends Model
         // compare to last week to see if it has
         // increased or not
         if ($items->count()) {
-            $startDate = Carbon::now()->subWeek();
+            $startDate = SiteHelper::timeNow()->subWeek();
             $endDate = $startDate->copy()->addMonth();
 
             $lastWeekCount = DB::table('events')
@@ -107,14 +108,14 @@ class Report extends Model
         $stats['users']['total'] = DB::table('users')->count();
 
         // get new user count
-        $startDate = Carbon::now()->subWeek();
+        $startDate = SiteHelper::timeNow()->subWeek();
 
         $stats['users']['new'] = DB::table('users')
             ->where('created_at', '>=', $startDate->format('Y-m-d'))
             ->count();
 
         // compare to previous week
-        $startDate = Carbon::now()->subWeeks(2);
+        $startDate = SiteHelper::timeNow()->subWeeks(2);
 
         $lastWeekCount = DB::table('users')
             ->where('created_at', '>=', $startDate->format('Y-m-d'))
@@ -139,7 +140,7 @@ class Report extends Model
         // compare to last week to see if it has
         // increased or not
         if ($items->count()) {
-            $startDate = Carbon::now()->subWeek();
+            $startDate = SiteHelper::timeNow()->subWeek();
             $endDate = $startDate->copy()->addMonth();
 
             $lastWeekCount = DB::table('locations')
@@ -168,7 +169,7 @@ class Report extends Model
         // compare to last week to see if it has
         // increased or not
         if ($items->count()) {
-            $startDate = Carbon::now()->subWeek();
+            $startDate = SiteHelper::timeNow()->subWeek();
             $endDate = $startDate->copy()->addMonth();
 
             $lastWeekCount = DB::table('contact_submissions')
@@ -227,7 +228,7 @@ class Report extends Model
             ]
         ];
 
-        $startDate = Carbon::now()->subMonth()->startOf('month');
+        $startDate = SiteHelper::timeNow()->subMonth()->startOf('month');
         $endDate = $startDate->copy()->addMonths(6)->endOf('month');
 
         for($date = $startDate; $date->lte($endDate); $date->addMonth()) {
@@ -262,7 +263,7 @@ class Report extends Model
             ]
         ];
 
-        $startDate = Carbon::now();
+        $startDate = SiteHelper::timeNow();
         $endDate = $startDate->copy()->addDays(30);
 
         // get events
@@ -320,74 +321,75 @@ class Report extends Model
 
         $response = [];
         $errorResponse = function ($key) {
-            $response = [
-                'events' => [],
-                'status' => false,
-                'error' => 'Cannot find ' . $key . '.'
-            ];
+          $response = [
+            'events' => [],
+            'status' => false,
+            'error' => 'Cannot find ' . $key . '.'
+          ];
 
-            $response[$key] = [];
+          $response[$key] = [];
 
-            return $response;
+          return $response;
         };
 
         // get events
         $events = self::getCachedEvents();
 
         $query = $events
-            ->where('start_date', '>=', $start_date)
-            ->where('start_date', '<=', $end_date)
-            ->sortBy('start_date');
+          ->where('start_date', '>=', $start_date)
+          ->where('start_date', '<=', $end_date)
+          ->sortBy('start_date');
 
         // parse params
         if (!empty($params)) {
-            // filter by category
-            if (!empty($params['category'])) {
-                $categories = self::getCachedCategories();
-                $category = $categories->firstWhere('slug', $params['category']);
+          // filter by category
+          if (!empty($params['category'])) {
+            $categories = self::getCachedCategories();
+            $category = $categories->firstWhere('slug', $params['category']);
 
-                if (!empty($category)) {
-                    $query->where('category_id', '=', $category['id']);
+            if (!empty($category)) {
+              $query->where('category_id', '=', $category['id']);
 
-                    $response['category'] = $category;
-                } else {
-                    return $errorResponse('category');
-                }
+              $response['category'] = $category;
+            } else {
+              return $errorResponse('category');
             }
+          }
 
-            // filter by location
-            if (!empty($params['location'])) {
-                $locations = self::getCachedLocations();
-                $location = $locations->firstWhere('slug', $params['location']);
+          // filter by location
+          if (!empty($params['location'])) {
+            $locations = self::getCachedLocations();
+            $location = $locations->firstWhere('slug', $params['location']);
 
-                if (!empty($location)) {
-                    $query->where('location_id', '=', $location['id']);
+            if (!empty($location)) {
+              $query->where('location_id', '=', $location['id']);
 
-                    $response['location'] = $location;
-                }
+              $response['location'] = $location;
             }
+          }
 
-            // filter by tag
-            if (!empty($params['tag'])) {
-                $tags = self::getCachedTags();
-                $tag = $tags->firstWhere('slug', $params['tag']);
+          // filter by tag
+          if (!empty($params['tag'])) {
+            $tags = self::getCachedTags();
+            $tag = $tags->firstWhere('slug', $params['tag']);
 
-                if (!empty($tag)) {
-                    $query = $query->filter(function ($event) use ($params) {
-                        if (!empty($event['tags'])) {
-                            foreach($event['tags'] as $tag) {
-                                if ($tag['slug'] === $params['tag']) {
-                                    return true;
-                                }
-                            }
-                        }
-
-                        return false;
-                    });
-
-                    $response['tag'] = $tag;
+            if (!empty($tag)) {
+              $query = $query->filter(function ($event) use ($params) {
+                $status = false;
+                if (!empty($event['tags'])) {
+                  foreach($event['tags'] as $tag) {
+                    if ($tag['slug'] === $params['tag']) {
+                      $status = true;
+                    }
+                  }
                 }
+
+                return $status;
+              });
+
+              $response['tag'] = $tag;
             }
+          }
         }
 
         // get the events data
@@ -396,146 +398,158 @@ class Report extends Model
         // if event index, append list of locations
         // and categories
         if (empty($response)) {
-            $response['categories'] = self::getCachedCategories();
-            $response['locations'] = self::getCachedLocations();
+          $response['categories'] = self::getCachedCategories();
+          $response['locations'] = self::getCachedLocations();
         }
 
         // set weekend/weekdays
         Carbon::macro('isWeekendDay', function () {
-            return $this->isFriday() || $this->isSaturday() || $this->isSunday();
+          return $this->isFriday() || $this->isSaturday() || $this->isSunday();
         });
 
         $start_date = Carbon::parse($start_date);
         $end_date = Carbon::parse($end_date);
-        $now = Carbon::now();
+        $now = SiteHelper::timeNow();
 
         // collect dates inbetween start & end date
         // group by weekday vs weekend
         $dates = [];
         $existingDates = [];
         for ($date = $start_date->copy(); $date->lte($end_date); $date->addWeek()) {
-            $formattedDate = $date->format('Y-m-d');
-            $endOfWeek = $date->copy()->addWeek();
+          $formattedDate = $date->format('Y-m-d');
+          $endOfWeek = $date->copy()->addWeek();
 
-            if ($endOfWeek->greaterThan($end_date)) {
-                $endOfWeek = $date->copy()->addDay();
+          if ($endOfWeek->greaterThan($end_date)) {
+            $endOfWeek = $date->copy()->addDay();
+          }
+
+          for ($day = $date->copy(); $day->lte($endOfWeek); $day->addDay()) {
+            $dayFormatted = $day->format('Y-m-d');
+
+            if (!in_array($dayFormatted, $existingDates)) {
+              $dates[] = $day->copy();
+              $existingDates[] = $dayFormatted;
             }
-
-            for ($day = $date->copy(); $day->lte($endOfWeek); $day->addDay()) {
-                $dayFormatted = $day->format('Y-m-d');
-
-                if (!in_array($dayFormatted, $existingDates)) {
-                    $dates[] = $day->copy();
-                    $existingDates[] = $dayFormatted;
-                }
-            }
+          }
         }
 
         $results = [];
         $lastIndex = 0;
         foreach($dates as $key => $date) {
-            $formattedDate = $date->format('Y-m-d');
+          $formattedDate = $date->format('Y-m-d');
 
-            if ($key > 0) {
-                $lastDate = $dates[($key - 1)];
+          if ($key > 0) {
+            $lastDate = $dates[($key - 1)];
 
-                if ($lastDate->isWeekendDay() !== $date->isWeekendDay()) {
-                    $lastIndex++;
+            if ($lastDate->isWeekendDay() !== $date->isWeekendDay()) {
+              $lastIndex++;
+            }
+          }
+
+          if (!isset($results[$lastIndex])) {
+            if ($now->format('Y-m-d') === $start_date->format('Y-m-d')) {
+              $diff = $date->diffInDays($start_date->copy());
+
+              if ($date->isWeekendDay()) {
+                $label = 'Weekend of ' . $date->format('F jS');
+                $label .= ' - ' . $date->copy()->addDays(2)->format('jS');
+
+                if ($diff === 0) {
+                  $label = 'This Weekend';
+                } elseif ($diff === 3) {
+                  $label = 'Next Weekend';
                 }
+              } else {
+                $label = 'Week of ' . $date->format('F jS');
+                $label .= ' - ' . $date->copy()->addDays(3)->format('jS');
+
+                if ($diff === 0) {
+                  $label = 'This Week';
+                } elseif ($diff == 3) {
+                  $label = 'Next Week';
+                }
+              }
+            } else {
+              if ($date->isWeekendDay()) {
+                $label = 'Weekend of ' . $date->format('F jS');
+                $label .= ' - ' . $date->copy()->addDays(2)->format('jS');
+              } else {
+                $label = 'Week of ' . $date->format('F jS');
+                $label .= ' - ' . $date->copy()->addDays(3)->format('jS');
+              }
             }
 
-            if (!isset($results[$lastIndex])) {
-                if ($now->format('Y-m-d') === $start_date->format('Y-m-d')) {
-                    $diff = $date->diffInDays($start_date->copy());
+            $results[$lastIndex] = [
+              'label' => $label,
+              'days' => []
+            ];
+          }
 
-                    if ($date->isWeekendDay()) {
-                        $label = 'Weekend of ' . $date->format('F jS');
-                        $label .= ' - ' . $date->copy()->addDays(2)->format('jS');
+          $daysEvents = $events->filter(function ($event) use ($formattedDate) {
+            $ymd = Carbon::parse($event['start_date'])->format('Y-m-d');
 
-                        if ($diff === 0) {
-                            $label = 'This Weekend';
-                        } elseif ($diff === 3) {
-                            $label = 'Next Weekend';
-                        }
-                    } else {
-                        $label = 'Week of ' . $date->format('F jS');
-                        $label .= ' - ' . $date->copy()->addDays(3)->format('jS');
-
-                        if ($diff === 0) {
-                            $label = 'This Week';
-                        } elseif ($diff == 3) {
-                            $label = 'Next Week';
-                        }
-                    }
-                } else {
-                    if ($date->isWeekendDay()) {
-                        $label = 'Weekend of ' . $date->format('F jS');
-                        $label .= ' - ' . $date->copy()->addDays(2)->format('jS');
-                    } else {
-                        $label = 'Week of ' . $date->format('F jS');
-                        $label .= ' - ' . $date->copy()->addDays(3)->format('jS');
-                    }
-                }
-
-                $results[$lastIndex] = [
-                    'label' => $label,
-                    'days' => []
-                ];
+            if ($formattedDate === '2020-03-20') {
+              \Log::info($ymd . ' :: ' . ($ymd === $formattedDate ? 'yay' : 'nay'));
             }
 
-            $daysEvents = $events->filter(function ($event) use ($formattedDate) {
-                return $event['start_date'] === $formattedDate;
-            });
+            return ($ymd === $formattedDate);
+          });
 
-            $sorted = $daysEvents->sortBy(function ($event) {
-                if (empty($event['start_time'])) {
-                    return -1;
-                }
+          if ($formattedDate === '2020-03-20') {
+            // dd($daysEvents->count(), $formattedDate, $events->count());
+          }
 
-                // format date
-                $date = Carbon::parse($event['start_date'])->format('Y-m-d');
-
-                // format time
-                $ex = explode(':', $event['start_time']);
-                $time = (int) $ex[0];
-
-                if (strlen($time) === 1) {
-                    $time = '0' . $time;
-                }
-
-                if (strstr($ex[1], 'PM')) {
-                    $minutes = str_replace(' PM', '', $ex[1]);
-
-                    if ($time != 12) {
-                        $time += 12;
-                    }
-                } else {
-                    $minutes = str_replace(' AM', '', $ex[1]);
-                }
-
-                $time .= ':' . $minutes . ':00';
-
-                $start_time = Carbon::parse($date . ' ' . $time)->format('U');
-
-                return (int) $start_time;
-            });
-
-            $eventsForDay = $sorted->values()->all();
-
-            if (!empty($eventsForDay)) {
-                $results[$lastIndex]['days'][] = [
-                    'date' => $formattedDate,
-                    'events' => $eventsForDay
-                ];
+          $sorted = $daysEvents->sortBy(function ($event) {
+            if (empty($event['start_time'])) {
+              return -1;
             }
+
+            // format date
+            $date = Carbon::parse($event['start_date'])->format('Y-m-d');
+
+            // format time
+            $ex = explode(':', $event['start_time']);
+            $time = (int) $ex[0];
+
+            if (strlen($time) === 1) {
+              $time = '0' . $time;
+            }
+
+            if (strstr($ex[1], 'PM')) {
+              $minutes = str_replace(' PM', '', $ex[1]);
+
+              if ($time != 12) {
+                $time += 12;
+              }
+            } else {
+              $minutes = str_replace(' AM', '', $ex[1]);
+            }
+
+            $time .= ':' . $minutes . ':00';
+
+            $start_time = Carbon::parse($date . ' ' . $time)->format('U');
+
+            return (int) $start_time;
+          });
+
+          $eventsForDay = $sorted->values()->all();
+
+          if (!empty($eventsForDay)) {
+            $results[$lastIndex]['days'][] = [
+                'date' => $formattedDate,
+                'events' => $eventsForDay
+            ];
+          } else {
+            dd($formattedDate, $daysEvents->count());
+          }
         }
 
         // unset days with empty events
         $newResults = [];
         foreach($results as $row) {
-            if (!empty($row['days'])) {
-                $newResults[] = $row;
-            }
+          if (!empty($row['days'])) {
+            $newResults[] = $row;
+          }
         }
 
         $response['events'] = $newResults;
@@ -550,7 +564,7 @@ class Report extends Model
     */
     public static function getCachedCategories()
     {
-      return Cache::tags([ 'dbcache' ])->rememberForever('categories', function () {
+      return collect(Cache::tags([ 'dbcache' ])->rememberForever('categories', function () {
         $items = Redis::get('categories');
 
         if (!empty($items)) {
@@ -558,7 +572,7 @@ class Report extends Model
         }
 
         return $items;
-      });
+      }));
     }
 
     /**
@@ -568,7 +582,7 @@ class Report extends Model
     */
     public static function getCachedLocations()
     {
-      return Cache::tags([ 'dbcache' ])->rememberForever('locations', function () {
+      return collect(Cache::tags([ 'dbcache' ])->rememberForever('locations', function () {
         $items = Redis::get('locations');
 
         if (!empty($items)) {
@@ -576,7 +590,7 @@ class Report extends Model
         }
 
         return $items;
-      });
+      }));
     }
 
     /**
@@ -586,7 +600,7 @@ class Report extends Model
     */
     public static function getCachedTags()
     {
-      return Cache::tags([ 'dbcache' ])->rememberForever('tags', function () {
+      return collect(Cache::tags([ 'dbcache' ])->rememberForever('tags', function () {
         $items = Redis::get('tags');
 
         if (!empty($items)) {
@@ -594,7 +608,7 @@ class Report extends Model
         }
 
         return $items;
-      });
+      }));
     }
 
     /**
@@ -604,7 +618,7 @@ class Report extends Model
     */
     public static function getCachedBands()
     {
-      return Cache::tags([ 'dbcache' ])->rememberForever('music_bands', function () {
+      return collect(Cache::tags([ 'dbcache' ])->rememberForever('music_bands', function () {
         $items = Redis::get('music_bands');
 
         if (!empty($items)) {
@@ -612,7 +626,7 @@ class Report extends Model
         }
 
         return $items;
-      });
+      }));
     }
 
     /**
@@ -635,29 +649,6 @@ class Report extends Model
       $tags = [ 'dbcache', 'eventsCache' ];
 
       $items = Cache::tags($tags)->rememberForever($cacheKey, function () use ($params) {
-        /*
-        $query = DB::collection('events');
-
-        if (!empty($params)) {
-          foreach($params as $row) {
-            $method = $row['method'];
-            $key = isset($row['key']) ? $row['key'] : null;
-            $value = isset($row['value']) ? $row['value'] : null;
-            $operator = isset($row['operator']) ? $row['operator'] : false;
-
-            if ($key !== null && $value !== null) {
-              if ($operator) {
-                $query->$method($key, $operator, $value);
-              } else {
-                $query->$method($key, $value);
-              }
-            }
-          }
-        }
-
-        return $query->get();
-        */
-
         $query = Event::query();
 
         if (!empty($params)) {
@@ -680,8 +671,10 @@ class Report extends Model
         return $query->get();
       });
 
-      if (count($items) === 1) {
-        $items = $items[0];
+      $items = collect($items);
+
+      if ($items->count() === 1) {
+        $items = $items->first();
       }
 
       return $items;
@@ -698,13 +691,13 @@ class Report extends Model
     {
         // collect dates
         if (empty($filters['start_date'])) {
-            $startDate = Carbon::now()->addDay();
+            $startDate = SiteHelper::timeNow()->addDay();
         } else {
             $startDate = Carbon::parse($filters['start_date']);
         }
 
         if (empty($filters['end_date'])) {
-            $endDate = Carbon::now()->addDays(14);
+            $endDate = SiteHelper::timeNow()->addDays(14);
         } else {
             $endDate = Carbon::parse($filters['end_date']);
         }

@@ -356,6 +356,7 @@ class DevCommand extends Command
 
       // loop through model items and create/update
       $changesCount = 0;
+      $collectionData = [];
       foreach($items as $item) {
         $key = $collection . '.' . $item->id;
 
@@ -382,21 +383,6 @@ class DevCommand extends Command
           $valueKeys = array_keys($value);
           $newKeys = array_keys($newValue);
 
-          /*
-          $keysDiff = array_diff($newKeys, $valueKeys);
-
-          if (!empty($keysDiff)) {
-            foreach(array_values($keysDiff) as $key) {
-
-              DB::collection($prefix . $collection)
-                ->where('id', $item->id)
-                ->unset($key);
-
-              $this->info('Unset field `' . $key . '` for collection ' . $collection);
-            }
-          }
-          */
-
           // compare keys to see if model needs
           // to be updated
           $isMissingKeys = array_diff($valueKeys, $newKeys);
@@ -416,6 +402,8 @@ class DevCommand extends Command
             $shouldUpdate = array_map('json_decode', $diff);
           }
 
+          $collectionData[] = $value;
+
           if ($shouldUpdate) {
             $changesCount++;
 
@@ -427,6 +415,8 @@ class DevCommand extends Command
           }
         }
       }
+
+      Redis::set($collection, json_encode($collectionData));
 
       // sync to search
       if ($search && $changesCount) {

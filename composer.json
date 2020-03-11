@@ -30,7 +30,7 @@
         "predis/predis": "^1.1",
         "thujohn/twitter": "^2.2",
         "silber/bouncer": "v1.0.0-rc.7",
-        "spatie/laravel-medialibrary": "^7.12",
+        "spatie/laravel-medialibrary": "^8.0",
         "spatie/laravel-newsletter": "^4.6",
         "spatie/laravel-responsecache": "^6.3",
         "spatie/laravel-sluggable": "^2.2",
