@@ -48,110 +48,103 @@ class CrawlAisleFiveLink implements ShouldQueue
      */
     public function handle()
     {
-        // init data
-        $data = $this->data;
-        $spotify = $this->spotify;
+      // init data
+      $data = $this->data;
+      $spotify = $this->spotify;
 
-        // parse date
-        $startDate = Carbon::parse($data['start_date']);
+      // parse date
+      $startDate = Carbon::parse($data['start_date']);
 
-        // get crawler
-        $scraper = new WebScraper;
+      // get crawler
+      $scraper = new WebScraper;
 
-        $crawler = $scraper->request('GET', $data['website']);
+      $crawler = $scraper->request('GET', $data['website']);
 
-        // event array
-        $event = [
-            'name' => '',
-            'location_id' => $data['location_id'],
-            'user_id' => 1,
-            'category_id' => $data['category_id'],  
-            'event_type_id' => 2,
-            'start_date' => $startDate->format('Y-m-d'),
-            'price' => '',
-            'start_time' => '',
-            'end_time' => '',
-            'website' => $data['website'],
-            'is_sold_out' => false,
-            'tags' => [],
-            'bands' => []
-        ];
+      // event array
+      $event = [
+        'name' => '',
+        'location_id' => $data['location_id'],
+        'user_id' => 1,
+        'category_id' => $data['category_id'],
+        'event_type_id' => 2,
+        'start_date' => $startDate->format('Y-m-d'),
+        'price' => '',
+        'start_time' => '',
+        'end_time' => '',
+        'website' => $data['website'],
+        'is_sold_out' => false,
+        'tags' => [],
+        'bands' => []
+      ];
 
-        // get the name of the event
-        $event['name'] = Str::title(trim($crawler->filter('.headliners.summary')->text()));
+      // get the name of the event
+      $event['name'] = Str::title(trim($crawler->filter('.event-name')->text()));
 
-        // get start time
-        try {
-            $start_time = trim($crawler->filter('.start.dtstart')->text());
-            $start_time = str_replace($startDate->format('F d') . ' @ ', '', $start_time);
+      // get start time
+      try {
+        $start_time = trim($crawler->filter('.start')->text());
+        $start_time = str_replace('Show: ', '', $start_time);
+        $start_time = str_replace($startDate->format('F d') . ' @ ', '', $start_time);
 
-            $start_time = Carbon::parse($event['start_date'] . ' ' . $start_time);
+        if (!strstr($start_time, ':')) {
+          $ex = explode(' ', $start_time);
 
-            // set start time
-            $event['start_time'] = $start_time->copy()->format('g:i A');
-
-            // add 3 hours to start time
-            $event['end_time'] = $start_time->copy()->addHours(3)->format('g:i A');
-        } catch (\Exception $e) {
-
+          $start_time = $ex[0] . ':00 ' . $ex[1];
         }
 
-        // figure out price
-        try {
-            $event['price'] = trim($crawler->filter('.price-range')->text());
-        } catch (\Exception $e) {
+        $start_time = Carbon::parse($event['start_date'] . ' ' . $start_time);
 
+        // set start time
+        $event['start_time'] = $start_time->copy()->format('g:i A');
+
+        // add 3 hours to start time
+        $event['end_time'] = $start_time->copy()->addHours(3)->format('g:i A');
+      } catch (\Exception $e) {
+        //
+      }
+
+      // figure out price
+      try {
+        $event['price'] = trim($crawler->filter('.price-range')->text());
+      } catch (\Exception $e) {
+        //
+      }
+
+      // check if sold out
+      try {
+        $is_sold_out = $crawler->filter('.ticket-price > .sold-out')->text();
+
+        if (!empty($is_sold_out)) {
+          $event['is_sold_out'] = true;
         }
+      } catch (\Exception $e) {
+        //
+      }
 
-        // check if sold out
-        try {
-            $is_sold_out = $crawler->filter('.ticket-price > .sold-out')->text();
+      // get list of bands
 
-            if (!empty($is_sold_out)) {
-                $event['is_sold_out'] = true;
+      // first, let's get the main band
+      $event['bands'][] = $event['name'];
+
+      // now, let's get any supporting bands
+      try {
+        $bands = trim($crawler->filter('.supports')->text());
+
+        if (!empty($bands)) {
+          $bands = explode(', ', $bands);
+
+          foreach($bands as $row) {
+            if (!empty($row)) {
+              $event['bands'][] = Str::title(trim($row));
             }
-        } catch (\Exception $e) {
+          }
 
+          $event['short_description'] = 'With ' . implode(', ', $bands);
         }
+      } catch (\Exception $e) {
+        //
+      }
 
-        // get list of bands
-
-        // first, let's get the main band
-        try {
-            $headliner = $crawler->filter('.artist-box-headliner > .artist-headline > .artist-name')->text();
-
-            if (!empty($headliner)) {
-                $headliner = trim($headliner);
-
-                $event['bands'][] = $headliner;
-            }
-        } catch (\Exception $e) {
-
-        }
-
-        // now, let's get any supporting bands
-        try {
-            $checkForSupportingBands = $crawler->filter('.artist-box-support')->text();
-
-            if (!empty($checkForSupportingBands)) {
-                $bands = $crawler->filter('.artist-box-support')->each(function ($node) {
-                    return trim($node->filter('.artist-headline > .artist-name')->text());
-                });
-
-                if (!empty($bands)) {
-                    foreach($bands as $row) {
-                        if (!empty($row)) {
-                            $event['bands'][] = $row;
-                        }
-                    }
-
-                    $event['short_description'] = 'With ' . implode(', ', $bands);
-                }
-            }
-        } catch (\Exception $e) {
-
-        }
-
-        dispatch(new ParseMusicEvent($event, $spotify));
+      dispatch(new ParseMusicEvent($event, $spotify));
     }
 }

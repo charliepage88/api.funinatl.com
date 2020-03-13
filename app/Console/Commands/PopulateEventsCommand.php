@@ -60,9 +60,9 @@ class PopulateEventsCommand extends Command
         $this->today = Carbon::today()->startOfDay();
 
         $providers = Provider::isActive()
-            ->where('last_scraped', '<=', $this->today->format('Y-m-d H:i:s'))
+            // ->where('last_scraped', '<=', $this->today->format('Y-m-d H:i:s'))
             ->where('id', '=', 6)
-            ->orWhereNull('last_scraped')
+            // ->orWhereNull('last_scraped')
             ->get();
 
         /*
@@ -1383,8 +1383,6 @@ class PopulateEventsCommand extends Command
 
             CrawlAisleFiveLink::dispatch($event, $spotify)
                 ->delay(now()->addSeconds($rand));
-
-            dd($event->toFormattedArray(true));
 
             $this->info('Dispatching crawler for url: ' . $event['website'] . '. Delay: ' . $rand);
         }
