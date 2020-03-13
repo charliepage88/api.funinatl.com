@@ -488,16 +488,8 @@ class Report extends Model
           $daysEvents = $events->filter(function ($event) use ($formattedDate) {
             $ymd = Carbon::parse($event['start_date'])->format('Y-m-d');
 
-            if ($formattedDate === '2020-03-20') {
-              \Log::info($ymd . ' :: ' . ($ymd === $formattedDate ? 'yay' : 'nay'));
-            }
-
             return ($ymd === $formattedDate);
           });
-
-          if ($formattedDate === '2020-03-20') {
-            // dd($daysEvents->count(), $formattedDate, $events->count());
-          }
 
           $sorted = $daysEvents->sortBy(function ($event) {
             if (empty($event['start_time'])) {
@@ -536,11 +528,9 @@ class Report extends Model
 
           if (!empty($eventsForDay)) {
             $results[$lastIndex]['days'][] = [
-                'date' => $formattedDate,
-                'events' => $eventsForDay
+              'date' => $formattedDate,
+              'events' => $eventsForDay
             ];
-          } else {
-            dd($formattedDate, $daysEvents->count());
           }
         }
 
@@ -649,7 +639,14 @@ class Report extends Model
       $tags = [ 'dbcache', 'eventsCache' ];
 
       $items = Cache::tags($tags)->rememberForever($cacheKey, function () use ($params) {
-        $query = Event::query();
+        $query = Event::with([
+          'tags',
+          'category',
+          'location',
+          'bands',
+          'eventType',
+          'media'
+        ]);
 
         if (!empty($params)) {
           foreach($params as $row) {
@@ -668,7 +665,13 @@ class Report extends Model
           }
         }
 
-        return $query->get();
+        $items = $query->get();
+
+        if (!is_array($items)) {
+          $items = $items->getFormattedArray(true);
+        }
+
+        return $items;
       });
 
       $items = collect($items);

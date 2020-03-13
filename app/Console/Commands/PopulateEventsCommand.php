@@ -61,7 +61,7 @@ class PopulateEventsCommand extends Command
 
         $providers = Provider::isActive()
             ->where('last_scraped', '<=', $this->today->format('Y-m-d H:i:s'))
-            // ->where('id', '=', 1)
+            ->where('id', '=', 6)
             ->orWhereNull('last_scraped')
             ->get();
 
@@ -422,9 +422,11 @@ class PopulateEventsCommand extends Command
         }
 
         // save last scraped time
-        $provider->last_scraped = Carbon::now();
+        if (count($events)) {
+          $provider->last_scraped = Carbon::now();
 
-        $provider->save();
+          $provider->save();
+        }
 
         return $events;
     }
@@ -1351,8 +1353,7 @@ class PopulateEventsCommand extends Command
             ->each(function ($node) use ($today, $provider) {
                 $startDate = Carbon::parse(trim($node->filter('.dtstart > span')->attr('title')));
 
-                $url = 'https://www.aisle5atl.com';
-                $url .= rtrim($node->filter('.one-event > a')->eq(0)->attr('href'), '/');
+                $url = rtrim($node->filter('.one-event > a')->eq(0)->attr('href'), '/');
 
                 $event = [
                     'website' => $url,
@@ -1382,6 +1383,8 @@ class PopulateEventsCommand extends Command
 
             CrawlAisleFiveLink::dispatch($event, $spotify)
                 ->delay(now()->addSeconds($rand));
+
+            dd($event->toFormattedArray(true));
 
             $this->info('Dispatching crawler for url: ' . $event['website'] . '. Delay: ' . $rand);
         }

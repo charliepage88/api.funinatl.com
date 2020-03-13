@@ -224,18 +224,8 @@ class EventsController extends Controller
     */
     public function getBySlug(Request $request, $slug)
     {
-        /*
-        $event = Report::getCachedEvents([
-            [
-                'method' => 'where',
-                'key'    => 'slug',
-                'value'  => $slug
-            ]
-        ]);
-        */
+      $event = Event::where('slug', $slug)->firstOrFail();
 
-        $event = Event::where('slug', $slug)->firstOrFail();
-
-        return response()->json(compact('event'));
+      return response()->json(compact('event'));
     }
 }

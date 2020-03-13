@@ -374,7 +374,7 @@ class DevCommand extends Command
           $shouldUpdate = false;
 
           // get value from local DB
-          $value = $item->getFormattedArray(false);
+          $value = $item->getFormattedArray();
 
           // get data array to compare
           $newValue = json_decode($find, true);
