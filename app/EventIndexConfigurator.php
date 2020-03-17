@@ -12,7 +12,7 @@ class EventIndexConfigurator extends IndexConfigurator
     /**
     * @var string
     */
-    protected $name = 'events';
+    protected $name = 'events_production';
 
     /**
      * @var array

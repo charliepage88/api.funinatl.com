@@ -12,7 +12,7 @@ class CategoryIndexConfigurator extends IndexConfigurator
     /**
     * @var string
     */
-    protected $name = 'categories';
+    protected $name = 'categories_production';
 
     /**
      * @var array

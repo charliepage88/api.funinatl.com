@@ -12,7 +12,7 @@ class LocationIndexConfigurator extends IndexConfigurator
     /**
     * @var string
     */
-    protected $name = 'locations';
+    protected $name = 'locations_production';
 
     /**
      * @var array

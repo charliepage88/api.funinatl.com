@@ -12,7 +12,7 @@ class MusicBandIndexConfigurator extends IndexConfigurator
     /**
     * @var string
     */
-    protected $name = 'music_bands';
+    protected $name = 'music_bands_production';
 
     /**
      * @var array
