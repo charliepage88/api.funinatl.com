@@ -931,7 +931,9 @@ class DevCommand extends Command
       }
     }
 
-    dd($leftOverFolders);
+    foreach ($leftOverFolders as $folder) {
+      $this->info($folder);
+    }
   }
 
   /**
@@ -1008,5 +1010,23 @@ class DevCommand extends Command
         yield $key;
       }
     } while ($cursor);
+  }
+
+  public function fixEventTitles()
+  {
+    $events = Event::all();
+
+    foreach ($events as $event) {
+      $oldValue = $event->name;
+      $newValue = trim(html_entity_decode($event->name));
+
+      if ($newValue !== $oldValue) {
+        $this->info($event->id . ' --- ' . $newValue . ' (' . $oldValue . ')');
+
+        $event->name = $newValue;
+
+        $event->save();
+      }
+    }
   }
 }
