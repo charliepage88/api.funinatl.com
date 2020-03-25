@@ -114,7 +114,7 @@ class DevCommand extends Command
     Cache::tags('eventsByPeriodAndCategory')->flush();
     Cache::tags('eventsByPeriodAndLocation')->flush();
     Cache::tags('eventsByPeriodAndTag')->flush();
-    Cache::tags('eventsBySlug')->flush();
+    // Cache::tags('eventsBySlug')->flush();
     Cache::tags('categoriesIndex')->flush();
     Cache::tags('locationsIndex')->flush();
     Cache::tags('routesList')->flush();
@@ -205,7 +205,7 @@ class DevCommand extends Command
 
     // event by slug urls
     foreach($events as $event) {
-        $urls[] = $apiUrl . '/api/events/bySlug/' . $event['slug'];
+        // $urls[] = $apiUrl . '/api/events/bySlug/' . $event['slug'];
     }
 
     // category urls
@@ -310,32 +310,32 @@ class DevCommand extends Command
   {
     $models = [
       [
-        'items' => Tag::all(),
+        'items' => Tag::orderBy('name', 'asc')->get(),
         'collection' => 'tags',
         'name' => 'tag',
         'search' => false
       ],
 
       [
-        'items' => MusicBand::all(),
+        'items' => MusicBand::orderBy('name', 'asc')->get(),
         'collection' => 'music_bands',
         'name' => 'music band'
       ],
 
       [
-        'items' => Category::isActive()->get(),
+        'items' => Category::isActive()->orderBy('name', 'asc')->get(),
         'collection' => 'categories',
         'name' => 'category'
       ],
 
       [
-        'items' => Location::isActive()->get(),
+        'items' => Location::isActive()->orderBy('name', 'asc')->get(),
         'collection' => 'locations',
         'name' => 'location'
       ],
 
       [
-        'items' => Event::isActive()->get(),
+        'items' => Event::isActive()->orderBy('start_date', 'asc')->get(),
         'collection' => 'events',
         'name' => 'event'
       ]
