@@ -78,34 +78,40 @@ class CrawlAisleFiveLink implements ShouldQueue
       ];
 
       // get the name of the event
-      $event['name'] = Str::title(trim($crawler->filter('.event-name')->text()));
+      $event['name'] = Str::title(trim($crawler->filter('.event-h2')->text()));
 
       // get start time
       try {
-        $start_time = trim($crawler->filter('.start')->text());
-        $start_time = str_replace('Show: ', '', $start_time);
-        $start_time = str_replace($startDate->format('F d') . ' @ ', '', $start_time);
+        $start_time = $crawler->filter('.event-bar-right .event-h3')->each(function ($node) {
+          $text = trim($node->text());
 
-        if (!strstr($start_time, ':')) {
-          $ex = explode(' ', $start_time);
+          if (strstr($text, 'Show:')) {
+            $ex = explode('Show:', $text);
 
-          $start_time = $ex[0] . ':00 ' . $ex[1];
+            return trim($ex[1]);
+          }
+        });
+
+        foreach ($start_time as $row) {
+          if (!empty($row)) {
+            $start_time = Carbon::parse($event['start_date'] . ' ' . $row);
+
+            // set start time
+            $event['start_time'] = $start_time->copy()->format('g:i A');
+
+            // add 3 hours to start time
+            $event['end_time'] = $start_time->copy()->addHours(3)->format('g:i A');
+          }
         }
-
-        $start_time = Carbon::parse($event['start_date'] . ' ' . $start_time);
-
-        // set start time
-        $event['start_time'] = $start_time->copy()->format('g:i A');
-
-        // add 3 hours to start time
-        $event['end_time'] = $start_time->copy()->addHours(3)->format('g:i A');
       } catch (\Exception $e) {
+        \Log::error($e->getMessage());
         //
       }
 
       // figure out price
       try {
-        $event['price'] = trim($crawler->filter('.price-range')->text());
+        $event['price'] = trim($crawler->filter('.price')->eq(1)->text());
+        $event['price'] = str_replace('(price)', '', $event['price']);
       } catch (\Exception $e) {
         //
       }
@@ -128,18 +134,27 @@ class CrawlAisleFiveLink implements ShouldQueue
 
       // now, let's get any supporting bands
       try {
-        $bands = trim($crawler->filter('.supports')->text());
+        $eventSiteDate = Carbon::parse($event['start_date'])->format('l, M j, Y');
+        $bands = $crawler->filter('.event-bar-left .event-h3')->each(function ($node) use ($eventSiteDate) {
+          $text = trim($node->text());
 
-        if (!empty($bands)) {
-          $bands = explode(', ', $bands);
+          if (!strstr($text, 'Aisle 5') && $text === $eventSiteDate) {
+            return $text;
+          }
+        });
 
-          foreach($bands as $row) {
-            if (!empty($row)) {
-              $event['bands'][] = Str::title(trim($row));
+        foreach($bands as $row) {
+          if (!empty($row)) {
+            $ex = explode(', ', $row);
+
+            foreach ($ex as $item) {
+              $event['bands'][] = Str::title(trim($item));
             }
           }
+        }
 
-          $event['short_description'] = 'With ' . implode(', ', $bands);
+        if (!empty($event['bands'])) {
+          $event['short_description'] = 'With ' . implode(', ', $event['bands']);
         }
       } catch (\Exception $e) {
         //

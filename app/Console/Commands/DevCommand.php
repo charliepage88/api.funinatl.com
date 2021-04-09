@@ -432,20 +432,6 @@ class DevCommand extends Command
   }
 
   /**
-   * Flush Data
-   *
-   * @return void
-   */
-  public function flushData()
-  {
-    DB::connection('mongodb')->collection($prefix . 'tags')->delete();
-    DB::connection('mongodb')->collection($prefix . 'music_bands')->delete();
-    DB::connection('mongodb')->collection($prefix . 'categories')->delete();
-    DB::connection('mongodb')->collection($prefix . 'locations')->delete();
-    DB::connection('mongodb')->collection($prefix . 'events')->delete();
-  }
-
-  /**
   * Regenerate Event Slugs
   *
   * @return void

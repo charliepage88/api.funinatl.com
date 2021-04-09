@@ -61,7 +61,7 @@ class PopulateEventsCommand extends Command
 
         $providers = Provider::isActive()
             // ->where('last_scraped', '<=', $this->today->format('Y-m-d H:i:s'))
-            ->where('id', '=', 10)
+            ->where('id', '=', 11)
             // ->orWhereNull('last_scraped')
             ->get();
 
@@ -1267,12 +1267,12 @@ class PopulateEventsCommand extends Command
         // let's just collect links, that's it
         $today = Carbon::now();
 
-        $urls = $crawler->filter('.has-event')
+        $urls = $crawler->filter('.calendar-day-event')
             ->reduce(function ($node) use ($today) {
                 $status = true;
 
                 try {
-                    $event = $node->filter('.one-event')->text();
+                    $event = $node->filter('.event-title')->text();
 
                     $startDate = Carbon::parse($node->filter('.dtstart > span')->attr('title'));
 
@@ -1288,7 +1288,7 @@ class PopulateEventsCommand extends Command
             ->each(function ($node) use ($today, $provider) {
                 $startDate = Carbon::parse(trim($node->filter('.dtstart > span')->attr('title')));
 
-                $url = rtrim($node->filter('.one-event > a')->eq(0)->attr('href'), '/');
+                $url = rtrim($node->filter('.event-title')->eq(0)->attr('href'), '/');
 
                 $event = [
                     'website' => $url,
@@ -1304,10 +1304,10 @@ class PopulateEventsCommand extends Command
 
         // fire off data into queue
         $delays = [];
-        $max = 300;
+        $max = 60;
         foreach($urls as $event) {
             do {
-                $rand = rand(15, $max);
+                $rand = rand(10, $max);
 
                 if (!in_array($rand, $delays)) {
                     $delays[] = $rand;
@@ -1463,7 +1463,7 @@ class PopulateEventsCommand extends Command
           } catch (\Exception $e) {
             // do nothing
 
-            $this->error($e->getMessage());
+            $this->error($e->getMessage() . ' :: ' . $event['name']);
           }
         }
 
@@ -1906,84 +1906,82 @@ class PopulateEventsCommand extends Command
     */
     public function providerLaughingSkullLounge(Provider $provider, $scraper, SpotifyWebAPI $spotify)
     {
-      // get events for 5 months
-      $startDate = Carbon::now();
-      $endDate = $startDate->copy()->addMonths(5);
-      $months = [];
+      $url = $provider->scrape_url;
 
-      $months[] = $startDate->copy();
+      $crawler = $scraper->request('GET', $url);
 
-      for ($date = $startDate->copy(); $date->lte($endDate); $date->addMonth()) {
-        $months[] = $date->copy();
-      }
+      $events = [];
+      $eventUrls = [];
+      $crawler->filter('#ft-date-list > li')->each(function ($node) use (&$events, &$eventUrls, $provider) {
+        // get date
+        $startDate = Carbon::parse(trim($node->filter('h2')->text()));
 
-      $urls = [];
-      foreach($months as $date) {
-        $url = $provider->scrape_url . '?m=' . $date->format('n') . '&y=' . $date->format('Y');
+        $item = $node->filter('li')->each(function ($eventNode) use (&$events, $provider, $startDate) {
+          $event = [
+            'name' => '',
+            'location_id' => $provider->location_id,
+            'user_id' => 1,
+            'category_id' => $provider->location->category_id,
+            'event_type_id' => 2,
+            'start_date' => '',
+            'price' => '',
+            'start_time' => '',
+            'end_time' => '',
+            'website' => '',
+            'is_sold_out' => false,
+            'tags' => [],
+            'bands' => [],
+            'meta' => []
+          ];
 
-        $crawler = $scraper->request('GET', $url);
+          $event['start_date'] = $startDate->format('Y-m-d');
 
-        // let's just collect links, that's it
-        $links = [];
-        $today = Carbon::now();
+          // get event name & start/end time
+          $eventName = trim($eventNode->filter('h3')->text());
 
-        $crawler->filter('.eventContainer')->each(function ($node) use (&$links, $provider, $today, $date) {
-          // get day
-          $day = trim($node->parents()->filter('.day')->text());
+          $ex = explode(' @ ', $eventName);
 
-          if (strlen($day) === 1) {
-            $day = '0' . $day;
-          }
+          $startTime = trim($ex[1]);
+          $replaceDate = $startDate->format('l F j') . ' @ ' . $ex[1];
 
-          // figure out date time
-          $startDate = Carbon::parse($date->format('Y-m') . '-' . $day);
+          $event['name'] = str_replace(' - ' . $replaceDate, '', $eventName);
 
-          if ($startDate->greaterThanOrEqualTo($today)) {
-            for ($i = 1; $i <= 5; $i++) {
-              try {
-                $hasTitle = $node->filter('.title-' . $i)->text();
+          $dateObj = Carbon::parse($event['start_date'] . ' ' . $startTime);
 
-                if (!empty($hasTitle)) {
-                  $links[] = [
-                    'website' => rtrim($node->filter('.title-' . $i . ' > a')->attr('href'), '/'),
-                    'location_id' => $provider->location_id,
-                    'category_id' => $provider->location->category_id,
-                    'start_date' => $startDate->format('Y-m-d')
-                  ];
-                }
-              } catch (\Exception $e) {
-                // do nothing
-              }
-            }
-          }
+          $event['start_time'] = $dateObj->format('g:i A');
+          $event['end_time'] = $dateObj->copy()->addHours(3)->format('g:i A');
 
-          return true;
+          // website
+          $event['website'] = 'https://www.freshtix.com' . $eventNode->filter('h3 a')->attr('href');
+
+          // get price
+          $event['price'] = trim($eventNode->filter('.ft-event-price-range')->text());
+
+          return $event;
         });
 
-        foreach($links as $link) {
-          $urls[] = $link;
+        foreach ($item as $event) {
+          if (!in_array($event['website'], $eventUrls)) {
+            $eventUrls[] = $event['website'];
+            $events[] = $event;
+          }
         }
+      });
+
+      $this->info(count($events) . ' events found for provider `' . $provider->name . '`');
+
+      // validate
+      $validator = $this->validate($events);
+
+      if (!$validator) {
+        return false;
       }
 
-      $this->info(count($urls) . ' links found that need to be crawled for provider `' . $provider->name . '`');
+      // fire off data into queue
+      foreach($events as $event) {
+        ParseMusicEvent::dispatch($event, $spotify);
 
-      $delays = [];
-      $max = 180;
-      foreach($urls as $event) {
-        do {
-          $rand = rand(5, $max);
-
-          if (!in_array($rand, $delays)) {
-            $delays[] = $rand;
-
-            break;
-          }
-        } while (0);
-
-        CrawlLaughingSkullLoungeLink::dispatch($event)
-          ->delay(now()->addSeconds($rand));
-
-        $this->info('Dispatching crawler for url: ' . $event['website'] . '. Delay: ' . $rand);
+        $this->info('Dispatching job for event `' . $event['name'] . '`');
       }
 
       // save last scraped time
@@ -1991,7 +1989,7 @@ class PopulateEventsCommand extends Command
 
       $provider->save();
 
-      return $urls;
+      return $events;
     }
 
     /**

@@ -226,6 +226,8 @@ class EventsController extends Controller
     {
       $event = Event::where('slug', $slug)->firstOrFail();
 
+      $event = $event->toSearchableArray();
+
       return response()->json(compact('event'));
     }
 }
