@@ -94,7 +94,7 @@ class MusicBand extends Model implements HasMedia
     */
     public function events()
     {
-        return $this->belongsToMany(Event::class, 'event_music_bands', 'music_band_id', 'event_id');
+      return $this->belongsToMany(Event::class, 'event_music_bands', 'music_band_id', 'event_id');
     }
 
     /**
@@ -117,15 +117,15 @@ class MusicBand extends Model implements HasMedia
     */
     public function getPhotoUrlAttribute()
     {
-        $photos = $this->getMedia('bands');
+      $photos = $this->getMedia('bands');
 
-        if ($photos->count()) {
-            $photo = config('filesystems.disks.spaces.url') . '/' . $photos->first()->getPath();
-        } else {
-            $photo = null;
-        }
+      if ($photos->count()) {
+        $photo = config('filesystems.disks.spaces.url') . '/' . $photos->first()->getPath();
+      } else {
+        $photo = null;
+      }
 
-        return $photo;
+      return $photo;
     }
 
     /**
@@ -135,9 +135,9 @@ class MusicBand extends Model implements HasMedia
     */
     public function registerMediaCollections(): void
     {
-        $this
-           ->addMediaCollection('bands')
-           ->useDisk('spaces');
+      $this
+       ->addMediaCollection('bands')
+       ->useDisk('spaces');
     }
 
     /**
@@ -147,11 +147,11 @@ class MusicBand extends Model implements HasMedia
     */
     public function getSpotifyUrlAttribute()
     {
-        if (empty($this->spotify_json)) {
-            return null;
-        }
+      if (empty($this->spotify_json)) {
+        return null;
+      }
 
-        return \igorw\get_in($this->spotify_json, [ 'external_urls', 'spotify' ]);
+      return \igorw\get_in($this->spotify_json, [ 'external_urls', 'spotify' ]);
     }
 
     /**
@@ -161,23 +161,23 @@ class MusicBand extends Model implements HasMedia
     */
     public function toSearchableArray()
     {
-        $fields = [
-            'id',
-            'name',
-            'slug'
-        ];
+      $fields = [
+        'id',
+        'name',
+        'slug'
+      ];
 
-        $band = [];
-        foreach($fields as $field) {
-            $band[$field] = $this->$field;
-        }
+      $band = [];
+      foreach($fields as $field) {
+        $band[$field] = $this->$field;
+      }
 
-        $band['photo'] = $this->photo_url;
-        $band['spotify_url'] = $this->spotify_url;
-        $band['created_at'] = $this->created_at->toAtomString();
-        $band['updated_at'] = $this->updated_at->toAtomString();
+      $band['photo'] = $this->photo_url;
+      $band['spotify_url'] = $this->spotify_url;
+      $band['created_at'] = $this->created_at->toAtomString();
+      $band['updated_at'] = $this->updated_at->toAtomString();
 
-        return $band;
+      return $band;
     }
 
     /**

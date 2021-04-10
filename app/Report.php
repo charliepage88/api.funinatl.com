@@ -335,7 +335,7 @@ class Report extends Model
         // get events
         $events = self::getCachedEvents();
 
-        $query = $events
+        $events = $events
           ->where('start_date', '>=', $start_date)
           ->where('start_date', '<=', $end_date)
           ->sortBy('start_date');
@@ -348,7 +348,7 @@ class Report extends Model
             $category = $categories->firstWhere('slug', $params['category']);
 
             if (!empty($category)) {
-              $query->where('category_id', '=', $category['id']);
+              $events = $events->where('category_id', '=', $category['id']);
 
               $response['category'] = $category;
             } else {
@@ -362,7 +362,7 @@ class Report extends Model
             $location = $locations->firstWhere('slug', $params['location']);
 
             if (!empty($location)) {
-              $query->where('location_id', '=', $location['id']);
+              $events = $events->where('location_id', $location['id']);
 
               $response['location'] = $location;
             }
@@ -374,12 +374,14 @@ class Report extends Model
             $tag = $tags->firstWhere('slug', $params['tag']);
 
             if (!empty($tag)) {
-              $query = $query->filter(function ($event) use ($params) {
+              $events = $events->filter(function ($event) use ($params) {
                 $status = false;
                 if (!empty($event['tags'])) {
                   foreach($event['tags'] as $tag) {
                     if ($tag['slug'] === $params['tag']) {
                       $status = true;
+
+                      break;
                     }
                   }
                 }
@@ -390,10 +392,33 @@ class Report extends Model
               $response['tag'] = $tag;
             }
           }
-        }
 
-        // get the events data
-        $events = $query;
+          // filter by band
+          if (!empty($params['band'])) {
+            $bands = self::getCachedBands();
+            $band = $bands->firstWhere('slug', $params['band']);
+
+            if (!empty($band)) {
+              $events = $events->filter(function ($event) use ($band) {
+                $status = false;
+
+                if (!empty($event['bands'])) {
+                  foreach ($event['bands'] as $row) {
+                    if ($row['slug'] === $band['slug']) {
+                      $status = true;
+
+                      break;
+                    }
+                  }
+                }
+
+                return $status;
+              });
+
+              $response['band'] = $band;
+            }
+          }
+        }
 
         // if event index, append list of locations
         // and categories

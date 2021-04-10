@@ -24,11 +24,14 @@ Route::namespace('Api')->group(function () {
     Route::get('/events/tag/{slug}/{start_date}/{end_date}', 'EventsController@getByPeriodAndTag')
         ->middleware('cacheResponse:300,eventsByPeriodAndTag');
 
+    Route::get('/events/band/{slug}/{start_date}/{end_date}', 'EventsController@getByPeriodAndBand')
+        ->middleware('cacheResponse:300,eventsByPeriodAndBand');
+
     Route::get('/events/index/{start_date}/{end_date}', 'EventsController@indexByPeriod')
         ->middleware('cacheResponse:300,eventsIndexByPeriod');
 
-    Route::get('/events/bySlug/{slug}', 'EventsController@getBySlug')
-        ->middleware('cacheResponse:300,eventsBySlug');
+    Route::get('/events/bySlug/{slug}', 'EventsController@getBySlug');
+        // ->middleware('cacheResponse:300,eventsBySlug');
 
     // locations
     Route::get('/locations', 'LocationsController@index')

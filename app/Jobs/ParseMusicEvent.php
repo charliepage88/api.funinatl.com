@@ -215,11 +215,11 @@ class ParseMusicEvent implements ShouldQueue
                     if (!empty($results) && !empty($results->artists)) {
                         // get largest image
                         $artistJson = null;
-                        $largestImage = 0;
                         foreach($results->artists->items as $result) {
                             if (!empty($result->images)) {
+                              /*
+                                $largestImage = 0;
                                 foreach($result->images as $image) {
-                                    // $size = ($image->width + $image->height);
                                     if ($image->width > $image->height) {
                                         $size = $image->width;
                                     } else {
@@ -231,6 +231,9 @@ class ParseMusicEvent implements ShouldQueue
                                         $artistJson = $result;
                                     }
                                 }
+                              */
+                              $imageUrl = $result->images[0]->url;
+                              $artistJson = $result;
                             }
                         }
 

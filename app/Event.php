@@ -409,10 +409,7 @@ class Event extends Model implements HasMedia
     */
     public function bands()
     {
-        $tbl = 'event_music_bands';
-        $class = MusicBand::class;
-
-        return $this->belongsToMany($class, $tbl, 'event_id', 'music_band_id');
+      return $this->belongsToMany(MusicBand::class, 'event_music_bands', 'event_id', 'music_band_id');
     }
 
     /**
@@ -936,59 +933,17 @@ class Event extends Model implements HasMedia
     */
     public function registerMediaConversions(?Media $media = NULL): void
     {
-        // init vars
-        $useDefaults = true;
-        /*
-        $photoUrl = $this->photo_url;
+        $this->addMediaConversion('thumb_mobile')
+          ->optimize()
+          ->fit(Manipulations::FIT_CROP, 372, 250);
 
-        // if has photo, then check size
-        // if < min requirements, fit & fill
-        if (!empty($photoUrl)) {
-            // \Log::info('registerMediaConversions -> event `' . $this->id . '`');
-            // \Log::info($photoUrl);
+        $this->addMediaConversion('thumb_tablet')
+          ->optimize()
+          ->fit(Manipulations::FIT_CROP, 726, 250);
 
-            list($width, $height) = getimagesize($photoUrl);
-
-            // \Log::info($width . ' x ' . $height);
-
-            if ($width < 726 || $height < 250) {
-                $useDefaults = false;
-            }
-        }
-        */
-
-        if ($useDefaults) {
-            // \Log::info('useDefaults -> event `' . $this->id . '` -> true');
-
-            $this->addMediaConversion('thumb_mobile')
-                ->optimize()
-                ->fit(Manipulations::FIT_CROP, 372, 250);
-
-            $this->addMediaConversion('thumb_tablet')
-                ->optimize()
-                ->fit(Manipulations::FIT_CROP, 726, 250);
-
-            $this->addMediaConversion('thumb_desktop')
-                ->optimize()
-                ->fit(Manipulations::FIT_CROP, 608, 250);
-        } else {
-            // \Log::info('useDefaults -> event `' . $this->id . '` -> false');
-
-            $this->addMediaConversion('thumb_mobile')
-                ->optimize()
-                ->fit(Manipulations::FIT_FILL, 372, 250)
-                ->background('000000');
-
-            $this->addMediaConversion('thumb_tablet')
-                ->optimize()
-                ->fit(Manipulations::FIT_FILL, 726, 250)
-                ->background('000000');
-
-            $this->addMediaConversion('thumb_desktop')
-                ->optimize()
-                ->fit(Manipulations::FIT_FILL, 608, 250)
-                ->background('000000');
-        }
+        $this->addMediaConversion('thumb_desktop')
+          ->optimize()
+          ->fit(Manipulations::FIT_CROP, 608, 250);
     }
 
     /**
@@ -999,7 +954,7 @@ class Event extends Model implements HasMedia
      */
     public function newCollection(array $models = [])
     {
-        return new EventCollection($models);
+      return new EventCollection($models);
     }
 
     /**
@@ -1011,26 +966,26 @@ class Event extends Model implements HasMedia
     */
     public function getSimilarEventAttribute($attribute)
     {
-        // init var
-        $value = null;
+      // init var
+      $value = null;
 
-        // do the query
-        $query = Event::where('name', '=', $this->name)
-            ->where('start_date', '=', $this->start_date)
-            ->where('location_id', '=', $this->location_id)
-            ->where('category_id', '=', $this->category_id);
+      // do the query
+      $query = Event::where('name', '=', $this->name)
+        ->where('start_date', '=', $this->start_date)
+        ->where('location_id', '=', $this->location_id)
+        ->where('category_id', '=', $this->category_id);
 
-        if (!empty($this->id)) {
-            $query->where('id', '!=', $this->id);
-        }
+      if (!empty($this->id)) {
+        $query->where('id', '!=', $this->id);
+      }
 
-        $lookup = $query->first();
+      $lookup = $query->first();
 
-        if (!empty($lookup)) {
-            $value = $lookup->$attribute;
-        }
+      if (!empty($lookup)) {
+        $value = $lookup->$attribute;
+      }
 
-        return $value;
+      return $value;
     }
 
     /**

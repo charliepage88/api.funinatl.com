@@ -180,15 +180,15 @@ class EventsController extends Controller
     */
     public function getByPeriodAndLocation(Request $request, string $slug, string $start_date, string $end_date)
     {
-        $response = Report::getEventsByPeriod($start_date, $end_date, [
-            'location' => $slug
-        ]);
+      $response = Report::getEventsByPeriod($start_date, $end_date, [
+        'location' => $slug
+      ]);
 
-        if (!empty($response['error'])) {
-            abort(404, $response['error']);
-        }
+      if (!empty($response['error'])) {
+        abort(404, $response['error']);
+      }
 
-        return response()->json($response);
+      return response()->json($response);
     }
 
     /**
@@ -212,6 +212,29 @@ class EventsController extends Controller
         }
 
         return response()->json($response);
+    }
+
+    /**
+    * Get By Period And Band
+    *
+    * @param Request $request
+    * @param string  $slug
+    * @param string  $start_date
+    * @param string  $end_date
+    *
+    * @return Response
+    */
+    public function getByPeriodAndBand(Request $request, string $slug, string $start_date, string $end_date)
+    {
+      $response = Report::getEventsByPeriod($start_date, $end_date, [
+        'band' => $slug
+      ]);
+
+      if (!empty($response['error'])) {
+        abort(404, $response['error']);
+      }
+
+      return response()->json($response);
     }
 
     /**

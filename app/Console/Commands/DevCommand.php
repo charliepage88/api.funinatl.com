@@ -114,7 +114,8 @@ class DevCommand extends Command
     Cache::tags('eventsByPeriodAndCategory')->flush();
     Cache::tags('eventsByPeriodAndLocation')->flush();
     Cache::tags('eventsByPeriodAndTag')->flush();
-    // Cache::tags('eventsBySlug')->flush();
+    Cache::tags('eventsByPeriodAndBand')->flush();
+    Cache::tags('eventsBySlug')->flush();
     Cache::tags('categoriesIndex')->flush();
     Cache::tags('locationsIndex')->flush();
     Cache::tags('routesList')->flush();
@@ -151,6 +152,9 @@ class DevCommand extends Command
 
     // location events
     $locations = Location::isActive()->get();
+
+    // get bands
+    $bands = MusicBand::all();
 
     // tags
     $tags = Tag::all();
@@ -205,7 +209,7 @@ class DevCommand extends Command
 
     // event by slug urls
     foreach($events as $event) {
-        // $urls[] = $apiUrl . '/api/events/bySlug/' . $event['slug'];
+      $urls[] = $apiUrl . '/api/events/bySlug/' . $event['slug'];
     }
 
     // category urls
@@ -247,6 +251,19 @@ class DevCommand extends Command
         }
     }
 
+    // location urls
+    foreach ($bands as $band) {
+      foreach($dates as $date) {
+        $firstDate = $date->copy();
+        $lastDate = $firstDate->copy()->addDays(10)->format('Y-m-d');
+
+        $url = $apiUrl . '/api/events/band/' . $band->slug;
+        $url .= '/' . $firstDate->format('Y-m-d') . '/' . $lastDate;
+
+        $urls[] = $url;
+      }
+    }
+
     // event urls
     foreach($eventDates as $date) {
         $firstDate = $date->copy();
@@ -261,22 +278,22 @@ class DevCommand extends Command
     // if error occurred, let's
     // not redo ALL of the url's
     if (!empty($start_at_url)) {
-        $find = array_search($start_at_url, $urls);
+      $find = array_search($start_at_url, $urls);
 
-        if ($find === false) {
-            $this->error('Cannot find url `' . $start_at_url . '` to start caching at.');
+      if ($find === false) {
+        $this->error('Cannot find url `' . $start_at_url . '` to start caching at.');
 
-            return false;
-        } else {
-            $newUrls = [];
-            foreach($urls as $key => $url) {
-                if ($key >= $find) {
-                    $newUrls[] = $url;
-                }
-            }
-
-            $urls = $newUrls;
+        return false;
+      } else {
+        $newUrls = [];
+        foreach($urls as $key => $url) {
+          if ($key >= $find) {
+            $newUrls[] = $url;
+          }
         }
+
+        $urls = $newUrls;
+      }
     }
 
     // hit URLs to generate cache
@@ -1013,6 +1030,62 @@ class DevCommand extends Command
 
         $event->save();
       }
+    }
+  }
+
+  public function updateMusicBandImages()
+  {
+    // $bands = MusicBand::whereNotNull('spotify_json')->with([ 'events' ])->get();
+    $bands = MusicBand::whereNotNull('spotify_json')->where('id', 1866)->with([ 'events' ])->get();
+
+    foreach ($bands as $band) {
+      // $event = Event::find(2600);
+      // $event->searchable();
+      // $event->getFirstBandWithImage();
+
+      dd($band->photo_url);
+
+      if ($band->getMedia('bands')->count()) {
+        $band->getMedia('bands')->first()->delete();
+      }
+
+      $imageUrl = $band->spotify_json['images'][0]['url'];
+
+      // get image contents
+      $contents = file_get_contents($imageUrl);
+
+      // get image info
+      $info = pathinfo($imageUrl);
+
+      // set filename & path
+      if (!empty($info['extension'])) {
+        $extension = $info['extension'];
+      } else {
+        $extension = '.jpeg';
+      }
+
+      $filename = $band->id . '-' . $band->slug;
+      $filename = $filename . $extension;
+      $tmpPath = storage_path('app') . '/' . $filename;
+
+      // store locally for a moment
+      Storage::disk('local')->put($filename, $contents);
+
+      // then add the url
+      $band->addMedia($tmpPath)->toMediaCollection('bands');
+
+      $this->info('Image updated for band `' . $band->name . '`');
+
+      if ($band->events->count()) {
+        foreach ($band->events as $event) {
+          $event->getFirstBandWithImage();
+          $event->searchable();
+
+          $this->info('New band image saved to event `' . $event->name . '`');
+        }
+      }
+
+      sleep(1);
     }
   }
 }
