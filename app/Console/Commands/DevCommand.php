@@ -84,6 +84,7 @@ class DevCommand extends Command
     $this->info('sync');
 
     $this->syncData();
+    $this->generateRoutesList();
     $this->syncCache();
   }
 
@@ -119,6 +120,7 @@ class DevCommand extends Command
     Cache::tags('categoriesIndex')->flush();
     Cache::tags('locationsIndex')->flush();
     Cache::tags('routesList')->flush();
+    Cache::tags('routesListWeb')->flush();
     Cache::tags('dbcache')->flush();
     Cache::tags('eventsCache')->flush();
   }
@@ -935,6 +937,8 @@ class DevCommand extends Command
     }
 
     foreach ($leftOverFolders as $folder) {
+      Storage::deleteDirectory($folder);
+
       $this->info($folder);
     }
   }
@@ -1036,7 +1040,7 @@ class DevCommand extends Command
   public function updateMusicBandImages()
   {
     // $bands = MusicBand::whereNotNull('spotify_json')->with([ 'events' ])->get();
-    $bands = MusicBand::whereNotNull('spotify_json')->where('id', 1866)->with([ 'events' ])->get();
+    $bands = MusicBand::whereNotNull('spotify_json')->where('id', 1473)->with([ 'events' ])->get();
 
     foreach ($bands as $band) {
       // $event = Event::find(2600);
@@ -1087,5 +1091,17 @@ class DevCommand extends Command
 
       sleep(1);
     }
+  }
+
+  /**
+  * Generate Routes List
+  *
+  * @return void
+  */
+  public function generateRoutesList()
+  {
+    $routes = Report::getRoutesList();
+
+    $this->info('Routes generated for `' . $routes->count() . '` items.');
   }
 }

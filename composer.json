@@ -42,7 +42,7 @@
         "facade/ignition": "^2.8",
         "fakerphp/faker": "^1.1",
         "mockery/mockery": "^1.4",
-        "nunomaduro/collision": "^5.3",
+        "nunomaduro/collision": "^5.4",
         "phpunit/phpunit": "^9.5"
     },
     "config": {

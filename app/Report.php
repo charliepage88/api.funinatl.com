@@ -789,4 +789,142 @@ class Report extends Model
 
         return $report;
     }
+
+  /**
+  * Get Routes List
+  *
+  * @return Collection
+  */
+  public static function getRoutesList()
+  {
+    return collect(Cache::tags([ 'dbcache' ])->rememberForever('routesList', function () {
+      // init vars
+      $routes = [];
+
+      // get events for home page & _slug pages
+
+      // get start date/end date
+      $now = Carbon::now();
+
+      $start_date = $now->copy()->format('Y-m-d');
+      $end_date = $now->copy()->addWeeks(2)->format('Y-m-d');
+
+      $payload = self::getEventsByPeriod($start_date, $end_date);
+
+      $locations = $payload['locations'];
+      $categories = $payload['categories'];
+
+      $routes[] = [
+        'route' => '/',
+        'payload' => [
+          'eventsByPeriod' => $payload
+        ]
+      ];
+
+      // static pages
+      $pages = [
+        '/about',
+        '/contact',
+        '/subscribe',
+        '/auth/login',
+        '/auth/register'
+      ];
+
+      foreach($pages as $page) {
+        $routes[] = [
+          'route' => $page,
+          'payload' => []
+        ];
+      }
+
+      // submit event page
+      $routes[] = [
+        'route' => '/submit-event',
+        'payload' => [
+          'locations' => $locations,
+          'categories' => $categories
+        ]
+      ];
+
+      // get listed page
+      $routes[] = [
+        'route' => '/get-listed',
+        'payload' => [
+          'categories' => $categories
+        ]
+      ];
+
+      // categories
+      foreach($categories as $category) {
+        $payload = self::getEventsByPeriod($start_date, $end_date, [
+          'category' => $category['slug']
+        ]);
+
+        $routes[] = [
+          'route' => '/category/' . $category['slug'],
+          'payload' => [
+            'eventsByCategory' => $payload
+          ]
+        ];
+      }
+
+      // events
+      $events = self::getCachedEvents();
+      foreach($events as $event) {
+      $routes[] = [
+          'route' => '/event/' . $event['slug'],
+          'payload' => [
+            'eventBySlug' => $event
+          ]
+        ];
+      }
+
+      // locations
+      foreach($locations as $location) {
+        $payload = self::getEventsByPeriod($start_date, $end_date, [
+          'location' => $location['slug']
+        ]);
+
+        $routes[] = [
+          'route' => '/location/' . $location['slug'],
+          'payload' => [
+            'eventsByLocation' => $payload
+          ]
+        ];
+      }
+
+      // tags
+      $tags = self::getCachedTags();
+      foreach($tags as $tag) {
+        $payload = self::getEventsByPeriod($start_date, $end_date, [
+          'tag' => $tag['slug']
+        ]);
+
+        $routes[] = [
+          'route' => '/tag/' . $tag['slug'],
+          'payload' => [
+            'eventsByTag' => $payload
+          ]
+        ];
+      }
+
+      // bands
+      $bands = self::getCachedBands();
+
+      foreach($bands as $band) {
+        $payload = self::getEventsByPeriod($start_date, $end_date, [
+          'band' => $band['slug']
+        ]);
+
+        $routes[] = [
+          'route' => '/band/' . $band['slug'],
+          'payload' => [
+            'eventsByBand' => $payload
+          ]
+        ];
+      }
+
+      return $routes;
+    }));
+  }
 }

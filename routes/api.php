@@ -48,7 +48,7 @@ Route::namespace('Api')->group(function () {
     Route::post('/locations/submit', 'LocationsController@submit');
     Route::post('/contact/submit', 'ContactSubmissionsController@submit');
     Route::get('/routes', 'MetaController@routes')
-        ->middleware('cacheResponse:300,routesList');
+        ->middleware('cacheResponse:300,routesListWeb');
 
     // users
     Route::middleware('auth:api')->get('/user', 'UsersController@show');
