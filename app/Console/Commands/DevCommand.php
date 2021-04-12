@@ -84,7 +84,6 @@ class DevCommand extends Command
     $this->info('sync');
 
     $this->syncData();
-    $this->generateRoutesList();
     $this->syncCache();
   }
 
@@ -99,6 +98,9 @@ class DevCommand extends Command
 
     // flush cache
     $this->flushCache();
+
+    // generate routes
+    $this->generateRoutesList();
 
     // create cache
     $this->createCache();
