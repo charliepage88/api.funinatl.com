@@ -51,6 +51,13 @@ mix.webpackConfig({
   plugins: webpackPlugins
 })
 
+mix.vue({ version: 2 })
+mix.options({
+  terser: { extractComments: false } // Stop Mix from generating license file
+})
+
 if (mix.inProduction()) {
-  mix.sourceMaps().version()
+  mix.version()
+} else {
+  mix.sourceMaps()
 }

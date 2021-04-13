@@ -6,7 +6,9 @@
 
 require('./bootstrap');
 
-window.Vue = require('vue');
+import Vue from 'vue'
+
+window.Vue = Vue;
 
 import Buefy from 'buefy'
 import 'buefy/dist/buefy.css'
