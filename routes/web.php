@@ -63,6 +63,14 @@ Route::middleware('auth')->namespace('Admin')->prefix('admin')->group(function (
     Route::any('/tags/edit/{tag}', 'TagsController@edit')
         ->name('admin.tags.edit');
 
+    // Bands
+    Route::get('/bands', 'MusicBandsController@index')
+        ->name('admin.bands.index');
+    Route::any('/bands/create', 'MusicBandsController@create')
+        ->name('admin.bands.create');
+    Route::any('/bands/edit/{band}', 'MusicBandsController@edit')
+        ->name('admin.bands.edit');
+
     // Events
     Route::get('/events', 'EventsController@index')
         ->name('admin.events.index');

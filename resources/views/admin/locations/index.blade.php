@@ -25,7 +25,7 @@
                             </td>
                             <td>
                                 @if(!empty($location->category_id))
-                                    <a href="{{ route('admin.categories.edit', [ 'location' => $location->category_id ]) }}" class="tag is-warning has-no-underline">
+                                    <a href="{{ route('admin.categories.edit', [ 'category' => $location->category_id ]) }}" class="tag is-warning has-no-underline">
                                         {{ $location->category->name }}
                                     </a>
                                 @else

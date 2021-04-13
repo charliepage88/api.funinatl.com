@@ -37,6 +37,7 @@
           class="is-fullwidth"
         >
           <option value="null">Choose Source</option>
+          <option value="admin">Admin</option>
           <option value="submission">Submission</option>
           <option value="custom">Custom</option>
         </b-select>

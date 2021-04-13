@@ -11,7 +11,7 @@
     <link rel="manifest" href="/site.webmanifest">
 
     <title>{{ config('app.name', 'Laravel') }}</title>
-    
+
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
@@ -82,6 +82,13 @@
                         <i class="fas fa-users fa-fw"></i>
                     </span>
                     <span>Users</span>
+                </a>
+
+                <a href="{{ route('admin.bands.index') }}" class="navbar-item {{ (strstr($routeName, 'admin.bands') ? 'is-active' : '') }}">
+                    <span class="icon mr-px-3">
+                        <i class="fas fa-music fa-fw"></i>
+                    </span>
+                    <span>Bands</span>
                 </a>
 
                 <a href="{{ route('admin.tags.index') }}" class="navbar-item {{ (strstr($routeName, 'admin.tags') ? 'is-active' : '') }}">
@@ -188,11 +195,11 @@
             </div>
         </div>
     </section>
-  
+
     <footer class="footer">
         <div class="container">
             <p class="has-text-centered">
-                Copyright &copy; {{ date('Y') }} Charles Page. 
+                Copyright &copy; {{ date('Y') }} Charles Page.
             </p>
         </div>
     </footer>
