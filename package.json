@@ -12,25 +12,25 @@
         "production-sync": "cross-env NODE_ENV=production UPLOAD_S3=true node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
     },
     "devDependencies": {
-        "axios": "^0.19",
-        "browser-sync": "^2.26.7",
-        "browser-sync-webpack-plugin": "^2.2.2",
-        "bulmaswatch": "^0.7.5",
+        "axios": "^0.21.1",
+        "browser-sync": "^2.26.14",
+        "browser-sync-webpack-plugin": "^2.3.0",
+        "bulmaswatch": "^0.8.1",
         "cross-env": "^6.0",
         "laravel-mix": "^5.0.0",
-        "resolve-url-loader": "3.1.0",
-        "sass": "^1.23.0",
+        "resolve-url-loader": "^3.1.2",
+        "sass": "^1.32.8",
         "sass-loader": "8.*",
-        "vue": "^2.6.10",
-        "vue-template-compiler": "^2.6.10"
+        "vue": "^2.6.12",
+        "vue-template-compiler": "^2.6.12"
     },
     "dependencies": {
-        "buefy": "^0.8.5",
+        "buefy": "^0.9.6",
         "chart.js": "^2.8.0",
-        "flatpickr": "^4.6.3",
+        "flatpickr": "^4.6.9",
         "lodash.get": "^4.4.2",
         "lodash.isempty": "^4.4.0",
-        "vue-chartjs": "^3.4.2",
+        "vue-chartjs": "^3.5.1",
         "webpack-s3-plugin": "^1.0.3"
     }
 }
