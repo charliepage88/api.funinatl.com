@@ -5,7 +5,7 @@ namespace App;
 use Geocoder\Query\GeocodeQuery;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use ScoutElastic\Searchable;
+use Laravel\Scout\Searchable;
 use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;

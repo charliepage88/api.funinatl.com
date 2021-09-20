@@ -61,7 +61,7 @@ class PopulateEventsCommand extends Command
 
         $providers = Provider::isActive()
             // ->where('last_scraped', '<=', $this->today->format('Y-m-d H:i:s'))
-            ->where('id', '=', 11)
+            ->where('id', '=', 1)
             // ->orWhereNull('last_scraped')
             ->get();
 
