@@ -52,53 +52,6 @@ class Category extends Model implements HasMedia
     ];
 
     /**
-    * @var string
-    */
-    protected $indexConfigurator = CategoryIndexConfigurator::class;
-
-    /**
-    * @var array
-    */
-    protected $searchRules = [
-        SearchCategoriesRule::class
-    ];
-
-    /**
-    * @var array
-    */
-    protected $mapping = [
-        'properties' => [
-            'id' => [
-                'type' => 'integer'
-            ],
-            'name' => [
-                'type' => 'text',
-                'fields' => [
-                    'raw' => [
-                        'type' => 'keyword'
-                    ]
-                ],
-                'analyzer' => 'category_analyzer'
-            ],
-            'slug' => [
-                'type' => 'text'
-            ],
-            'is_default' => [
-                'type' => 'boolean'
-            ],
-            'photo' => [
-                'type' => 'text'
-            ],
-            'created_at' => [
-                'type' => 'date'
-            ],
-            'updated_at' => [
-                'type' => 'date'
-            ]
-        ]
-    ];
-
-    /**
     * Events
     *
     * @return Collection

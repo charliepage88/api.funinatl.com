@@ -88,15 +88,23 @@ return [
         'secret' => env('ALGOLIA_SECRET', ''),
     ],
 
-    'tntsearch' => [
-        'storage'  => storage_path('search/'), //place where the index files will be stored
-        'fuzziness' => env('TNTSEARCH_FUZZINESS', false),
-        'fuzzy' => [
-            'prefix_length' => 0,
-            'max_expansions' => 50,
-            'distance' => 2
+    'meilisearch' => [
+        'host' => env('MEILISEARCH_HOST', 'http://localhost:7700'),
+        'key' => env('MEILISEARCH_KEY'),
+        'index-settings' => [
+            'funinatl_events' => [
+                'filterableAttributes' => ['start_date', 'is_family_friendly', 'category_id', 'location_id', 'active'],
+                'sortableAttributes' => ['start_date'],
+            ],
+            'funinatl_locations' => [
+                'filterableAttributes' => ['active', 'category_id', 'is_family_friendly'],
+            ],
+            'funinatl_categories' => [
+                'filterableAttributes' => ['active', 'is_default'],
+            ],
+            'funinatl_music_bands' => [
+                'filterableAttributes' => [],
+            ],
         ],
-        'asYouType' => true,
-        'searchBoolean' => env('TNTSEARCH_BOOLEAN', false),
-    ]
+    ],
 ];

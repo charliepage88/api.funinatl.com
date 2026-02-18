@@ -115,8 +115,8 @@ class EventsController extends Controller
 
         $events = $query->raw();
 
-        if (!empty($events['hits']['hits'])) {
-            $events = $events['hits']['hits'];
+        if (!empty($events['hits'])) {
+            $events = $events['hits'];
         } else {
             $events = [];
         }

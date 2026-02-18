@@ -6,7 +6,7 @@ use Geocoder\Query\GeocodeQuery;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Laravel\Scout\Searchable;
-use Spatie\Image\Manipulations;
+use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -65,139 +65,6 @@ class Location extends Model implements HasMedia
     protected $casts = [
         'is_family_friendly' => 'boolean',
         'active'             => 'boolean'
-    ];
-
-    /**
-    * @var string
-    */
-    protected $indexConfigurator = LocationIndexConfigurator::class;
-
-    /**
-    * @var array
-    */
-    protected $searchRules = [
-        SearchLocationsRule::class
-    ];
-
-    /**
-    * @var array
-    */
-    protected $mapping = [
-        'properties' => [
-            'id' => [
-                'type' => 'integer'
-            ],
-
-            'name' => [
-                'type' => 'text'
-            ],
-
-            'slug' => [
-                'type' => 'text'
-            ],
-
-            'category_id' => [
-                'type' => 'integer'
-            ],
-
-            'website' => [
-                'type' => 'text'
-            ],
-
-            'address' => [
-                'type' => 'text'
-            ],
-
-            'city' => [
-                'type' => 'text'
-            ],
-
-            'state' => [
-                'type' => 'text'
-            ],
-
-            'zip' => [
-                'type' => 'text'
-            ],
-
-            'geo' => [
-                'type' => 'geo_point'
-            ],
-
-            'description' => [
-                'type' => 'text'
-            ],
-
-            'is_family_friendly' => [
-                'type' => 'boolean'
-            ],
-
-            'photo' => [
-                'type' => 'text'
-            ],
-
-            'thumb_small' => [
-                'type' => 'text'
-            ],
-
-            'thumb_medium' => [
-                'type' => 'text'
-            ],
-
-            'created_at' => [
-                'type' => 'date'
-            ],
-
-            'updated_at' => [
-                'type' => 'date'
-            ],
-
-            'tags' => [
-                'type' => 'nested',
-
-                'properties' => [
-                    'name' => [
-                        'type' => 'text'
-                    ],
-
-                    'slug' => [
-                        'type' => 'text'
-                    ]
-                ]
-            ],
-
-            'category' => [
-                'properties' => [
-                    'id' => [
-                        'type' => 'integer'
-                    ],
-
-                    'name' => [
-                        'type' => 'text'
-                    ],
-
-                    'slug' => [
-                        'type' => 'text'
-                    ],
-
-                    'is_default' => [
-                        'type' => 'boolean'
-                    ],
-
-                    'photo' => [
-                        'type' => 'text'
-                    ],
-
-                    'created_at' => [
-                        'type' => 'date'
-                    ],
-
-                    'updated_at' => [
-                        'type' => 'date'
-                    ]
-                ]
-            ]
-        ]
     ];
 
     /**
@@ -552,11 +419,11 @@ class Location extends Model implements HasMedia
     {
         $this->addMediaConversion('thumb_small')
             ->optimize()
-            ->fit(Manipulations::FIT_CROP, 96, 96);
+            ->fit(Fit::Crop, 96, 96);
 
         $this->addMediaConversion('thumb_medium')
             ->optimize()
-            ->fit(Manipulations::FIT_CROP, 128, 128);
+            ->fit(Fit::Crop, 128, 128);
     }
 
     /**

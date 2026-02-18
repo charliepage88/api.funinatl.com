@@ -3,7 +3,7 @@
 namespace App\Jobs\Locations;
 
 use Carbon\Carbon;
-use Goutte\Client as WebScraper;
+use Symfony\Component\BrowserKit\HttpBrowser as WebScraper;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;

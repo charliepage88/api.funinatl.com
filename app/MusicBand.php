@@ -35,59 +35,6 @@ class MusicBand extends Model implements HasMedia
     ];
 
     /**
-    * @var string
-    */
-    protected $indexConfigurator = MusicBandIndexConfigurator::class;
-
-    /**
-    * @var array
-    */
-    protected $searchRules = [
-        SearchMusicBandsRule::class
-    ];
-
-    /**
-    * @var array
-    */
-    protected $mapping = [
-        'properties' => [
-            'id' => [
-                'type' => 'integer'
-            ],
-
-            'name' => [
-                'type' => 'text',
-                'fields' => [
-                    'raw' => [
-                        'type' => 'keyword'
-                    ]
-                ],
-                'analyzer' => 'band_analyzer'
-            ],
-
-            'slug' => [
-                'type' => 'text'
-            ],
-
-            'photo' => [
-                'type' => 'text'
-            ],
-
-            'spotify_url' => [
-                'type' => 'text'
-            ],
-
-            'created_at' => [
-                'type' => 'date'
-            ],
-
-            'updated_at' => [
-                'type' => 'date'
-            ]
-        ]
-    ];
-
-    /**
     * Events
     *
     * @return Collection
