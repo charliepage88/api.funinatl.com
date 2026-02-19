@@ -114,6 +114,7 @@ class Location extends Model implements HasMedia
      */
     public function geocodeAddress()
     {
+        return;
         $parts = [
             $this->address,
             $this->city,

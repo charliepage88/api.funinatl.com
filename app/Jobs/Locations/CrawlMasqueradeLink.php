@@ -3,16 +3,17 @@
 namespace App\Jobs\Locations;
 
 use Carbon\Carbon;
+use GuzzleHttp\Client as Guzzle;
+use Symfony\Component\DomCrawler\Crawler;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Support\Str;
 
 use App\Jobs\ParseMusicEvent;
 
-class CrawlAisleFiveLink implements ShouldQueue
+class CrawlMasqueradeLink implements ShouldQueue
 {
     use Dispatchable,
         InteractsWithQueue,
@@ -36,7 +37,7 @@ class CrawlAisleFiveLink implements ShouldQueue
      */
     public function __construct(array $data, $spotify)
     {
-        $this->data = $data;
+        $this->data    = $data;
         $this->spotify = $spotify;
     }
 
@@ -47,15 +48,11 @@ class CrawlAisleFiveLink implements ShouldQueue
      */
     public function handle()
     {
-        // init data
-        // all event fields are pre-collected from the listing page
-        // since individual event pages (wl.eventim.us) block scraping
-        $data = $this->data;
+        $data    = $this->data;
         $spotify = $this->spotify;
 
         $startDate = Carbon::parse($data['start_date']);
 
-        // event array
         $event = [
             'name'          => $data['name'] ?? '',
             'location_id'   => $data['location_id'],
@@ -64,30 +61,66 @@ class CrawlAisleFiveLink implements ShouldQueue
             'event_type_id' => 2,
             'start_date'    => $startDate->format('Y-m-d'),
             'price'         => $data['price'] ?? '',
-            'start_time'    => '',
+            'start_time'    => $data['start_time'] ?? '',
             'end_time'      => '',
             'website'       => $data['website'],
             'is_sold_out'   => $data['is_sold_out'] ?? false,
             'tags'          => [],
-            'bands'         => []
+            'bands'         => [],
         ];
 
         // parse start & end time
-        if (!empty($data['start_time'])) {
+        if (!empty($event['start_time'])) {
             try {
-                $startTimeObj = Carbon::parse($event['start_date'] . ' ' . $data['start_time']);
+                $startTimeObj        = Carbon::parse($event['start_date'] . ' ' . $event['start_time']);
                 $event['start_time'] = $startTimeObj->format('g:i A');
                 $event['end_time']   = $startTimeObj->copy()->addHours(3)->format('g:i A');
             } catch (\Exception $e) {
-                \Log::error($e->getMessage());
+                \Log::error('CrawlMasqueradeLink time parse: ' . $e->getMessage());
             }
         }
 
-        // build bands list: main act first, then supporting acts
+        // fetch individual event page for price
+        // detail page .time-show format: "Doors 9:00 pm / $15 - $20 ADV / 18+"
+        if (!empty($data['detail_url'])) {
+            try {
+                $client   = new Guzzle([
+                    'timeout' => 15,
+                    'headers' => [
+                        'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                    ],
+                ]);
+                $response = $client->get($data['detail_url']);
+                $html     = (string) $response->getBody();
+                $crawler  = new Crawler($html);
+
+                $timeShow = $crawler->filter('.time-show');
+                if ($timeShow->count() > 0) {
+                    $timeText = trim($timeShow->text());
+                    // split "Doors X:XX pm / $XX ADV / 18+" by " / "
+                    $segments = array_map('trim', explode('/', $timeText));
+                    foreach ($segments as $segment) {
+                        if (stripos($segment, 'free') !== false || stripos($segment, 'no cover') !== false) {
+                            $event['price'] = 'Free';
+                            break;
+                        }
+                        if (strpos($segment, '$') !== false) {
+                            $event['price'] = $segment;
+                            break;
+                        }
+                    }
+                }
+            } catch (\Exception $e) {
+                \Log::error('CrawlMasqueradeLink fetch: ' . $e->getMessage());
+            }
+        }
+
+        // build bands list: headliner first, then support acts
         $event['bands'][] = $event['name'];
 
         if (!empty($data['bands'])) {
             foreach ($data['bands'] as $band) {
+                $band = trim($band);
                 if (!empty($band) && $band !== $event['name']) {
                     $event['bands'][] = $band;
                 }

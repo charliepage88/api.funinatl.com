@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a89f52e205def31620e7bcd292495202",
+    "content-hash": "527cdb08d8c4c877b25ece5db68e99bc",
     "packages": [
         {
             "name": "appstract/laravel-meta",
@@ -6540,82 +6540,6 @@
             "time": "2024-06-11T12:45:25+00:00"
         },
         {
-            "name": "silber/bouncer",
-            "version": "v1.0.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/JosephSilber/bouncer.git",
-                "reference": "5d4d2b77645069978af42ceed8f4234541391294"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/JosephSilber/bouncer/zipball/5d4d2b77645069978af42ceed8f4234541391294",
-                "reference": "5d4d2b77645069978af42ceed8f4234541391294",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/auth": "^11.0|^12.0",
-                "illuminate/cache": "^11.0|^12.0",
-                "illuminate/container": "^11.0|^12.0",
-                "illuminate/contracts": "^11.0|^12.0",
-                "illuminate/database": "^11.0|^12.0",
-                "php": "^8.2"
-            },
-            "require-dev": {
-                "illuminate/console": "^11.0|^12.0",
-                "illuminate/events": "^11.0|^12.0",
-                "laravel/pint": "^1.14",
-                "orchestra/testbench": "^9.0|^10.0",
-                "pestphp/pest": "^3.7",
-                "phpunit/phpunit": "^11.0"
-            },
-            "suggest": {
-                "illuminate/console": "Allows running the bouncer:clean artisan command",
-                "illuminate/events": "Required for multi-tenancy support"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "aliases": {
-                        "Bouncer": "Silber\\Bouncer\\BouncerFacade"
-                    },
-                    "providers": [
-                        "Silber\\Bouncer\\BouncerServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Silber\\Bouncer\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Joseph Silber",
-                    "email": "contact@josephsilber.com"
-                }
-            ],
-            "description": "Eloquent roles and abilities.",
-            "keywords": [
-                "abilities",
-                "acl",
-                "capabilities",
-                "eloquent",
-                "laravel",
-                "permissions",
-                "roles"
-            ],
-            "support": {
-                "issues": "https://github.com/JosephSilber/bouncer/issues",
-                "source": "https://github.com/JosephSilber/bouncer/tree/v1.0.3"
-            },
-            "time": "2025-02-24T22:33:29+00:00"
-        },
-        {
             "name": "spatie/eloquent-sortable",
             "version": "5.0.0",
             "source": {
@@ -7069,6 +6993,93 @@
                 }
             ],
             "time": "2025-07-17T15:46:43+00:00"
+        },
+        {
+            "name": "spatie/laravel-permission",
+            "version": "7.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spatie/laravel-permission.git",
+                "reference": "7d5ca47515fcba891cd18a769de0b6f0aa2555d8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/7d5ca47515fcba891cd18a769de0b6f0aa2555d8",
+                "reference": "7d5ca47515fcba891cd18a769de0b6f0aa2555d8",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/auth": "^12.0",
+                "illuminate/container": "^12.0",
+                "illuminate/contracts": "^12.0",
+                "illuminate/database": "^12.0",
+                "php": "^8.3",
+                "spatie/laravel-package-tools": "^1.0"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.9",
+                "laravel/passport": "^12.0",
+                "laravel/pint": "^1.0",
+                "orchestra/testbench": "^10.0",
+                "pestphp/pest": "^3.0",
+                "pestphp/pest-plugin-laravel": "^3.0",
+                "phpstan/phpstan": "^2.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Spatie\\Permission\\PermissionServiceProvider"
+                    ]
+                },
+                "branch-alias": {
+                    "dev-main": "7.x-dev",
+                    "dev-master": "7.x-dev"
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/helpers.php"
+                ],
+                "psr-4": {
+                    "Spatie\\Permission\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Freek Van der Herten",
+                    "email": "freek@spatie.be",
+                    "homepage": "https://spatie.be",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Permission handling for Laravel 12 and up",
+            "homepage": "https://github.com/spatie/laravel-permission",
+            "keywords": [
+                "acl",
+                "laravel",
+                "permission",
+                "permissions",
+                "rbac",
+                "roles",
+                "security",
+                "spatie"
+            ],
+            "support": {
+                "issues": "https://github.com/spatie/laravel-permission/issues",
+                "source": "https://github.com/spatie/laravel-permission/tree/7.2.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/spatie",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-02-16T22:23:26+00:00"
         },
         {
             "name": "spatie/laravel-responsecache",

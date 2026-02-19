@@ -97,8 +97,8 @@ class EventsController extends Controller
         // init query
         $now = Carbon::now()->format('Y-m-d');
 
-        $query = Event::search($request->get('query'))
-            ->where('start_date', '>=', $now);
+        $query = Event::search($request->get('query'));
+            // ->where('start_date', '>=', $now);
 
         // filters
         if ($request->get('is_family_friendly')) {

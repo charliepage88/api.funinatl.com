@@ -26,9 +26,9 @@
         "meilisearch/meilisearch-php": "^1.16",
         "php-http/message": "^1.11",
         "predis/predis": "^2.0",
-        "silber/bouncer": "^1.0",
         "spatie/laravel-medialibrary": "^11.0",
         "spatie/laravel-newsletter": "^5.3",
+        "spatie/laravel-permission": "^7.2",
         "spatie/laravel-responsecache": "^7.5",
         "spatie/laravel-sluggable": "^3.6",
         "spatie/laravel-tags": "^4.5",
@@ -83,6 +83,8 @@
         ],
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
-        ]
+        ],
+        "post-install-cmd": [],
+        "post-update-cmd": []
     }
 }

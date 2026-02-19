@@ -43,7 +43,7 @@
                             </td>
                             <td>
                                 <div class="tags">
-                                    @foreach($user->getRoles() as $role)
+                                    @foreach($user->getRoleNames() as $role)
                                         <span class="tag is-success is-rounded">
                                             {{ $role }}
                                         </span>

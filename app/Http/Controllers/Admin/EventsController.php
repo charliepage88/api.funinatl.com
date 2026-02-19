@@ -239,9 +239,9 @@ class EventsController extends Controller
     */
     private function getRelatedData()
     {
-        $categories = Category::orderBy('name', 'asc')->pluck('name', 'id')->toArray();
-        $locations = Location::orderBy('name', 'asc')->pluck('name', 'id')->toArray();
-        $eventTypes = EventType::orderBy('name', 'asc')->pluck('name', 'id')->toArray();
+        $categories = Category::orderBy('name', 'asc')->get();
+        $locations = Location::orderBy('name', 'asc')->get();
+        $eventTypes = EventType::orderBy('name', 'asc')->get();
 
         return compact('categories', 'locations', 'eventTypes');
     }

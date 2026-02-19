@@ -76,12 +76,12 @@
                         <div class="select is-medium is-fullwidth">
                             <select name="role">
                                 <option value="">Choose Role</option>
-                                @foreach($roles as $value => $label)
+                                @foreach($roles as $role)
                                     <option
-                                        value="{{ $value }}"
-                                        {{ (old('role') === $value || \Bouncer::is($user)->an($value)) ? 'selected' : '' }}
+                                        value="{{ $role->name }}"
+                                        {{ (old('role') === $role->name || $user->hasRole($role)) ? 'selected' : '' }}
                                     >
-                                        {{ $label }}
+                                        {{ $role->name }}
                                     </option>
                                 @endforeach
                             </select>

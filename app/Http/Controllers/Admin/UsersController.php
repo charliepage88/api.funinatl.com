@@ -3,11 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
-
+use Spatie\Permission\Models\Role;
 use App\User;
 use App\Http\Controllers\Controller;
-
-use Bouncer;
 
 class UsersController extends Controller
 {
@@ -57,7 +55,7 @@ class UsersController extends Controller
             return redirect(route('admin.users.index'))->with('is-success', 'User has been created!');
         }
 
-        $roles = Bouncer::role()->pluck('title', 'name');
+        $roles = Role::all();
 
         return view('admin.users.create', compact('user', 'roles'));
     }
@@ -88,13 +86,13 @@ class UsersController extends Controller
             $user->save();
 
             if ($request->has('role')) {
-                Bouncer::sync($user)->roles([ $request->role ]);
+                $user->syncRoles([ $request->role ]);
             }
 
             return redirect(route('admin.users.index'))->with('is-success', 'User has been saved!');
         }
 
-        $roles = Bouncer::role()->pluck('title', 'name');
+        $roles = Role::all();
 
         return view('admin.users.edit', compact('user', 'roles'));
     }
