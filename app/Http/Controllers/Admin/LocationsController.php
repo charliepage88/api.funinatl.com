@@ -67,7 +67,7 @@ class LocationsController extends Controller
 
             $location->save();
 
-            if ($request->has('photo')) {
+            if ($request->hasFile('photo')) {
                 $location->addMedia($request->file('photo'))->toMediaCollection('locations');
             }
 
@@ -108,7 +108,7 @@ class LocationsController extends Controller
 
             $location->save();
 
-            if ($request->has('photo')) {
+            if ($request->hasFile('photo')) {
                 $location->addMedia($request->file('photo'))->toMediaCollection('locations');
             }
 

@@ -1,27 +1,29 @@
 <template>
-  <div class="columns is-multiline">
+  <div class="columns is-multiline" style="position: relative">
     <div class="column is-full-tablet is-half-desktop">
       <h1 class="title is-1 is-size-3-mobile is-size-2-tablet">Report - Daily Tweets</h1>
     </div>
 
     <div class="column is-half-tablet is-one-quarter-desktop">
-      <b-field label="Start Date">
+      <div class="field">
+        <label class="label">Start Date</label>
         <form-date-picker
           name="start_date"
           v-model="filters.start_date"
-          @input="updateFilter('start_date')"
+          @update:modelValue="updateFilter('start_date')"
         />
-      </b-field>
+      </div>
     </div>
 
     <div class="column is-half-tablet is-one-quarter-desktop">
-      <b-field label="End Date">
+      <div class="field">
+        <label class="label">End Date</label>
         <form-date-picker
           name="end_date"
           v-model="filters.end_date"
-          @input="updateFilter('end_date')"
+          @update:modelValue="updateFilter('end_date')"
         />
-      </b-field>
+      </div>
     </div>
 
     <div class="column is-full" v-if="hasDates">
@@ -38,7 +40,7 @@
               <nav class="level">
                 <div class="level-left">
                   <h4 class="subtitle is-4 mb-2 mt-2">
-                    {{ day.date | dayOfWeek }}
+                    {{ $filters.dayOfWeek(day.date) }}
                   </h4>
                 </div>
               </nav>
@@ -49,7 +51,7 @@
                 <div class="columns">
                   <div class="column is-half">
                     <h4 class="title is-6">Tweet Content</h4>
-                    <h5 class="subtitle is-6">For: {{ day.date | dayOfWeek }}</h5>
+                    <h5 class="subtitle is-6">For: {{ $filters.dayOfWeek(day.date) }}</h5>
                   </div>
 
                   <div class="column is-half">
@@ -78,7 +80,9 @@
       </div>
     </div>
 
-    <b-loading :active.sync="loading" />
+    <div v-if="loading" class="loading-overlay">
+      <div class="loading-icon"></div>
+    </div>
   </div>
 </template>
 
@@ -215,7 +219,7 @@ export default {
             if (event.id === id) {
               tweetableEventIds.push(event.id)
 
-              this.$set(this.dates[periodKey].days[dayKey].events[eventKey], 'is_tweetable', value)
+              this.dates[periodKey].days[dayKey].events[eventKey].is_tweetable = value
 
               if (generateTweet) {
                 tweet += `${event.name} at ${event.location.name}, `
@@ -234,8 +238,8 @@ export default {
             tweet += ', and more!'
           }
 
-          this.$set(this.dates[periodKey].days[dayKey], 'tweetable_event_ids', tweetableEventIds)
-          this.$set(this.dates[periodKey].days[dayKey], 'tweet_content', tweet)
+          this.dates[periodKey].days[dayKey].tweetable_event_ids = tweetableEventIds
+          this.dates[periodKey].days[dayKey].tweet_content = tweet
         }
       }
     }
@@ -248,9 +252,37 @@ export default {
 
     for (let key in this.filters) {
       if (urlParams.get(key)) {
-        this.$set(this.filters, key, urlParams.get(key))
+        this.filters[key] = urlParams.get(key)
       }
     }
   }
 }
 </script>
+
+<style scoped>
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.6);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-icon {
+  width: 3em;
+  height: 3em;
+  border: 4px solid #dbdbdb;
+  border-top-color: #485fc7;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+</style>

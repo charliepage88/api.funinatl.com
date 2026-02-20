@@ -1,25 +1,19 @@
 <template>
   <div class="control">
-    <b-datepicker
-      v-model="date"
-      :min-date="minDate"
-      :max-date="maxDate"
-      :first-day-of-week="1"
-      size="is-medium"
-      :mobile-native="false"
-      :date-formatter="formatDate"
-      @input="update"
-    />
-
-    <input type="hidden" v-if="name" :name="name" v-model="dateHidden" />
+    <input ref="fpInput" type="text" class="input is-medium" />
+    <input type="hidden" v-if="name" :name="name" :value="dateHidden" />
   </div>
 </template>
 
 <script>
 import moment from 'moment'
+import flatpickr from 'flatpickr'
+import 'flatpickr/dist/flatpickr.min.css'
 
 export default {
   name: 'form-date-picker',
+
+  emits: ['update:modelValue'],
 
   props: {
     name: {
@@ -27,50 +21,48 @@ export default {
       default: null
     },
 
-    value: {
+    modelValue: {
       type: String,
-      default: moment().format('YYYY-MM-DD')
-    }
-  },
-
-  watch: {
-    value (newVal, oldVal) {
-      if (newVal && newVal !== oldVal) {
-        this.date = moment(newVal).toDate()
-      }
-    },
-
-    date (newVal, oldVal) {
-      if (newVal) {
-        this.dateHidden = this.formatDate(newVal)
-      } else {
-        this.dateHidden = null
-      }
+      default: () => moment().format('YYYY-MM-DD')
     }
   },
 
   data () {
     return {
-      date: null,
       dateHidden: null,
-      minDate: moment().subtract(1, 'day').toDate(),
-      maxDate: moment().add(4, 'month').toDate()
+      fp: null
     }
   },
 
-  methods: {
-    formatDate (date) {
-      return moment(date).format('YYYY-MM-DD')
-    },
-
-    update (value) {
-      this.$emit('input', value)
+  watch: {
+    modelValue (newVal) {
+      if (newVal && this.fp) {
+        this.fp.setDate(newVal, false)
+        this.dateHidden = moment(newVal).format('YYYY-MM-DD')
+      }
     }
   },
 
   mounted () {
-    if (this.value && this.value !== this.date) {
-      this.date = moment(this.value).toDate()
+    this.fp = flatpickr(this.$refs.fpInput, {
+      dateFormat: 'Y-m-d',
+      minDate: moment().subtract(1, 'day').toDate(),
+      maxDate: moment().add(4, 'month').toDate(),
+      defaultDate: this.modelValue || moment().format('YYYY-MM-DD'),
+      onChange: (selectedDates, dateStr) => {
+        this.dateHidden = dateStr
+        this.$emit('update:modelValue', dateStr)
+      }
+    })
+
+    if (this.modelValue) {
+      this.dateHidden = moment(this.modelValue).format('YYYY-MM-DD')
+    }
+  },
+
+  unmounted () {
+    if (this.fp) {
+      this.fp.destroy()
     }
   }
 }

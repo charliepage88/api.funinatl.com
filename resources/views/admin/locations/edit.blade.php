@@ -23,7 +23,7 @@
                     @if ($errors->has('name'))
                         <p class="help is-danger">
                             {{ $errors->first('name') }}
-                        </span>
+                        </p>
                     @endif
                 </div>
             </div>

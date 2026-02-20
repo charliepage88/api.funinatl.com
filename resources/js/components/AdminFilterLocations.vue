@@ -5,43 +5,39 @@
     </div>
 
     <div class="column" v-if="categories.length">
-      <b-field>
-        <b-select
-          v-model="category_id"
-          icon="tasks"
-          icon-pack="fas"
-          size="is-large"
-          @input="filterUpdate('category_id')"
-          class="is-fullwidth"
-        >
-          <option value="null">Choose Category</option>
-          <option
-            v-for="category in categories"
-            :key="category.id"
-            :value="category.id"
+      <div class="field">
+        <div class="select is-large is-fullwidth">
+          <select
+            v-model="category_id"
+            @change="filterUpdate('category_id')"
           >
-            {{ category.name }}
-          </option>
-        </b-select>
-      </b-field>
+            <option value="null">Choose Category</option>
+            <option
+              v-for="category in categories"
+              :key="category.id"
+              :value="category.id"
+            >
+              {{ category.name }}
+            </option>
+          </select>
+        </div>
+      </div>
     </div>
 
     <div class="column">
-      <b-field>
-        <b-select
-          v-model="source"
-          icon="cogs"
-          icon-pack="fas"
-          size="is-large"
-          @input="filterUpdate('source')"
-          class="is-fullwidth"
-        >
-          <option value="null">Choose Source</option>
-          <option value="admin">Admin</option>
-          <option value="submission">Submission</option>
-          <option value="custom">Custom</option>
-        </b-select>
-      </b-field>
+      <div class="field">
+        <div class="select is-large is-fullwidth">
+          <select
+            v-model="source"
+            @change="filterUpdate('source')"
+          >
+            <option value="null">Choose Source</option>
+            <option value="admin">Admin</option>
+            <option value="submission">Submission</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+      </div>
     </div>
 
     <div class="column is-narrow has-text-right" v-if="createLocationUrl">

@@ -1,55 +1,58 @@
 <template>
   <div class="control">
-    <b-timepicker
-      v-model="time"
-      hour-format="12"
-      size="is-medium"
-      icon="clock"
-      icon-pack="fas"
-      :mobile-native="false"
-    />
-
-    <input type="hidden" :name="name" v-model="timeHidden" />
+    <input ref="fpInput" type="text" class="input is-medium" />
+    <input type="hidden" :name="name" :value="timeHidden" />
   </div>
 </template>
 
 <script>
 import moment from 'moment'
+import flatpickr from 'flatpickr'
+import 'flatpickr/dist/flatpickr.min.css'
 
 export default {
   name: 'form-time-picker',
 
-  props: [
-    'name',
-    'value'
-  ],
+  emits: ['update:modelValue'],
 
-  watch: {
-    value (newVal, oldVal) {
-      if (newVal && (newVal !== oldVal)) {
-        this.time = moment(newVal).toDate()
-      }
-    },
-
-    time (newVal, oldVal) {
-      if (newVal) {
-        this.timeHidden = moment(newVal).format('h:mm A')
-      } else {
-        this.timeHidden = null
-      }
-    }
-  },
+  props: ['name', 'modelValue'],
 
   data () {
     return {
-      time: null,
-      timeHidden: null
+      timeHidden: null,
+      fp: null
+    }
+  },
+
+  watch: {
+    modelValue (newVal) {
+      if (newVal && this.fp) {
+        this.fp.setDate(moment(newVal).toDate(), false)
+        this.timeHidden = moment(newVal).format('h:mm A')
+      }
     }
   },
 
   mounted () {
-    if (this.value && (this.value !== this.time)) {
-      this.time = moment(this.value).toDate()
+    this.fp = flatpickr(this.$refs.fpInput, {
+      enableTime: true,
+      noCalendar: true,
+      dateFormat: 'h:i K',
+      defaultDate: this.modelValue ? moment(this.modelValue).toDate() : null,
+      onChange: (selectedDates, dateStr) => {
+        this.timeHidden = dateStr
+        this.$emit('update:modelValue', dateStr)
+      }
+    })
+
+    if (this.modelValue) {
+      this.timeHidden = moment(this.modelValue).format('h:mm A')
+    }
+  },
+
+  unmounted () {
+    if (this.fp) {
+      this.fp.destroy()
     }
   }
 }

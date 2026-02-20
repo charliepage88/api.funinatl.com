@@ -18,7 +18,7 @@ class MusicBandsController extends Controller
   */
   public function index(Request $request)
   {
-    $bands = MusicBand::paginate(15);
+    $bands = MusicBand::orderBy('id', 'desc')->paginate(15);
 
     return view('admin.bands.index', compact('bands'));
   }

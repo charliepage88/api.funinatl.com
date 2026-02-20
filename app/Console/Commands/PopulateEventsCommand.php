@@ -20,7 +20,6 @@ use App\Jobs\Locations\CrawlAisleFiveLink;
 use App\Jobs\Locations\CrawlLaughingSkullLoungeLink;
 use App\Jobs\Locations\CrawlTerminalWestLink;
 use App\Jobs\Locations\CrawlMasqueradeLink;
-use App\Jobs\Locations\CrawlVenkmansLink;
 
 use Cache;
 use DB;
@@ -81,34 +80,6 @@ class PopulateEventsCommand extends Command
             ->orWhereNull('last_scraped')
             ->get();
 
-        /*
-        // see if checksums need to be regenerated
-        $keyDate = 'provider_checksums_date';
-        $skipGenerateChecksum = false;
-        if (!Cache::has($keyDate)) {
-            $this->regenerateChecksums($providers);
-
-            $skipGenerateChecksum = true;
-        } else {
-            $cacheDate = Cache::get($keyDate);
-
-            if (empty($cacheDate)) {
-                $this->regenerateChecksums($providers);
-
-                $skipGenerateChecksum = true;
-            } else {
-                $today = $this->today->copy();
-                $date = Carbon::parse($cacheDate);
-
-                if ($today->diffInDays($date) >= 3) {
-                    $this->regenerateChecksums($providers);
-
-                    $skipGenerateChecksum = true;
-                }
-            }
-        }
-        */
-
         // loop through providers
         $scraper = new WebScraper;
         foreach($providers as $provider) {
@@ -123,35 +94,10 @@ class PopulateEventsCommand extends Command
             $methodName = Str::camel('provider' . $providerName);
 
             if (method_exists($this, $methodName)) {
-                /*
-                // checksum
-
-                $key = 'provider_' . $provider->slug;
-                $keyDate = 'provider_' . $provider->slug . '_date';
-
-                if (!$skipGenerateChecksum) {
-                    $this->info('Checksum for provider `' . $name . '`');
-
-                    if (Cache::has($key) && Cache::has($keyDate)) {
-                        $cacheDate = Cache::get($keyDate);
-
-                        $today = $this->today->copy();
-                        $date = Carbon::parse($cacheDate);
-
-                        if ($today->diffInDays($date) < 3) {
-                            $this->info('Checksum validated, skipping scraper for `' . $name . '`');
-
-                            continue;
-                        }
-                    }
-                }*/
-
                 // call method
                 $this->info('Starting scraper for `' . $name . '`');
 
                 $events = $this->$methodName($provider, $scraper, $spotify);
-
-                // $this->createChecksum($provider, $events);
             } else {
                 $this->error('Cannot find method name `' . $methodName . '`');
             }
@@ -876,119 +822,6 @@ class PopulateEventsCommand extends Command
 
 
     /**
-    * Provider Venkmans
-    *
-    * @param Provider      $provider
-    * @param WebScraper    $scraper
-    * @param SpotifyWebAPI $spotify
-    *
-    * @return array
-    */
-    public function providerVenkmans(Provider $provider, $scraper, SpotifyWebAPI $spotify)
-    {
-        // get events for 3 months
-        $months = [];
-
-        $months['current'] = Carbon::now();
-        $months['next'] = $months['current']->copy()->addMonth();
-        $months['third'] = $months['next']->copy()->addMonth();
-
-        $urls = [];
-        foreach($months as $month) {
-            $url = $provider->scrape_url . '/' . $month->format('Y-m');
-
-            $crawler = $scraper->request('GET', $url);
-
-            try {
-                $noResultsFind = $crawler->filter('.tribe-events-notices')->text();
-
-                if (!empty($noResultsFind)) {
-                    $status = false;
-                }
-            } catch (\Exception $e) {
-                $status = true;
-            }
-
-            if ($status) {
-                // let's just collect links, that's it
-                $today = Carbon::now();
-                $links = [];
-
-                $crawler->filter('.tribe-events-thismonth')->each(function ($parentNode) use ($today, &$links, $provider) {
-                    $startDate = Carbon::parse($parentNode->attr('data-day'));
-
-                    if ($startDate->greaterThanOrEqualTo($today)) {
-                        $parentNode->filter('.tribe_events')->each(function ($linkNode) use ($startDate, &$links, $provider) {
-                            $url = rtrim($linkNode->filter('.tribe-events-month-event-title > a')->attr('href'), '/');
-                            $title = strtolower($linkNode->filter('.tribe-events-month-event-title > a')->text());
-
-                            if (!strstr($title, 'closed for')) {
-                                $links[] = [
-                                    'website' => $url,
-                                    'start_date' => $startDate,
-                                    'location_id' => $provider->location_id,
-                                    'category_id' => $provider->location->category_id
-                                ];
-                            }
-
-                            return true;
-                        });
-                    }
-
-                    return true;
-                });
-
-                foreach($links as $link) {
-                    $urls[] = $link;
-                }
-            }
-        }
-
-        $this->info(count($urls) . ' links found that need to be crawled for provider `' . $provider->name . '`');
-
-        // fire off data into queue
-        $items = Category::all();
-
-        $categories = [];
-        foreach($items as $item) {
-            $categories[$item->slug] = $item;
-        }
-
-        $items = EventType::all();
-
-        $eventTypes = [];
-        foreach($items as $item) {
-            $eventTypes[$item->slug] = $item;
-        }
-
-        $delays = [];
-        $max = 300;
-        foreach($urls as $event) {
-            do {
-                $rand = rand(15, $max);
-
-                if (!in_array($rand, $delays)) {
-                    $delays[] = $rand;
-
-                    break;
-                }
-            } while (0);
-
-            CrawlVenkmansLink::dispatch($event, $spotify, $categories, $eventTypes)
-                ->delay(now()->addSeconds($rand));
-
-            $this->info('Dispatching crawler for url: ' . $event['website'] . '. Delay: ' . $rand);
-        }
-
-        // save last scraped time
-        $provider->last_scraped = Carbon::now();
-
-        $provider->save();
-
-        return $urls;
-    }
-
-    /**
     * Provider Aisle 5
     *
     * @param Provider      $provider
@@ -1505,57 +1338,6 @@ class PopulateEventsCommand extends Command
         }
 
         return $events;
-    }
-
-    /**
-    * Create Checksum
-    *
-    * @param Provider $provider
-    * @param array    $data
-    *
-    * @return void
-    */
-    private function createChecksum(Provider $provider, array $data)
-    {
-        // get hash
-        $hash = md5(array_map('json_decode', $data));
-
-        // store cache
-        $key = 'provider_' . $provider->slug;
-        $keyDate = 'provider_' . $provider->slug . '_date';
-
-        Cache::put($key, $hash);
-        Cache::put($keyDate, Carbon::now()->format('Y-m-d H:i:s'));
-    }
-
-    /**
-    * Regenerate Checksums
-    *
-    * @param Collection $providers
-    *
-    * @return void
-    */
-    private function regenerateChecksums($providers)
-    {
-        $this->info('regenerateChecksums -> start');
-
-        // regenerate checksums
-        foreach($providers as $provider) {
-            $events = [];
-            foreach($provider->location->events as $event) {
-                $events[] = $event->toSearchableArray();
-            }
-
-            $this->createChecksum($provider, $events);
-        }
-
-        // set cache
-        $keyDate = 'provider_checksums_date';
-        $date = Carbon::now()->format('Y-m-d H:i:s');
-
-        Cache::put($keyDate, $date);
-
-        $this->info('regenerateChecksums -> end');
     }
 
     /**

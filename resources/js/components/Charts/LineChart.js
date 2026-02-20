@@ -1,24 +1,41 @@
 import { Line } from 'vue-chartjs'
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+} from 'chart.js'
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+)
 
 export default {
-  extends: Line,
+  name: 'line-chart',
+
+  components: { Line },
 
   props: {
     chartData: {
-      type: Object|Array
+      type: Object,
+      required: true
     },
 
     chartOptions: {
-      type: Object|Array
-    },
-
-    height: {
-      type: String|Number,
-      default: 200
+      type: Object,
+      default: () => ({})
     }
   },
 
-  mounted () {
-    this.renderChart(this.chartData, this.chartOptions)
-  }
+  template: '<Line :data="chartData" :options="chartOptions" />'
 }

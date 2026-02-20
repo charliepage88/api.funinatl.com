@@ -54,11 +54,11 @@
           <div class="content">
             <!-- start/end date -->
             <h4 class="title is-5 is-size-5-mobile is-size-6-tablet has-text-normal has-text-centered" v-if="event.end_date" :class="{ 'has-text-white': event.is_tweetable }">
-              {{ event.start_date | fullDate }} - {{ event.end_date | fullDate }}
+              {{ $filters.fullDate(event.start_date) }} - {{ $filters.fullDate(event.end_date) }}
             </h4>
 
             <h4 class="title is-5 is-size-5-mobile is-size-6-tablet has-text-normal has-text-centered" :class="{ 'has-text-white': event.is_tweetable }" v-else>
-              {{ event.start_date | fullDate }}
+              {{ $filters.fullDate(event.start_date) }}
             </h4>
 
             <!-- start time/end time -->
@@ -71,30 +71,21 @@
             </span>
 
             <!-- price -->
-            <b-button
-              type="is-light"
-              class="is-centered"
-              size="is-large"
-            >
+            <button class="button is-light is-large is-centered">
               {{ event.price }}
-            </b-button>
+            </button>
 
             <!-- family friendly (if active) -->
             <div class="is-visible-touch" v-if="event.is_family_friendly">
-              <b-button
-                type="is-warning"
-                icon-left="child"
-                icon-pack="fas"
-                size="is-medium"
-                class="mt-1 is-centered"
-              >
-                Family Friendly
-              </b-button>
+              <button class="button is-warning is-medium mt-1 is-centered">
+                <span class="icon"><i class="fas fa-child"></i></span>
+                <span>Family Friendly</span>
+              </button>
             </div>
 
             <!-- descriptions -->
             <p class="mt-2 is-size-7-tablet" v-if="event.short_description">
-              {{ event.short_description | truncate(200) }}
+              {{ $filters.truncate(event.short_description, 200) }}
             </p>
 
             <!-- bands list (if any) -->
@@ -141,14 +132,10 @@
 
             <!-- family friendly (if active) - computer -->
             <div class="absolute bottom-10 right-10 is-visible-computer" v-if="event.is_family_friendly">
-              <b-button
-                type="is-warning"
-                icon-left="child"
-                icon-pack="fas"
-                size="is-small"
-              >
-                Family Friendly
-              </b-button>
+              <button class="button is-warning is-small">
+                <span class="icon"><i class="fas fa-child"></i></span>
+                <span>Family Friendly</span>
+              </button>
             </div>
           </div>
         </div>
