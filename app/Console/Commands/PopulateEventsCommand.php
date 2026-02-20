@@ -1760,14 +1760,6 @@ class PopulateEventsCommand extends Command
                             ->setTimezone('America/New_York');
                     }
 
-                    // ── cache check ──────────────────────────────────────────
-                    $cacheKey = 'rlc-' . $provider->id . '-' . ($itemId ?? md5($item['title'] . $startDate->format('Y-m-d')));
-
-                    if (Cache::has($cacheKey)) {
-                        $this->info('RLC: already processed, skipping `' . $item['title'] . '`');
-                        if ($itemId) $seenIds[] = $itemId;
-                        continue;
-                    }
 
                     // ── name ─────────────────────────────────────────────────
                     $name = html_entity_decode(trim($item['title'] ?? ''), ENT_QUOTES | ENT_HTML5);
@@ -1995,8 +1987,6 @@ class PopulateEventsCommand extends Command
                         $seenIds[] = $itemId;
                     }
 
-                    Cache::put($cacheKey, true, now()->addDays(3));
-
                     ParseMusicEvent::dispatch($event, $spotify);
 
                     $this->info('RLC: dispatched job for `' . $name . '`');
@@ -2145,21 +2135,13 @@ class PopulateEventsCommand extends Command
         $this->info(count($events) . ' Masquerade events found to crawl');
 
         // dispatch CrawlMasqueradeLink jobs with staggered delays
-        $delays = [];
-        $max    = 30;
-        foreach ($events as $event) {
-            do {
-                $rand = rand(10, $max);
-                if (!in_array($rand, $delays)) {
-                    $delays[] = $rand;
-                    break;
-                }
-            } while (true);
+        foreach ($events as $key => $event) {
+            $delay = ($key + 1) * rand(5, 10);
 
             CrawlMasqueradeLink::dispatch($event, $spotify)
-                ->delay(now()->addSeconds($rand));
+                ->delay(now()->addSeconds($delay));
 
-            $this->info('Masquerade: dispatched job for `' . $event['name'] . '`. Delay: ' . $rand . 's');
+            $this->info('Masquerade: dispatched job for `' . $event['name'] . '`. Delay: ' . $delay . 's');
         }
 
         $provider->last_scraped = Carbon::now();
