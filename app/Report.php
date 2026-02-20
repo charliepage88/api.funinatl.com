@@ -798,129 +798,114 @@ class Report extends Model
   public static function getRoutesList()
   {
     return collect(Cache::tags([ 'dbcache' ])->rememberForever('routesList', function () {
-      // init vars
       $routes = [];
+      $now    = Carbon::now();
 
-      // get events for home page & _slug pages
-
-      // get start date/end date
-      $now = Carbon::now();
-
+      // cover from today through end of the current year
       $start_date = $now->copy()->format('Y-m-d');
-      $end_date = $now->copy()->addWeeks(2)->format('Y-m-d');
+      $end_date   = Carbon::create($now->year, 12, 31)->format('Y-m-d');
 
-      $payload = self::getEventsByPeriod($start_date, $end_date);
-
-      $locations = $payload['locations'];
+      $payload    = self::getEventsByPeriod($start_date, $end_date);
+      $locations  = $payload['locations'];
       $categories = $payload['categories'];
 
       $routes[] = [
-        'route' => '/',
-        'payload' => [
-          'eventsByPeriod' => $payload
-        ]
+        'route'   => '/',
+        'payload' => ['eventsByPeriod' => $payload]
       ];
 
       // static pages
-      $pages = [
-        '/about',
-        '/contact',
-        '/subscribe',
-        '/auth/login',
-        '/auth/register'
+      foreach (['/about', '/contact', '/subscribe', '/auth/login', '/auth/register'] as $page) {
+        $routes[] = ['route' => $page, 'payload' => []];
+      }
+
+      $routes[] = [
+        'route'   => '/submit-event',
+        'payload' => ['locations' => $locations, 'categories' => $categories]
       ];
 
-      foreach($pages as $page) {
-        $routes[] = [
-          'route' => $page,
-          'payload' => []
-        ];
-      }
-
-      // submit event page
       $routes[] = [
-        'route' => '/submit-event',
-        'payload' => [
-          'locations' => $locations,
-          'categories' => $categories
-        ]
+        'route'   => '/get-listed',
+        'payload' => ['categories' => $categories]
       ];
 
-      // get listed page
-      $routes[] = [
-        'route' => '/get-listed',
-        'payload' => [
-          'categories' => $categories
-        ]
-      ];
+      // load all events; limit slugs to this year only
+      $events    = self::getCachedEvents();
+      $thisYear  = $now->year;
+      $yearEvents = $events->filter(
+        fn($e) => Carbon::parse($e['start_date'])->year >= $thisYear
+      );
 
-      // categories
-      foreach($categories as $category) {
-        $payload = self::getEventsByPeriod($start_date, $end_date, [
-          'category' => $category['slug']
-        ]);
+      // pre-compute which slugs actually have events this year
+      // so we skip the ~2000 bands that have nothing
+      $activeCategorySlugs = $yearEvents->pluck('category_slug')->unique()->filter()->flip();
+      $activeLocationSlugs = $yearEvents->pluck('location_slug')->unique()->filter()->flip();
 
+      $activeTagSlugs = collect($yearEvents->pluck('tags')->filter()->flatten(1))
+        ->pluck('slug')->unique()->filter()->flip();
+
+      $activeBandSlugs = collect($yearEvents->pluck('bands')->filter()->flatten(1))
+        ->pluck('slug')->unique()->filter()->flip();
+
+      // categories — only those with events this year
+      foreach ($categories as $category) {
+        if (!isset($activeCategorySlugs[$category['slug']])) {
+          continue;
+        }
+
+        $payload  = self::getEventsByPeriod($start_date, $end_date, ['category' => $category['slug']]);
         $routes[] = [
-          'route' => '/category/' . $category['slug'],
-          'payload' => [
-            'eventsByCategory' => $payload
-          ]
+          'route'   => '/category/' . $category['slug'],
+          'payload' => ['eventsByCategory' => $payload]
         ];
       }
 
-      // events
-      $events = self::getCachedEvents();
-      foreach($events as $event) {
-      $routes[] = [
-          'route' => '/event/' . $event['slug'],
-          'payload' => [
-            'eventBySlug' => $event
-          ]
-        ];
-      }
-
-      // locations
-      foreach($locations as $location) {
-        $payload = self::getEventsByPeriod($start_date, $end_date, [
-          'location' => $location['slug']
-        ]);
-
+      // event slug pages — this year and future only
+      foreach ($yearEvents as $event) {
         $routes[] = [
-          'route' => '/location/' . $location['slug'],
-          'payload' => [
-            'eventsByLocation' => $payload
-          ]
+          'route'   => '/event/' . $event['slug'],
+          'payload' => ['eventBySlug' => $event]
         ];
       }
 
-      // tags
+      // locations — only those with events this year
+      foreach ($locations as $location) {
+        if (!isset($activeLocationSlugs[$location['slug']])) {
+          continue;
+        }
+
+        $payload  = self::getEventsByPeriod($start_date, $end_date, ['location' => $location['slug']]);
+        $routes[] = [
+          'route'   => '/location/' . $location['slug'],
+          'payload' => ['eventsByLocation' => $payload]
+        ];
+      }
+
+      // tags — only those attached to events this year
       $tags = self::getCachedTags();
-      foreach($tags as $tag) {
-        $payload = self::getEventsByPeriod($start_date, $end_date, [
-          'tag' => $tag['slug']
-        ]);
+      foreach ($tags as $tag) {
+        if (!isset($activeTagSlugs[$tag['slug']])) {
+          continue;
+        }
 
+        $payload  = self::getEventsByPeriod($start_date, $end_date, ['tag' => $tag['slug']]);
         $routes[] = [
-          'route' => '/tag/' . $tag['slug'],
-          'payload' => [
-            'eventsByTag' => $payload
-          ]
+          'route'   => '/tag/' . $tag['slug'],
+          'payload' => ['eventsByTag' => $payload]
         ];
       }
 
-      // bands
+      // bands — only those performing at events this year
       $bands = self::getCachedBands();
+      foreach ($bands as $band) {
+        if (!isset($activeBandSlugs[$band['slug']])) {
+          continue;
+        }
 
-      foreach($bands as $band) {
-        $payload = self::getEventsByPeriod($start_date, $end_date, [
-          'band' => $band['slug']
-        ]);
-
+        $payload  = self::getEventsByPeriod($start_date, $end_date, ['band' => $band['slug']]);
         $routes[] = [
-          'route' => '/band/' . $band['slug'],
-          'payload' => [
-            'eventsByBand' => $payload
-          ]
+          'route'   => '/band/' . $band['slug'],
+          'payload' => ['eventsByBand' => $payload]
         ];
       }
 

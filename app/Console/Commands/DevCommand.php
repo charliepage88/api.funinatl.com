@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use Carbon\Carbon;
-use GuzzleHttp\Client as Guzzle;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Redis;
@@ -130,196 +129,41 @@ class DevCommand extends Command
   /**
   * Create Cache
   *
-  * @param string|null $apiUrl
-  * @param string|null $start_at_url
+  * Warms all persistent (rememberForever) caches directly via Report methods,
+  * bypassing HTTP entirely — no rate limiting, no network overhead.
   *
   * @return void
   */
-  public function createCache($apiUrl = null, $start_at_url = null)
+  public function createCache()
   {
-    // create cache for queries
-    Report::getCachedCategories();
-    Report::getCachedLocations();
-    Report::getCachedBands();
-    Report::getCachedTags();
-    Report::getCachedEvents();
+    $started = microtime(true);
 
-    // get data
+    // Prime base data caches (all use rememberForever in Redis)
+    $this->info('Warming base data caches...');
 
-    // events
-    $events = Event::isActive()
-        ->orderBy('start_date', 'asc')
-        ->get();
+    $categories = Report::getCachedCategories();
+    $locations  = Report::getCachedLocations();
+    $tags       = Report::getCachedTags();
+    $bands      = Report::getCachedBands();
+    $events     = Report::getCachedEvents();
 
-    // categories
-    $categories = Category::isActive()->get();
+    $this->info(sprintf(
+      'Loaded: %d events · %d categories · %d locations · %d tags · %d bands',
+      $events->count(),
+      $categories->count(),
+      $locations->count(),
+      $tags->count(),
+      $bands->count()
+    ));
 
-    // location events
-    $locations = Location::isActive()->get();
+    // Warm the routes list — covers all category/location/tag/band
+    // combinations for this year (rememberForever cache)
+    $this->info('Warming routes list...');
+    $routes = Report::getRoutesList();
+    $this->info('Routes list: ' . count($routes) . ' routes warmed.');
 
-    // get bands
-    $bands = MusicBand::all();
-
-    // tags
-    $tags = Tag::all();
-
-    // init vars
-    $client = new Guzzle;
-
-    // get first event
-    $firstEvent = $events->first();
-
-    // $startDate = $firstEvent->start_date;
-    $startDate = Carbon::today();
-
-    // get end date
-    $endDate = $startDate->copy()->addDays(10);
-    $eventsEndDate = $startDate->copy()->addWeeks(4);
-
-    // function to hit URI to generate cache
-    $hitUrl = function ($url) use ($client) {
-        $response = $client->request('GET', $url);
-
-        $statusCode = $response->getStatusCode();
-
-        if ($statusCode === 200) {
-            $this->info('Hit URL: `' . $url . '`');
-        } else {
-            $this->error('Error Hitting URL: `' . $url . '`. Status Code: ' . $statusCode);
-        }
-    };
-
-    // collect all possible date values
-    $dates = [];
-    for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
-        $dates[] = $date->copy();
-    }
-
-    $eventDates = [];
-    for ($date = $startDate->copy(); $date->lte($eventsEndDate); $date->addDay()) {
-        $eventDates[] = $date->copy();
-    }
-
-    if (empty($apiUrl)) {
-        $apiUrl = config('app.url');
-    }
-
-    $urls = [];
-
-    // misc pages
-    $urls[] = $apiUrl . '/api/locations';
-    $urls[] = $apiUrl . '/api/categories';
-    $urls[] = $apiUrl . '/api/routes';
-
-    // event by slug urls
-    foreach($events as $event) {
-      $urls[] = $apiUrl . '/api/events/bySlug/' . $event['slug'];
-    }
-
-    // category urls
-    foreach ($categories as $category) {
-        foreach($dates as $date) {
-            $firstDate = $date->copy();
-            $lastDate = $firstDate->copy()->addDays(10)->format('Y-m-d');
-
-            $url = $apiUrl . '/api/events/category/' . $category->slug;
-            $url .= '/' . $firstDate->format('Y-m-d') . '/' . $lastDate;
-
-            $urls[] = $url;
-        }
-    }
-
-    // tag urls
-    foreach ($tags as $tag) {
-        foreach($dates as $date) {
-            $firstDate = $date->copy();
-            $lastDate = $firstDate->copy()->addDays(10)->format('Y-m-d');
-
-            $url = $apiUrl . '/api/events/tag/' . $tag->slug;
-            $url .= '/' . $firstDate->format('Y-m-d') . '/' . $lastDate;
-
-            $urls[] = $url;
-        }
-    }
-
-    // location urls
-    foreach ($locations as $location) {
-        foreach($dates as $date) {
-            $firstDate = $date->copy();
-            $lastDate = $firstDate->copy()->addDays(10)->format('Y-m-d');
-
-            $url = $apiUrl . '/api/events/location/' . $location->slug;
-            $url .= '/' . $firstDate->format('Y-m-d') . '/' . $lastDate;
-
-            $urls[] = $url;
-        }
-    }
-
-    // location urls
-    foreach ($bands as $band) {
-      foreach($dates as $date) {
-        $firstDate = $date->copy();
-        $lastDate = $firstDate->copy()->addDays(10)->format('Y-m-d');
-
-        $url = $apiUrl . '/api/events/band/' . $band->slug;
-        $url .= '/' . $firstDate->format('Y-m-d') . '/' . $lastDate;
-
-        $urls[] = $url;
-      }
-    }
-
-    // event urls
-    foreach($eventDates as $date) {
-        $firstDate = $date->copy();
-        $lastDate = $firstDate->copy()->addDays(10)->format('Y-m-d');
-
-        $url = $apiUrl . '/api/events/index';
-        $url .= '/' . $firstDate->format('Y-m-d') . '/' . $lastDate;
-
-        $urls[] = $url;
-    }
-
-    // if error occurred, let's
-    // not redo ALL of the url's
-    if (!empty($start_at_url)) {
-      $find = array_search($start_at_url, $urls);
-
-      if ($find === false) {
-        $this->error('Cannot find url `' . $start_at_url . '` to start caching at.');
-
-        return false;
-      } else {
-        $newUrls = [];
-        foreach($urls as $key => $url) {
-          if ($key >= $find) {
-            $newUrls[] = $url;
-          }
-        }
-
-        $urls = $newUrls;
-      }
-    }
-
-    // hit URLs to generate cache
-    foreach($urls as $key => $url) {
-      $this->info('Start: ' . $url);
-
-      $hitUrl($url);
-
-      $this->info('Done: ' . $url);
-
-      if ($key > 0 && ($key % 30 === 0)) {
-        $this->info('Sleeping for 20 seconds...');
-
-        sleep(20);
-      } elseif ($key > 0 && ($key % 10 === 0)) {
-        $this->info('Sleeping for 2 seconds...');
-
-        sleep(2);
-      }
-    }
-
-    $this->info('Done Creating Cache for: ' . $startDate->format('Y-m-d') . '-' . $endDate->format('Y-m-d'));
+    $elapsed = round(microtime(true) - $started, 2);
+    $this->info('Done in ' . $elapsed . 's.');
   }
 
   /**
@@ -331,123 +175,99 @@ class DevCommand extends Command
   {
     $models = [
       [
-        'items' => Tag::orderBy('name', 'asc')->get(),
+        'items'      => Tag::orderBy('name', 'asc')->get(),
         'collection' => 'tags',
-        'name' => 'tag',
-        'search' => false
+        'name'       => 'tag',
+        'search'     => false
       ],
-
       [
-        'items' => MusicBand::orderBy('name', 'asc')->get(),
+        'items'      => MusicBand::orderBy('name', 'asc')->get(),
         'collection' => 'music_bands',
-        'name' => 'music band'
+        'name'       => 'music band'
       ],
-
       [
-        'items' => Category::isActive()->orderBy('name', 'asc')->get(),
+        'items'      => Category::isActive()->orderBy('name', 'asc')->get(),
         'collection' => 'categories',
-        'name' => 'category'
+        'name'       => 'category'
       ],
-
       [
-        'items' => Location::isActive()->orderBy('name', 'asc')->get(),
+        'items'      => Location::isActive()->orderBy('name', 'asc')->get(),
         'collection' => 'locations',
-        'name' => 'location'
+        'name'       => 'location'
       ],
-
       [
-        'items' => Event::isActive()->orderBy('start_date', 'asc')->get(),
+        'items'      => Event::isActive()->orderBy('start_date', 'asc')->get(),
         'collection' => 'events',
-        'name' => 'event'
+        'name'       => 'event'
       ]
     ];
 
-    foreach($models as $model) {
-      // init vars
-      $items = $model['items'];
+    foreach ($models as $model) {
+      $items      = $model['items'];
       $collection = $model['collection'];
-      $name = $model['name'];
-      $fullName = Str::title(Str::plural($name));
+      $name       = $model['name'];
+      $fullName   = Str::title(Str::plural($name));
+      $search     = $model['search'] ?? true;
 
-      if (isset($model['search']) && $model['search'] === false) {
-        $search = false;
-      } else {
-        $search = true;
+      if ($items->isEmpty()) {
+        $this->info($fullName . ': no items found.');
+        continue;
       }
 
-      // loop through model items and create/update
-      $changesCount = 0;
+      // batch fetch all Redis keys at once
+      $keys        = $items->map(fn($item) => $collection . '.' . $item->id)->all();
+      $redisValues = Redis::mget($keys);
+
+      $changesCount   = 0;
       $collectionData = [];
-      foreach($items as $item) {
-        $key = $collection . '.' . $item->id;
 
-        $find = Redis::get($key);
+      // pipeline all writes
+      $pipeline = Redis::pipeline();
 
-        if (empty($find)) {
+      foreach ($items as $index => $item) {
+        $value    = $item->getFormattedArray();
+        $existing = $redisValues[$index];
+
+        if (empty($existing)) {
           $changesCount++;
-
-          $value = $item->getFormattedArray();
-
-          Redis::set($key, json_encode($value));
-
+          $pipeline->set($collection . '.' . $item->id, json_encode($value));
           $this->info('Inserted ' . $name . ' #' . $item->id . '.');
         } else {
-          $shouldUpdate = false;
+          $existingDecoded = json_decode($existing, true);
+          $existingKeys    = array_keys($existingDecoded);
+          $valueKeys       = array_keys($value);
 
-          // get value from local DB
-          $value = $item->getFormattedArray();
-
-          // get data array to compare
-          $newValue = json_decode($find, true);
-
-          // compare keys to see if unset is needed
-          $valueKeys = array_keys($value);
-          $newKeys = array_keys($newValue);
-
-          // compare keys to see if model needs
-          // to be updated
-          $isMissingKeys = array_diff($valueKeys, $newKeys);
-
-          if (!empty($isMissingKeys)) {
-            $shouldUpdate = true;
-          }
+          $shouldUpdate = !empty(array_diff($valueKeys, $existingKeys));
 
           if (!$shouldUpdate) {
-            // compare values via json_encode
-            $diff = array_diff(
-              array_map('json_encode', $newValue),
+            $diff         = array_diff(
+              array_map('json_encode', $existingDecoded),
               array_map('json_encode', $value)
             );
-
-            // json decode diff result
-            $shouldUpdate = array_map('json_decode', $diff);
+            $shouldUpdate = !empty(array_map('json_decode', $diff));
           }
-
-          $collectionData[] = $value;
 
           if ($shouldUpdate) {
             $changesCount++;
-
-            Redis::set($key, json_encode($value));
-
+            $pipeline->set($collection . '.' . $item->id, json_encode($value));
             $this->info('Updated ' . $name . ' #' . $item->id . '.');
-          } else {
-            $this->info('Skipping update for ' . $name . ' #' . $item->id);
           }
         }
+
+        $collectionData[] = $value;
       }
 
-      Redis::set($collection, json_encode($collectionData));
+      $pipeline->set($collection, json_encode($collectionData));
+      $pipeline->execute();
 
       // sync to search
       if ($search && $changesCount) {
-        foreach($items as $item) {
+        foreach ($items as $item) {
           $item->searchable();
         }
-
-        $this->info($fullName . ' synced data, and Scout. ' . $changesCount . ' total changes.');
+        $this->info($fullName . ' synced data and Scout. ' . $changesCount . ' changes.');
       } else {
-        $this->info($fullName . ' synced data. ' . $changesCount . ' total changes.');
+        $this->info($fullName . ' synced data. ' . $changesCount . ' changes.');
       }
     }
   }
@@ -459,18 +279,17 @@ class DevCommand extends Command
   */
   public function regenerateEventSlugs()
   {
-      $this->info('regenerateEventSlugs');
+    $this->info('regenerateEventSlugs');
 
-      $now = Carbon::now();
-      $events = Event::all();
+    $now    = Carbon::now();
+    $events = Event::all();
 
-      foreach($events as $event) {
-          $event->updated_at = $now;
+    foreach ($events as $event) {
+      $event->updated_at = $now;
+      $event->save();
 
-          $event->save();
-
-          $this->info($event->id . ' :: ' . $event->name);
-      }
+      $this->info($event->id . ' :: ' . $event->name);
+    }
   }
 
   /**
@@ -480,15 +299,15 @@ class DevCommand extends Command
   */
   public function locationsWithoutPhoto()
   {
-      $this->info('locationsWithoutPhoto');
+    $this->info('locationsWithoutPhoto');
 
-      $locations = Location::isActive()->get();
+    $locations = Location::isActive()->get();
 
-      foreach($locations as $location) {
-          if (empty($location->photo_url)) {
-              $this->info($location->id . ' :: ' . $location->name);
-          }
+    foreach ($locations as $location) {
+      if (empty($location->photo_url)) {
+        $this->info($location->id . ' :: ' . $location->name);
       }
+    }
   }
 
   /**
@@ -498,10 +317,10 @@ class DevCommand extends Command
   */
   public function fixMediaCollections()
   {
-      DB::table('media')
-          ->where('collection_name', '=', 'images')
-          ->where('model_type', '=', 'App\Event')
-          ->update([ 'collection_name' => 'events' ]);
+    DB::table('media')
+      ->where('collection_name', '=', 'images')
+      ->where('model_type', '=', 'App\Event')
+      ->update(['collection_name' => 'events']);
   }
 
   /**
@@ -511,77 +330,63 @@ class DevCommand extends Command
   */
   public function syncMusicBands()
   {
-      $this->info('syncMusicBands -> start');
+    $this->info('syncMusicBands -> start');
 
-      $events = Event::isActive()->get();
-      $categories = Category::isActive()->get()->getList();
+    $events     = Event::isActive()->get();
+    $categories = Category::isActive()->get()->getList();
 
-      foreach($events as $event) {
-          if (!$event->bands()->count() && $event->category_id === 1) {
-              $message = $event->name . ' @ ';
-              $message .= $event->location->name . ' :: ' . $event->start_date->format('Y-m-d');
+    foreach ($events as $event) {
+      if (!$event->bands()->count() && $event->category_id === 1) {
+        $message  = $event->name . ' @ ';
+        $message .= $event->location->name . ' :: ' . $event->start_date->format('Y-m-d');
 
-              $this->info($message);
+        $this->info($message);
 
-              $bands = $this->ask('What are the band(s) for this event?');
+        $bands = $this->ask('What are the band(s) for this event?');
 
-              switch ($bands) {
-                  case null:
-                      $this->info('Skipping event...');
-                  break;
+        switch ($bands) {
+          case null:
+            $this->info('Skipping event...');
+            break;
 
-                  case 'category-other':
-                      $category = $categories['other'];
+          case 'category-other':
+            $category           = $categories['other'];
+            $event->category_id = $category->id;
+            $event->save();
+            $this->info('Category saved to `' . $category->name . '`');
+            break;
 
-                      $event->category_id = $category->id;
+          case 'category-food-drinks':
+            $category           = $categories['food-drinks'];
+            $event->category_id = $category->id;
+            $event->save();
+            $this->info('Category saved to `' . $category->name . '`');
+            break;
 
-                      $event->save();
+          case 'category-comedy':
+            $category           = $categories['comedy'];
+            $event->category_id = $category->id;
+            $event->save();
+            $this->info('Category saved to `' . $category->name . '`');
+            break;
 
-                      $this->info('Category saved to `' . $category->name . '`');
-                  break;
+          case 'category-arts-theatre':
+            $category           = $categories['arts-theatre'];
+            $event->category_id = $category->id;
+            $event->save();
+            $this->info('Category saved to `' . $category->name . '`');
+            break;
 
-                  case 'category-food-drinks':
-                      $category = $categories['food-drinks'];
-
-                      $event->category_id = $category->id;
-
-                      $event->save();
-
-                      $this->info('Category saved to `' . $category->name . '`');
-                  break;
-
-                  case 'category-comedy':
-                      $category = $categories['comedy'];
-
-                      $event->category_id = $category->id;
-
-                      $event->save();
-
-                      $this->info('Category saved to `' . $category->name . '`');
-                  break;
-
-                  case 'category-arts-theatre':
-                      $category = $categories['arts-theatre'];
-
-                      $event->category_id = $category->id;
-
-                      $event->save();
-
-                      $this->info('Category saved to `' . $category->name . '`');
-                  break;
-
-                  default:
-                      $ex = explode(',', $bands);
-
-                      $event->syncBands($ex);
-
-                      $this->info('Bands have been synced to event `' . $event->id . '`');
-                  break;
-              }
-          }
+          default:
+            $ex = explode(',', $bands);
+            $event->syncBands($ex);
+            $this->info('Bands have been synced to event `' . $event->id . '`');
+            break;
+        }
       }
+    }
 
-      $this->info('syncMusicBands -> end');
+    $this->info('syncMusicBands -> end');
   }
 
   /**
@@ -591,31 +396,29 @@ class DevCommand extends Command
   */
   public function syncSpotifyMusicBands()
   {
-      $spotify = $this->initSpotify();
+    $spotify = $this->initSpotify();
 
-      $bands = MusicBand::whereNotNull('spotify_artist_id')
-          ->whereNull('spotify_json')
-          ->get();
+    $bands = MusicBand::whereNotNull('spotify_artist_id')
+      ->whereNull('spotify_json')
+      ->get();
 
-      foreach($bands as $key => $band) {
-          $info = $spotify->getArtist($band->spotify_artist_id);
+    foreach ($bands as $key => $band) {
+      $info = $spotify->getArtist($band->spotify_artist_id);
 
-          if (!empty($info) && !empty($info->id)) {
-              $band->spotify_json = (array) $info;
+      if (!empty($info) && !empty($info->id)) {
+        $band->spotify_json = (array) $info;
+        $band->save();
 
-              $band->save();
-
-              $this->info('Band info saved for `' . $band->name . '`');
-          } else {
-              $this->error($info);
-          }
-
-          if ($key > 0 && ($key % 3 === 0)) {
-              $this->info('Sleeping for 2 seconds...');
-
-              sleep(2);
-          }
+        $this->info('Band info saved for `' . $band->name . '`');
+      } else {
+        $this->error($info);
       }
+
+      if ($key > 0 && ($key % 3 === 0)) {
+        $this->info('Sleeping for 2 seconds...');
+        sleep(2);
+      }
+    }
   }
 
   /**
@@ -625,89 +428,85 @@ class DevCommand extends Command
   */
   public function initSpotify()
   {
-      // get new access token
-      if (!Cache::has('spotify_access_token')) {
-          $this->info('getting new access token for Spotify');
+    if (!Cache::has('spotify_access_token')) {
+      $this->info('getting new access token for Spotify');
 
-          $session = new \SpotifyWebAPI\Session(
-              config('services.spotify.client_id'),
-              config('services.spotify.secret')
-          );
+      $session = new \SpotifyWebAPI\Session(
+        config('services.spotify.client_id'),
+        config('services.spotify.secret')
+      );
 
-          $session->requestCredentialsToken();
-          $accessToken = $session->getAccessToken();
+      $session->requestCredentialsToken();
+      $accessToken = $session->getAccessToken();
 
-          if (!empty($accessToken)) {
-              Cache::put('spotify_access_token', $accessToken, 60);
-          } else {
-              throw new \Exception('Cannot get access token from Spotify');
-          }
+      if (!empty($accessToken)) {
+        Cache::put('spotify_access_token', $accessToken, 60);
       } else {
-          $accessToken = Cache::get('spotify_access_token');
+        throw new \Exception('Cannot get access token from Spotify');
       }
+    } else {
+      $accessToken = Cache::get('spotify_access_token');
+    }
 
-      // init spotify instance
-      $spotify = new SpotifyWebAPI;
+    $spotify = new SpotifyWebAPI;
+    $spotify->setAccessToken($accessToken);
 
-      $spotify->setAccessToken($accessToken);
-
-      return $spotify;
+    return $spotify;
   }
 
   /**
-  * List
+  * List available methods
   *
   * @return void
   */
   public function list()
   {
-      $this->info('list');
+    $this->info('list');
 
-      $findMethods = get_class_methods($this);
-      $methods = [];
+    $findMethods = get_class_methods($this);
+    $methods     = [];
 
-      foreach($findMethods as $methodName) {
-          if ($methodName === '__construct') {
-              break;
-          } else {
-              if ($methodName !== 'handle') {
-                  $methods[] = $methodName;
-              }
-          }
+    foreach ($findMethods as $methodName) {
+      if ($methodName === '__construct') {
+        break;
+      } elseif ($methodName !== 'handle') {
+        $methods[] = $methodName;
       }
+    }
 
-      $headers = [
-          'Method'
-      ];
-      $body = [];
-      foreach($methods as $methodName) {
-          $row = [
-              $methodName
-          ];
+    // determine max param count across all methods
+    $maxParams = 0;
+    $methodData = [];
 
-          $reflection = new \ReflectionMethod($this, $methodName);
-          $params = $reflection->getParameters();
-          $paramsList = [];
-          foreach ($params as $param) {
-              $paramsList[] = true;
+    foreach ($methods as $methodName) {
+      $reflection  = new \ReflectionMethod($this, $methodName);
+      $params      = $reflection->getParameters();
+      $maxParams   = max($maxParams, count($params));
+      $methodData[] = ['name' => $methodName, 'params' => $params];
+    }
 
-              $row[] = $param->getName();
-              $row[] = !$param->isOptional() ? 'Yes' : 'No';
-          }
+    // build headers once based on max param count
+    $headers = ['Method'];
+    for ($i = 1; $i <= $maxParams; $i++) {
+      $headers[] = 'Param Name (' . $i . ')';
+      $headers[] = 'Param Required (' . $i . ')';
+    }
 
-          if (!empty($paramsList)) {
-              foreach($paramsList as $key => $value) {
-                  $i = ($key + 1);
-
-                  $headers[] = 'Param Name (' . $i . ')';
-                  $headers[] = 'Param Required (' . $i . ')';
-              }
-          }
-
-          $body[] = $row;
+    $body = [];
+    foreach ($methodData as $data) {
+      $row    = [$data['name']];
+      foreach ($data['params'] as $param) {
+        $row[] = $param->getName();
+        $row[] = !$param->isOptional() ? 'Yes' : 'No';
       }
+      // pad row to full width
+      while (count($row) < count($headers)) {
+        $row[] = '';
+      }
+      $body[] = $row;
+    }
 
-      $this->table($headers, $body);
+    $this->table($headers, $body);
   }
 
   /**
@@ -719,133 +518,102 @@ class DevCommand extends Command
   {
     $this->info('fixEventInfo -> start');
 
-    // get events
-    $events = Event::with([ 'bands', 'category' ])
-        ->shouldShow()
-        ->get();
+    $events = Event::with(['bands', 'category'])
+      ->shouldShow()
+      ->get();
 
-    foreach($events as $key => $event) {
-        // init debug info/vars
-        $this->info('Processing event #' . $event->id);
+    foreach ($events as $key => $event) {
+      $this->info('Processing event #' . $event->id);
 
-        $photoUrl = $event->photo_url;
-        $bands = $event->bands()->pluck('name')->toArray();
+      $photoUrl = $event->photo_url;
+      $bands    = $event->bands()->pluck('name')->toArray();
 
-        $this->info($photoUrl);
+      $this->info($photoUrl);
 
-        // fix images that are too small
-        // try to fit instead of crop
-        try {
-            list($width, $height) = getimagesize($photoUrl);
+      // fix images that are too small
+      try {
+        list($width, $height) = getimagesize($photoUrl);
 
-            $this->info($width . ' x ' . $height);
+        $this->info($width . ' x ' . $height);
 
-            if ($width < 250 || $height < 150) {
-                $this->info('Replace photo with category default....');
-
-                AssignCategoryPhoto::dispatch($event);
-
-                $this->info('DONE Replacing photo with category default....');
-            } else {
-                if ($width < 726 || $height < 250) {
-                    $this->info('Should regenerate url `' . $photoUrl . '` and conversions.');
-                } else {
-                    $this->info('Skipping....' . $width . ' x ' . $height);
-                }
-            }
-        } catch(\Exception $e) {
-            $this->error($e->getMessage());
-        }
-
-        // fix event descriptions so they are
-        // mostly consistent
-        $shouldSave = false;
-
-        // regenerate name & slug
-        // if the generated value is different
-        $newName = $event->generateName();
-
-        if ($newName !== $event->name) {
-            $this->info('New Name & Slug...');
-            $this->info($event->name);
-            $this->info($event->slug);
-
-            $event->name = $newName;
-            $event->generateSlug();
-
-            $this->info($event->name);
-            $this->info($event->slug);
-            $this->info('---');
-
-            $shouldSave = true;
-        }
-
-        // now figure out the short description
-        $newShortDescription = $event->generateShortDescription($bands);
-
-        if ($newShortDescription !== $event->short_description) {
-            $this->info('New Short Description...');
-            $this->info($event->short_description ?? 'empty...');
-
-            $event->short_description = $newShortDescription;
-
-            $this->info($event->short_description);
-            $this->info('---');
-
-            $shouldSave = true;
-        }
-
-        // and figure out the long description
-        $newDescription = $event->generateDescription($bands);
-
-        if ($newDescription !== $event->description) {
-            $this->info('New Description...');
-            $this->info($event->description ?? 'empty...');
-
-            $event->description = $newDescription;
-
-            $this->info($event->description);
-            $this->info('---');
-
-            $shouldSave = true;
-        }
-
-        // check if end time is set or not
-        // only set for music events
-        if (empty($event->end_time)) {
-            $startDate = $event->start_date->format('Y-m-d');
-            $time = Carbon::parse($startDate . ' ' . $event->start_time);
-
-            if ($event->category->slug === 'music') {
-                $event->end_time = $time->copy()->addHours(3)->format('g:i A');
-            }
-        }
-
-        // if event start date = end date
-        // unset end date
-        if ($event->start_date->format('Y-m-d') === $event->end_date->format('Y-m-d')) {
-            $event->end_date = null;
-
-            $this->info('Unset end date.');
-        }
-
-        // save event if data has changed
-        if ($shouldSave) {
-            $event->save();
-
-            $this->info('Saved event `' . $event->id . '`');
-        }
-
-        // sleep
-        if ($key > 0 && ($key % 15 === 0)) {
-            $this->info('Sleeping for 5 seconds...');
-
-            sleep(5);
+        if ($width < 250 || $height < 150) {
+          $this->info('Replace photo with category default....');
+          AssignCategoryPhoto::dispatch($event);
+          $this->info('DONE Replacing photo with category default....');
         } else {
-            $this->info('Sleeping for 2 seconds...');
-
-            sleep(2);
+          if ($width < 726 || $height < 250) {
+            $this->info('Should regenerate url `' . $photoUrl . '` and conversions.');
+          } else {
+            $this->info('Skipping....' . $width . ' x ' . $height);
+          }
         }
+      } catch (\Exception $e) {
+        $this->error($e->getMessage());
+      }
+
+      $shouldSave = false;
+
+      // regenerate name & slug
+      $newName = $event->generateName();
+
+      if ($newName !== $event->name) {
+        $this->info('New Name & Slug...');
+        $this->info($event->name . ' -> ' . $newName);
+
+        $event->name = $newName;
+        $event->generateSlug();
+
+        $this->info($event->slug);
+        $shouldSave = true;
+      }
+
+      // short description
+      $newShortDescription = $event->generateShortDescription($bands);
+
+      if ($newShortDescription !== $event->short_description) {
+        $this->info('New Short Description...');
+        $this->info(($event->short_description ?? 'empty...') . ' -> ' . $newShortDescription);
+
+        $event->short_description = $newShortDescription;
+        $shouldSave = true;
+      }
+
+      // long description
+      $newDescription = $event->generateDescription($bands);
+
+      if ($newDescription !== $event->description) {
+        $this->info('New Description...');
+        $this->info(($event->description ?? 'empty...') . ' -> ' . $newDescription);
+
+        $event->description = $newDescription;
+        $shouldSave = true;
+      }
+
+      // set end time for music events missing it
+      if (empty($event->end_time) && $event->category->slug === 'music') {
+        $time            = Carbon::parse($event->start_date->format('Y-m-d') . ' ' . $event->start_time);
+        $event->end_time = $time->copy()->addHours(3)->format('g:i A');
+        $shouldSave      = true;
+      }
+
+      // unset end_date if same as start_date
+      if (!empty($event->end_date) && $event->start_date->format('Y-m-d') === $event->end_date->format('Y-m-d')) {
+        $event->end_date = null;
+        $this->info('Unset end date.');
+        $shouldSave = true;
+      }
+
+      if ($shouldSave) {
+        $event->save();
+        $this->info('Saved event `' . $event->id . '`');
+      }
+
+      // sleep every 15 events
+      if ($key > 0 && ($key % 15 === 0)) {
+        sleep(5);
+      } else {
+        sleep(2);
+      }
     }
 
     $this->info('fixEventInfo -> end');
@@ -861,61 +629,42 @@ class DevCommand extends Command
     $this->info('fixEventDatesAndTimes');
 
     $events = Event::all();
+    $count  = 0;
 
-    $count = 0;
-    foreach($events as $event) {
-        // date check
-        $startDate = $event->start_date->format('Y-m-d');
+    foreach ($events as $event) {
+      $startDate  = $event->start_date->format('Y-m-d');
+      $endDate    = $event->end_date ? $event->end_date->format('Y-m-d') : null;
+      $hasEndDate = !empty($endDate);
 
-        if (!empty($event->end_date)) {
-            $endDate = $event->end_date->format('Y-m-d');
-            $hasEndDate = true;
-        } else {
-            $endDate = null;
-            $hasEndDate = false;
-        }
+      $unsetEndDate = $hasEndDate && ($startDate === $endDate);
+      if ($unsetEndDate) {
+        $count++;
+        $this->info('Event `' . $event->id . '` has same start & end date - ' . $startDate);
+      }
 
-        if ($hasEndDate && ($startDate === $endDate)) {
-            $count++;
-            $unsetEndDate = true;
+      $startTime  = $event->start_time;
+      $endTime    = $event->end_time;
 
-            $this->info('Event `' . $event->id . '` has same start & end date - ' . $startDate);
-        } else {
-            $unsetEndDate = false;
-        }
+      $unsetEndTime = !empty($endTime) && ($startTime === $endTime) && (!$hasEndDate || $unsetEndDate);
+      if ($unsetEndTime) {
+        $count++;
+        $this->info('Event `' . $event->id . '` has same start & end time - ' . $startTime);
+      }
 
-        // time check
-        $startTime = $event->start_time;
+      if ($unsetEndDate) {
+        $event->end_date = null;
+      }
 
-        if (!empty($event->end_time)) {
-            $endTime = $event->end_time;
-        } else {
-            $endTime = null;
-        }
+      if ($unsetEndTime) {
+        $event->end_time = null;
+      }
 
-        if (!empty($endTime) && ($startTime === $endTime) && (!$hasEndDate || $unsetEndDate)) {
-            $count++;
-            $unsetEndTime = true;
-
-            $this->info('Event `' . $event->id . '` has same start & end time - ' . $startTime);
-        } else {
-            $unsetEndTime = false;
-        }
-
-        if ($unsetEndDate) {
-            $event->end_date = null;
-        }
-
-        if ($unsetEndTime) {
-            $event->end_time = null;
-        }
-
-        if ($unsetEndDate || $unsetEndTime) {
-            $event->save();
-        }
+      if ($unsetEndDate || $unsetEndTime) {
+        $event->save();
+      }
     }
 
-    $this->info('Issues to fix: ' . $count);
+    $this->info('Issues fixed: ' . $count);
   }
 
   /**
@@ -925,22 +674,17 @@ class DevCommand extends Command
   */
   public function flushOldMedia()
   {
-    $folders = Storage::directories();
-    $mediaIds = DB::table('media')->pluck('id')->toArray();
+    $folders       = Storage::directories();
+    $mediaIds      = DB::table('media')->pluck('id')->toArray();
+    $ignoreFolders = ['site'];
 
-    $leftOverFolders = [];
-    $ignoreFolders = [
-      'site'
-    ];
-    foreach ($folders as $folder) {
-      if (!in_array($folder, $mediaIds) && !in_array($folder, $ignoreFolders)) {
-        $leftOverFolders[] = $folder;
-      }
-    }
+    $leftOverFolders = array_filter(
+      $folders,
+      fn($folder) => !in_array($folder, $mediaIds) && !in_array($folder, $ignoreFolders)
+    );
 
     foreach ($leftOverFolders as $folder) {
       Storage::deleteDirectory($folder);
-
       $this->info($folder);
     }
   }
@@ -961,49 +705,44 @@ class DevCommand extends Command
 
     $events = Event::with('location')->shouldShow()->get();
 
-    foreach($events as $event) {
+    // pre-group events by location+name to avoid N+1 queries
+    $grouped = $events->groupBy(fn($e) => $e->location_id . '|' . $e->name);
+
+    foreach ($events as $event) {
+      $groupKey = $event->location_id . '|' . $event->name;
+      $matches  = $grouped[$groupKey]->where('id', '!=', $event->id);
+
+      if ($matches->isEmpty()) {
+        continue;
+      }
+
       $location = $event->location;
       $origDate = $event->start_date->format('l, F jS');
       $event->category_id = (int) $event->category_id;
-      $find = Event::shouldShow()
-        ->where('id', '!=', $event->id)
-        ->where('location_id', '=', $event->location_id)
-        ->where('name', '=', $event->name)
-        ->get();
 
-      if ($find->count()) {
-        $this->info('Found other events with name `' . $event->name . '` for location `' . $location->name . '`');
+      $this->info('Found other events with name `' . $event->name . '` for location `' . $location->name . '`');
+      $this->info('Original Event: ' . $event->start_date->format('Y-m-d') . ' @ ' . $event->start_time);
 
-        $this->info('Original Event: ' . $event->start_date->format('Y-m-d') . ' @ ' . $event->start_time);
+      foreach ($matches as $row) {
+        $row->category_id = (int) $row->category_id;
+        $otherDate        = $row->start_date->format('l, F jS');
 
-        foreach($find as $row) {
-          $row->category_id = (int) $row->category_id;
+        foreach ($checkFields as $field) {
+          $eventValue = $field === 'short_description'
+            ? str_replace($origDate, $otherDate, $event->$field)
+            : $event->$field;
 
-          $otherDate = $row->start_date->format('l, F jS');
-
-          foreach($checkFields as $field) {
-            if ($field === 'short_description') {
-              $eventValue = str_replace($origDate, $otherDate, $event->$field);
-            } else {
-              $eventValue = $event->$field;
-            }
-
-            if ($eventValue !== $row->$field) {
-              $this->error('Different info for field `' . $field . '`');
-              $this->error('Original: `' . $eventValue . '`');
-              $this->error('Other: `' . $row->$field . '`');
-
-              //
-            }
+          if ($eventValue !== $row->$field) {
+            $this->error('Different info for field `' . $field . '`');
+            $this->error('Original: `' . $eventValue . '`');
+            $this->error('Other: `' . $row->$field . '`');
           }
-
-          $this->info('Recurring Event: ' . $row->start_date->format('Y-m-d') . ' @ ' . $row->start_time);
         }
 
-        $this->info('---');
-      } else {
-        $this->info('No other events found with name `' . $event->name . '` for location `' . $location->name . '`');
+        $this->info('Recurring Event: ' . $row->start_date->format('Y-m-d') . ' @ ' . $row->start_time);
       }
+
+      $this->info('---');
     }
   }
 
@@ -1033,7 +772,6 @@ class DevCommand extends Command
         $this->info($event->id . ' --- ' . $newValue . ' (' . $oldValue . ')');
 
         $event->name = $newValue;
-
         $event->save();
       }
     }
@@ -1041,43 +779,28 @@ class DevCommand extends Command
 
   public function updateMusicBandImages()
   {
-    // $bands = MusicBand::whereNotNull('spotify_json')->with([ 'events' ])->get();
-    $bands = MusicBand::whereNotNull('spotify_json')->where('id', 1473)->with([ 'events' ])->get();
+    $bands = MusicBand::whereNotNull('spotify_json')->with(['events'])->get();
 
     foreach ($bands as $band) {
-      // $event = Event::find(2600);
-      // $event->searchable();
-      // $event->getFirstBandWithImage();
-
-      dd($band->photo_url);
+      if (!isset($band->spotify_json['images'][0]['url'])) {
+        $this->info('No Spotify image for band `' . $band->name . '`, skipping.');
+        continue;
+      }
 
       if ($band->getMedia('bands')->count()) {
         $band->getMedia('bands')->first()->delete();
       }
 
       $imageUrl = $band->spotify_json['images'][0]['url'];
-
-      // get image contents
       $contents = file_get_contents($imageUrl);
+      $info     = pathinfo($imageUrl);
+      $extension = !empty($info['extension']) ? $info['extension'] : 'jpeg';
 
-      // get image info
-      $info = pathinfo($imageUrl);
+      $filename = $band->id . '-' . $band->slug . '.' . $extension;
+      $tmpPath  = storage_path('app') . '/' . $filename;
 
-      // set filename & path
-      if (!empty($info['extension'])) {
-        $extension = $info['extension'];
-      } else {
-        $extension = '.jpeg';
-      }
-
-      $filename = $band->id . '-' . $band->slug;
-      $filename = $filename . $extension;
-      $tmpPath = storage_path('app') . '/' . $filename;
-
-      // store locally for a moment
       Storage::disk('local')->put($filename, $contents);
 
-      // then add the url
       $band->addMedia($tmpPath)->toMediaCollection('bands');
 
       $this->info('Image updated for band `' . $band->name . '`');
