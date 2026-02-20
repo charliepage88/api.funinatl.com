@@ -144,15 +144,9 @@ class Location extends Model implements HasMedia
     */
     public function getPhotoUrlAttribute()
     {
-        $photos = $this->getMedia('locations');
+        $photo = $this->getMedia('locations')->sortByDesc('id')->first();
 
-        if ($photos->count()) {
-            $photo = config('filesystems.disks.spaces.url') . '/' . $photos->first()->getPath();
-        } else {
-            $photo = null;
-        }
-
-        return $photo;
+        return $photo ? config('filesystems.disks.spaces.url') . '/' . $photo->getPath() : null;
     }
 
     /**
@@ -162,15 +156,9 @@ class Location extends Model implements HasMedia
     */
     public function getThumbSmallUrlAttribute()
     {
-        $photos = $this->getMedia('locations');
+        $photo = $this->getMedia('locations')->sortByDesc('id')->first();
 
-        if ($photos->count()) {
-            $photo = config('filesystems.disks.spaces.url') . '/' . $photos->first()->getPath('thumb_small');
-        } else {
-            $photo = null;
-        }
-
-        return $photo;
+        return $photo ? config('filesystems.disks.spaces.url') . '/' . $photo->getPath('thumb_small') : null;
     }
 
     /**
@@ -180,15 +168,9 @@ class Location extends Model implements HasMedia
     */
     public function getThumbMediumUrlAttribute()
     {
-        $photos = $this->getMedia('locations');
+        $photo = $this->getMedia('locations')->sortByDesc('id')->first();
 
-        if ($photos->count()) {
-            $photo = config('filesystems.disks.spaces.url') . '/' . $photos->first()->getPath('thumb_medium');
-        } else {
-            $photo = null;
-        }
-
-        return $photo;
+        return $photo ? config('filesystems.disks.spaces.url') . '/' . $photo->getPath('thumb_medium') : null;
     }
 
     /**
