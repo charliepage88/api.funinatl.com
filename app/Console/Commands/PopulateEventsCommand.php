@@ -60,7 +60,7 @@ class PopulateEventsCommand extends Command
         $this->today = Carbon::today()->startOfDay();
 
         $providers = Provider::isActive()
-            >where('last_scraped', '<=', $this->today->format('Y-m-d H:i:s'))
+            ->where('last_scraped', '<=', $this->today->format('Y-m-d H:i:s'))
             // ->whereIn('id', [
             //     1, // Bad Earl
             //     2, // Northside Tavern
