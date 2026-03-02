@@ -1596,11 +1596,8 @@ class PopulateEventsCommand extends Command
                     }
 
                     // second fallback: any $ amount in the plain excerpt text
-                    if (empty($price) && preg_match('/\$\d+(?:\.\d{2})?/u', $excerptPlain, $pm)) {
-                        // grab from the $ to the next newline or end
-                        if (preg_match('/(\$[\d.]+[^\n<]*)/u', $excerptPlain, $pm2)) {
-                            $price = trim($pm2[1]);
-                        }
+                    if (empty($price) && preg_match('/(\$\d+(?:\.\d{2})?(?:\s*[-–—]\s*\$\d+(?:\.\d{2})?)?)/u', $excerptPlain, $pm2)) {
+                        $price = trim($pm2[1]);
                     }
 
                     if (empty($price)) {
