@@ -97,7 +97,11 @@ class PopulateEventsCommand extends Command
                 // call method
                 $this->info('Starting scraper for `' . $name . '`');
 
-                $events = $this->$methodName($provider, $scraper, $spotify);
+                try {
+                    $events = $this->$methodName($provider, $scraper, $spotify);
+                } catch (\Exception $e) {
+                    $this->error('Scraper `' . $name . '` failed: ' . $e->getMessage());
+                }
             } else {
                 $this->error('Cannot find method name `' . $methodName . '`');
             }
@@ -1947,19 +1951,51 @@ class PopulateEventsCommand extends Command
     */
     public function providerFoxTheatre(Provider $provider, $scraper, SpotifyWebAPI $spotify)
     {
+        // Origin (behind Fastly/Varnish) sporadically returns 406 to scraper-shaped
+        // requests on cache MISS. Retry with a fuller browser fingerprint.
         $client = new Guzzle([
-            'timeout' => 30,
+            'timeout'     => 30,
+            'http_errors' => false,
             'headers' => [
-                'User-Agent'      => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                'Accept'          => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-                'Accept-Language' => 'en-US,en;q=0.5',
+                'User-Agent'                => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept'                    => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+                'Accept-Language'           => 'en-US,en;q=0.9',
+                'Accept-Encoding'           => 'gzip, deflate, br',
+                'Cache-Control'             => 'no-cache',
+                'Pragma'                    => 'no-cache',
+                'Sec-Ch-Ua'                 => '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+                'Sec-Ch-Ua-Mobile'          => '?0',
+                'Sec-Ch-Ua-Platform'        => '"Windows"',
+                'Sec-Fetch-Dest'            => 'document',
+                'Sec-Fetch-Mode'            => 'navigate',
+                'Sec-Fetch-Site'            => 'none',
+                'Sec-Fetch-User'            => '?1',
+                'Upgrade-Insecure-Requests' => '1',
             ],
         ]);
 
         $today    = Carbon::now('America/New_York');
-        $response = $client->get($provider->scrape_url);
-        $html     = (string) $response->getBody();
-        $crawler  = new Crawler($html);
+        $response = null;
+        $attempts = 3;
+        for ($i = 1; $i <= $attempts; $i++) {
+            $response = $client->get($provider->scrape_url);
+            $status   = $response->getStatusCode();
+            if ($status === 200) {
+                break;
+            }
+            $this->warn('Fox Theatre: HTTP ' . $status . ' on attempt ' . $i . '/' . $attempts);
+            if ($i < $attempts) {
+                sleep($i * 2);
+            }
+        }
+
+        if (!$response || $response->getStatusCode() !== 200) {
+            $this->error('Fox Theatre: giving up after ' . $attempts . ' attempts (last status ' . ($response ? $response->getStatusCode() : 'none') . ')');
+            return [];
+        }
+
+        $html    = (string) $response->getBody();
+        $crawler = new Crawler($html);
 
         $events = [];
 
